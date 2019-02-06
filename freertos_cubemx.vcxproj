@@ -1,0 +1,297 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|VisualGDB">
+      <Configuration>Debug</Configuration>
+      <Platform>VisualGDB</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|VisualGDB">
+      <Configuration>Release</Configuration>
+      <Platform>VisualGDB</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}</ProjectGuid>
+    <BSP_ID>com.sysprogs.arm.stm32</BSP_ID>
+    <BSP_VERSION>2018.12</BSP_VERSION>
+    <InPlaceBSPSubdir />
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <MCUPropertyListFile>$(ProjectDir)stm32.props</MCUPropertyListFile>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <MCUPropertyListFile>$(ProjectDir)stm32.props</MCUPropertyListFile>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <GNUConfigurationType>Debug</GNUConfigurationType>
+    <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
+    <ToolchainVersion>7.2.0/8.0.1/r3</ToolchainVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <ToolchainID>com.visualgdb.arm-eabi</ToolchainID>
+    <ToolchainVersion>7.2.0/8.0.1/r3</ToolchainVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|VisualGDB'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>Inc;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Src;Middlewares\Third_Party\FreeRTOS\Source\include;Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;Drivers/CMSIS/Include;Middlewares/Third_Party/STemWin/config/inc;Middlewares/Third_Party/STemWin/lib/inc;=;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>flash_layout;STM32F103xE;USE_FREERTOS;DEBUG=1;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions />
+      <CLanguageStandard />
+      <CPPLanguageStandard />
+    </ClCompile>
+    <Link>
+      <LibrarySearchDirectories>;%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
+      <AdditionalLibraryNames>;%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
+      <AdditionalLinkerInputs>;%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
+      <AdditionalOptions />
+      <LinkerScript />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|VisualGDB'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>Inc;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Src;Middlewares\Third_Party\FreeRTOS\Source\include;Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>flash_layout;STM32F103xE;USE_FREERTOS;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions />
+      <CLanguageStandard />
+      <CPPLanguageStandard />
+    </ClCompile>
+    <Link>
+      <LibrarySearchDirectories>%(Link.LibrarySearchDirectories)</LibrarySearchDirectories>
+      <AdditionalLibraryNames>%(Link.AdditionalLibraryNames)</AdditionalLibraryNames>
+      <AdditionalLinkerInputs>%(Link.AdditionalLinkerInputs)</AdditionalLinkerInputs>
+      <AdditionalOptions />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Library Include="Middlewares\Third_Party\STemWin\lib\STemWin532_CM3_OS_GCC.a" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\GUIConf.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\GUIDRV_Template.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\LCDConf.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\LineSetup.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\LineSetupPulse.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\localTimeSetupMenu.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\mainMenu.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\Password.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\TimeCalibrate.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\TimeDateSetup.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\TimeSetup.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\TimeSumWinSetup.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\WindowDLG.c" />
+    <ClCompile Include="Middlewares\Third_Party\STemWin\lib\src\GUI_X_OS.c" />
+    <ClCompile Include="Src\Arial16.c" />
+    <ClCompile Include="Src\Arial18.c" />
+    <ClCompile Include="Src\arrow.c" />
+    <ClCompile Include="Src\button76x76Skin.c" />
+    <ClCompile Include="Src\callbacks.c" />
+    <ClCompile Include="Src\Digital-7 Mono70.c" />
+    <ClCompile Include="Src\Digital-747.c" />
+    <ClCompile Include="Src\freertos.c" />
+    <ClCompile Include="Src\guivars.c" />
+    <ClCompile Include="Src\lcdcmd.c" />
+    <ClCompile Include="Src\skinning.c" />
+    <ClCompile Include="Src\sram.c" />
+    <ClCompile Include="Src\stm32f1xx_it.c" />
+    <ClCompile Include="Src\stm32f1xx_hal_msp.c" />
+    <ClCompile Include="Src\stm32f1xx_hal_timebase_tim.c" />
+    <ClCompile Include="Src\main.c" />
+    <ClCompile Include="Drivers\CMSIS\Device\ST\STM32F1xx\Source\Templates\system_stm32f1xx.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_rtc.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_rtc_ex.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_pwr.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_sram.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_spi.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_spi_ex.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_flash.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_flash_ex.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_gpio.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\croutine.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\event_groups.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\list.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\queue.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\tasks.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\timers.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c" />
+    <ClCompile Include="Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3\port.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_rcc.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_rcc_ex.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_crc.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_cortex.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_tim.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_tim_ex.c" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_dma.c" />
+    <ClCompile Include="Src\touch.c" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\BUTTON.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\BUTTON_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\CALENDAR.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\CHECKBOX.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\CHECKBOX_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\CHOOSECOLOR.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\CHOOSEFILE.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\DIALOG.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\DIALOG_Intern.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\DROPDOWN.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\DROPDOWN_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\EDIT.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\EDIT_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\FRAMEWIN.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\FRAMEWIN_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\Global.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GRAPH.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GRAPH_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_DCache.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_DCache_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_Dist.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_FlexColor.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_FlexColor_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_Lin.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_Lin_Opt_16.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_Lin_Opt_24.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_Lin_Opt_32.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_Lin_Opt_8.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_Lin_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_NoOpt_1_8.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_Template.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_TemplateI.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIDRV_TemplateI_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUIMTDRV_TangoC32.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUITDRV_ADS7846.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_ARRAY.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_ARRAY_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_BMP_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_ConfDefaults.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_Debug.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_FontIntern.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_GIF_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_HOOK.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_JPEG_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_SetOrientation.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_SetOrientationCX.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_SIM_Win32.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_SPRITE_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_Type.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_Version.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\GUI_VNC.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\HEADER.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\HEADER_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\ICONVIEW.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\ICONVIEW_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\IMAGE.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\IMAGE_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\KNOB.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\KNOB_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LCD.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LCD_ConfDefaults.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LCD_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LCD_Protected.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LCD_SIM.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LISTBOX.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LISTBOX_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LISTVIEW.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LISTVIEW_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LISTWHEEL.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\LISTWHEEL_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\MENU.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\MENU_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\MESSAGEBOX.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\MULTIEDIT.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\MULTIPAGE.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\MULTIPAGE_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\PROGBAR.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\PROGBAR_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\RADIO.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\RADIO_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\SCROLLBAR.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\SCROLLBAR_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\SLIDER.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\SLIDER_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\SPINBOX.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\SPINBOX_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\SWIPELIST.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\SWIPELIST_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\TEXT.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\TEXT_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\TREEVIEW.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\TREEVIEW_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WIDGET.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WINDOW_Private.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WM.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WM_GUI.h" />
+    <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WM_Intern.h" />
+    <None Include="stm32.props" />
+    <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\StartupFiles\startup_stm32f103xe.c" />
+    <ClInclude Include="Inc\arial18.h" />
+    <ClInclude Include="Inc\arrow.h" />
+    <ClInclude Include="Inc\button76x76Skin.h" />
+    <ClInclude Include="Inc\callbacks.h" />
+    <ClInclude Include="Inc\FreeRTOSConfig.h" />
+    <ClInclude Include="Inc\guivars.h" />
+    <ClInclude Include="Inc\lcdcmd.h" />
+    <ClInclude Include="Inc\skinning.h" />
+    <ClInclude Include="Inc\sram.h" />
+    <ClInclude Include="Inc\stm32f1xx_it.h" />
+    <ClInclude Include="Inc\stm32f1xx_hal_conf.h" />
+    <ClInclude Include="Inc\main.h" />
+    <ClInclude Include="Drivers\CMSIS\Device\ST\STM32F1xx\Include\stm32f1xx.h" />
+    <ClInclude Include="Drivers\CMSIS\Device\ST\STM32F1xx\Include\system_stm32f1xx.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_def.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rtc.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rtc_ex.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_pwr.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_sram.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_spi.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_flash.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_flash_ex.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_gpio.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_gpio_ex.h" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_gpio_ex.c" />
+    <ClInclude Include="Inc\touch.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\croutine.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\deprecated_definitions.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\event_groups.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\FreeRTOS.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\list.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\mpu_prototypes.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\mpu_wrappers.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\portable.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\projdefs.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\queue.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\semphr.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\StackMacros.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\task.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\include\timers.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.h" />
+    <ClInclude Include="Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3\portmacro.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_rcc_ex.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_crc.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_cortex.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_tim.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_tim_ex.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_dma_ex.h" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_dma.h" />
+    <None Include="freertos_cubemx-Debug.vgdbsettings" />
+    <None Include="freertos_cubemx-Release.vgdbsettings" />
+    <None Include="stm32.xml" />
+  </ItemGroup>
+</Project>

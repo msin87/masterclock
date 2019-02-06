@@ -1,0 +1,10 @@
+freertos_cubemx\arrow.o: ..\Src\arrow.c
+freertos_cubemx\arrow.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+freertos_cubemx\arrow.o: ../Inc/arrow.h
+freertos_cubemx\arrow.o: ..\Middlewares\Third_Party\STemWin\lib\inc\GUI.h
+freertos_cubemx\arrow.o: ..\Middlewares\Third_Party\STemWin\lib\inc\GUI_ConfDefaults.h
+freertos_cubemx\arrow.o: ..\Middlewares\Third_Party\STemWin\config\inc\GUIConf.h
+freertos_cubemx\arrow.o: ..\Middlewares\Third_Party\STemWin\lib\inc\GUI_Type.h
+freertos_cubemx\arrow.o: ..\Middlewares\Third_Party\STemWin\lib\inc\LCD.h
+freertos_cubemx\arrow.o: ..\Middlewares\Third_Party\STemWin\lib\inc\Global.h
+freertos_cubemx\arrow.o: ..\Middlewares\Third_Party\STemWin\lib\inc\GUI_Version.h
