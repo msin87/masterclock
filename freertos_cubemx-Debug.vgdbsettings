@@ -46,6 +46,8 @@
   <ImportedPropertySheets />
   <CodeSense>
     <Enabled>Unknown</Enabled>
+    <CFLAGS>-Wno-invalid-source-encoding</CFLAGS>
+    <CXXFLAGS>-Wno-invalid-source-encoding</CXXFLAGS>
     <ExtraSettings>
       <HideErrorsInSystemHeaders>true</HideErrorsInSystemHeaders>
       <SupportLightweightReferenceAnalysis>true</SupportLightweightReferenceAnalysis>

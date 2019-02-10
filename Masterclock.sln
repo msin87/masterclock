@@ -8,13 +8,39 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|VisualGDB = Debug|VisualGDB
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		EmuDebug|VisualGDB = EmuDebug|VisualGDB
+		EmuDebug|x64 = EmuDebug|x64
+		EmuDebug|x86 = EmuDebug|x86
+		EmuRelease|VisualGDB = EmuRelease|VisualGDB
+		EmuRelease|x64 = EmuRelease|x64
+		EmuRelease|x86 = EmuRelease|x86
 		Release|VisualGDB = Release|VisualGDB
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.Debug|VisualGDB.ActiveCfg = Debug|VisualGDB
 		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.Debug|VisualGDB.Build.0 = Debug|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.Debug|x64.ActiveCfg = Debug|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.Debug|x86.ActiveCfg = Debug|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuDebug|VisualGDB.ActiveCfg = Debug|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuDebug|VisualGDB.Build.0 = Debug|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuDebug|x64.ActiveCfg = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuDebug|x64.Build.0 = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuDebug|x86.ActiveCfg = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuDebug|x86.Build.0 = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuRelease|VisualGDB.ActiveCfg = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuRelease|VisualGDB.Build.0 = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuRelease|x64.ActiveCfg = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuRelease|x64.Build.0 = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuRelease|x86.ActiveCfg = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.EmuRelease|x86.Build.0 = Release|VisualGDB
 		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.Release|VisualGDB.ActiveCfg = Release|VisualGDB
 		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.Release|VisualGDB.Build.0 = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.Release|x64.ActiveCfg = Release|VisualGDB
+		{3519B0DC-713A-4C5A-8D05-BF8F468A98C5}.Release|x86.ActiveCfg = Release|VisualGDB
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

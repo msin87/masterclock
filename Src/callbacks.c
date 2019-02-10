@@ -177,10 +177,10 @@ int _DrawSkin_BUTTON_WORDWRAP(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		// Set font 
 		GUI_SetFont(pFont);
 		// If the button is enabled 
-		if (WM_IsEnabled(pDrawItemInfo->hWin))
+		if(WM_IsEnabled(pDrawItemInfo->hWin))
 		{
 			// Set color for pressed / unpressed state
-			if (BUTTON_IsPressed(pDrawItemInfo->hWin))
+			if(BUTTON_IsPressed(pDrawItemInfo->hWin))
 				GUI_SetColor(TextColor_Pressed);
 			else
 				GUI_SetColor(TextColor_Unpressed);
@@ -243,7 +243,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 
 
 	   //;//µ?µ??«????µ??µ
-	for (pos = 0; pos < fontsize*charinfo.BytesPerLine; pos++)
+	for(pos = 0 ; pos < fontsize*charinfo.BytesPerLine ; pos++)
 	{
 		mask = 0x80;
 		for (t = 0; t < xlimit; t++)
@@ -260,7 +260,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7); //°??«  
+				Lcd_Write_Data(0x49E7);     //°??«  
 
 			}
 			mask >>= 1;
@@ -313,18 +313,18 @@ void TFT_LineSetupShowString(uint16_t x, uint16_t y, char *p, uint8_t fontsize, 
 unsigned char isDaylightSavingTimeUS(unsigned char day, unsigned char month, unsigned char dow)
 {
 	//January, february, and december are out.
-	if (month < 3 || month > 11)
+	if(month < 3 || month > 11)
 	{
 		return false;
 	}
 	//April to October are in
-	if (month > 3 && month < 11)
+	if(month > 3 && month < 11)
 	{
 		return true;
 	}
 	int previousSunday = day - dow;
 	//In march, we are DST if our previous sunday was on or after the 8th.
-	if (month == 3) { return previousSunday >= 8; }
+	if(month == 3) { return previousSunday >= 8; }
 	//In november we must be before the first sunday to be dst.
 	//That means the previous sunday must be before the 1st.
 	return previousSunday <= 0;
@@ -348,9 +348,9 @@ void rtc_write_backup_reg(uint16_t BackupRegister, uint16_t data)
 	RtcHandle.Instance = RTC;
 	HAL_PWR_EnableBkUpAccess();
 	HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
-	bkpCRC = calcCRCofBKP(); //рассчет новой CRC для регистров BKP
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16); //запись старших 16 бит CRC (Маска 0xFFFF0000)
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF); //запись младших 16 бит CRC
+	bkpCRC = calcCRCofBKP();     //рассчет новой CRC для регистров BKP
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);     //запись старших 16 бит CRC (Маска 0xFFFF0000)
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);     //запись младших 16 бит CRC
 
 
 }
@@ -362,14 +362,14 @@ uint16_t rtc_read_backup_reg(uint16_t BackupRegister)
 }
 uint32_t calcCRCofBKP(void)
 {
-	uint32_t dataInBKP[4] = { 0,0,0,0 };
-	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);  //date
-	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET); //line 1
-	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);  //line 2 
-	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET); //line 3
-	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);  //line 4
-	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET); //daylightsaving
-	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET); //daylightsaving
+	uint32_t dataInBKP[4] = { 0, 0, 0, 0 };
+	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);      //date
+	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);     //line 1
+	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);      //line 2 
+	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);     //line 3
+	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);      //line 4
+	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);     //daylightsaving
+	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);     //daylightsaving
 	CRC->CR |= CRC_CR_RESET;
 	CRC->DR = dataInBKP[0];
 	CRC->DR = dataInBKP[1];
@@ -379,7 +379,7 @@ uint32_t calcCRCofBKP(void)
 }
 uint32_t calkCRCofFlash(void)
 {
-	uint32_t dataInFLASH[6] = { 0,0,0,0,0,0 };
+	uint32_t dataInFLASH[6] = { 0, 0, 0, 0, 0, 0 };
 	dataInFLASH[0] = flash_read(FLASH_CALIA_OFFSET);
 	dataInFLASH[1] = flash_read(FLASH_CALIB_OFFSET);
 	dataInFLASH[2] = flash_read(FLASH_CALIC_OFFSET);
@@ -470,12 +470,12 @@ void saveDaylightSavingToBKP(void)
 	}
 	else
 	{
-		dataToBKP = (~(daylightSaving.timeZone)) & 0xFF; //если отрицательное, то инверсия и флаг отрицательного.
+		dataToBKP = (~(daylightSaving.timeZone)) & 0xFF;     //если отрицательное, то инверсия и флаг отрицательного.
 		dataToBKP |= 0b10000;
 	}
 	if (daylightSaving.timeShift < 0)
 	{
-		dataToBKP |= (0b10 << 5); //отрицательный флаг для timeShift
+		dataToBKP |= (0b10 << 5);     //отрицательный флаг для timeShift
 	}
 	else
 	{
@@ -491,18 +491,18 @@ void readDaylightSavingFromBKP(void)
 {
 	uint16_t dataInBKP = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
 	if (dataInBKP & 0b10000) //если флаг отрицательного числа
-	{
-		daylightSaving.timeZone = (char)(~(dataInBKP & 0b1111));
-	}
+		{
+			daylightSaving.timeZone = (char)(~(dataInBKP & 0b1111));
+		}
 	else
 	{
 		daylightSaving.timeZone = (char)(dataInBKP & 0b1111);
 	}
 	if (dataInBKP & 0b1000000) //если отрицательный флаг
-	{
-		daylightSaving.timeShift = -1;
+		{
+			daylightSaving.timeShift = -1;
 
-	}
+		}
 	else
 	{
 		daylightSaving.timeShift = (dataInBKP >> 5) & 0b11;
@@ -526,23 +526,23 @@ uint8_t increaseDay(RTC_DateTypeDef* Date)
 		}
 	}
 	else if (Date->Month == 2) //Если февраль
-	{
-		if ((Date->Year % 400 == 0 || (Date->Year % 4 == 0 && Date->Year % 100 != 0))) //Если високосный год
 		{
-			if (Date->Date != 29)
-			{
-				Date->Date++;
-			}
-		}
-		else
+			if ((Date->Year % 400 == 0 || (Date->Year % 4 == 0 && Date->Year % 100 != 0))) //Если високосный год
+				{
+					if (Date->Date != 29)
+					{
+						Date->Date++;
+					}
+				}
+			else
 
-		{
-			if (Date->Date != 28)
 			{
-				Date->Date++;
+				if (Date->Date != 28)
+				{
+					Date->Date++;
+				}
 			}
 		}
-	}
 }
 uint8_t getLastDayOfMonth(RTC_DateTypeDef* Date)
 {
@@ -555,17 +555,17 @@ uint8_t getLastDayOfMonth(RTC_DateTypeDef* Date)
 		return 30;
 	}
 	else if (Date->Month == 2) //Если февраль
-	{
-		if ((Date->Year % 400 == 0 || (Date->Year % 4 == 0 && Date->Year % 100 != 0))) //Если високосный год
 		{
-			return 29;
-		}
-		else
+			if ((Date->Year % 400 == 0 || (Date->Year % 4 == 0 && Date->Year % 100 != 0))) //Если високосный год
+				{
+					return 29;
+				}
+			else
 
-		{
-			return 28;
+			{
+				return 28;
+			}
 		}
-	}
 }
 void correctDate(RTC_DateTypeDef* Date)
 {
@@ -593,30 +593,30 @@ void correctDate(RTC_DateTypeDef* Date)
 			}
 		}
 		else if (Date->Month == 2) //Если февраль
-		{
-			if ((Date->Year % 400 == 0 || (Date->Year % 4 == 0 && Date->Year % 100 != 0))) //Если високосный год
 			{
-				if (Date->Date > 29)
+				if ((Date->Year % 400 == 0 || (Date->Year % 4 == 0 && Date->Year % 100 != 0))) //Если високосный год
+					{
+						if (Date->Date > 29)
+						{
+							Date->Date = 29;
+							sprintf(outString, "%02d", Date->Date);
+							HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, outString);
+							HEADER_SetTextColor(handles.hHeaderTimeDateSetupVals, GUI_WHITE);
+						}
+					}
+				else
+
 				{
-					Date->Date = 29;
-					sprintf(outString, "%02d", Date->Date);
-					HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, outString);
-					HEADER_SetTextColor(handles.hHeaderTimeDateSetupVals, GUI_WHITE);
+					if (Date->Date > 28)
+					{
+						Date->Date = 28;
+						sprintf(outString, "%02d", Date->Date);
+						HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, outString);
+						HEADER_SetTextColor(handles.hHeaderTimeDateSetupVals, GUI_WHITE);
+
+					}
 				}
 			}
-			else
-
-			{
-				if (Date->Date > 28)
-				{
-					Date->Date = 28;
-					sprintf(outString, "%02d", Date->Date);
-					HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, outString);
-					HEADER_SetTextColor(handles.hHeaderTimeDateSetupVals, GUI_WHITE);
-
-				}
-			}
-		}
 	}
 }
 void flash_unlock(void) {
@@ -631,27 +631,59 @@ uint8_t flash_ready(void) {
 }
 
 void flash_write(uint32_t address, uint32_t data) {
-	FLASH->CR |= FLASH_CR_PG; //Разрешаем программирование флеша
-	while (!flash_ready()); //Ожидаем готовности флеша к записи
-	*(__IO uint16_t*)address = (uint16_t)data; //Пишем младшие 2 бата
-	while (!flash_ready());
+	FLASH->CR |= FLASH_CR_PG;     //Разрешаем программирование флеша
+	while(!flash_ready());     //Ожидаем готовности флеша к записи
+	*(__IO uint16_t*)address = (uint16_t)data;     //Пишем младшие 2 бата
+	while(!flash_ready());
 	address += 2;
 	data >>= 16;
-	*(__IO uint16_t*)address = (uint16_t)data; //Пишем старшие 2 байта
-	while (!flash_ready());
-	FLASH->CR &= ~(FLASH_CR_PG); //Запрещаем программирование флеша
+	*(__IO uint16_t*)address = (uint16_t)data;     //Пишем старшие 2 байта
+	while(!flash_ready());
+	FLASH->CR &= ~(FLASH_CR_PG);     //Запрещаем программирование флеша
 }
 
 void flash_erase_page(uint32_t address) {
-	FLASH->CR |= FLASH_CR_PER; //Устанавливаем бит стирания одной страницы
-	FLASH->AR = address; // Задаем её адрес
-	FLASH->CR |= FLASH_CR_STRT; // Запускаем стирание 
-	while (!flash_ready())
-		;  //Ждем пока страница сотрется. 
-	FLASH->CR &= ~FLASH_CR_PER; //Сбрасываем бит обратно
+	FLASH->CR |= FLASH_CR_PER;     //Устанавливаем бит стирания одной страницы
+	FLASH->AR = address;     // Задаем её адрес
+	FLASH->CR |= FLASH_CR_STRT;     // Запускаем стирание 
+	while(!flash_ready())
+		;      //Ждем пока страница сотрется. 
+	FLASH->CR &= ~FLASH_CR_PER;     //Сбрасываем бит обратно
 }
 uint32_t flash_read(uint32_t address) {
 	return (*(__IO uint32_t*) address);
+}
+int LinesTimeOnStartup(Lines* lineToCheck)
+{
+	int diff_Min = 0;
+	float period_Sec = 0;
+	diff_Min = ((sTime.Hours / 2)*sTime.Minutes) - (lineToCheck->Hours / 2)*lineToCheck->Minutes;
+	period_Sec = (0.375*lineToCheck->Width)*diff_Min;
+	//ДОКУРИТЬ АЛГОРИТМ ДЛЯ 12ч табло!!! Пора спать и если бы не... 
+	//sTime=12:00, Line=10:00. 
+	//-10часов. -10ч*60=-600мин. При width = 0.5сек, потребуется 300сек или 5 минут.
+	if(diff_Min >= 0)
+	{
+		if (period_Sec > 1200)
+		{
+			return diff_Min;
+		}
+		else
+		{
+			return -diff_Min;
+		}
+	}
+	else
+	{
+		if (period_Sec > 1200)
+		{
+			return diff_Min;
+		}
+		else
+		{
+			return -diff_Min;
+		}
+	}
 }
 void pollButton(uint16_t id, uint8_t action, int8_t* val)
 {
@@ -721,7 +753,7 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			gui_Vars.valsChanged = true;
 			break;
 			//vv TIMESETUP vv
-		case ID_BUTTON_HOURplus:
+		case ID_BUTTON_HOURplus :
 			longPressCNT.direction = 1;
 			longPressCNT.upperLimit = 23;
 			longPressCNT.itCNT = 0;

@@ -47,9 +47,9 @@
   *
   ******************************************************************************
   */
-  /* USER CODE END Header */
+/* USER CODE END Header */
 
-  /* Define to prevent recursive inclusion -------------------------------------*/
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
 #define __MAIN_H
 
@@ -60,29 +60,29 @@ extern "C" {
 	/* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+	/* Private includes ----------------------------------------------------------*/
+	/* USER CODE BEGIN Includes */
 #include "touch.h"
 #include "sram.h"
 
-/* USER CODE END Includes */
+	/* USER CODE END Includes */
 
-/* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
+	/* Exported types ------------------------------------------------------------*/
+	/* USER CODE BEGIN ET */
+	SemaphoreHandle_t xSemaphoreOutput;
+	/* USER CODE END ET */
 
-/* USER CODE END ET */
+	/* Exported constants --------------------------------------------------------*/
+	/* USER CODE BEGIN EC */
 
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
+	/* USER CODE END EC */
 
-/* USER CODE END EC */
+	/* Exported macro ------------------------------------------------------------*/
+	/* USER CODE BEGIN EM */
 
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
+	/* USER CODE END EM */
 
-/* USER CODE END EM */
-
-/* Exported functions prototypes ---------------------------------------------*/
+	/* Exported functions prototypes ---------------------------------------------*/
 	void Error_Handler(void);
 
 	/* USER CODE BEGIN EFP */
@@ -90,6 +90,20 @@ extern "C" {
 	/* USER CODE END EFP */
 
 	/* Private defines -----------------------------------------------------------*/
+#define OUTPUT_LINE1_Pin GPIO_PIN_0
+#define OUTPUT_LINE1_GPIO_Port GPIOC
+#define OUTPUT_LINE2_Pin GPIO_PIN_1
+#define OUTPUT_LINE2_GPIO_Port GPIOC
+#define OUTPUT_LINE3_Pin GPIO_PIN_2
+#define OUTPUT_LINE3_GPIO_Port GPIOC
+#define OUTPUT_LINE4_Pin GPIO_PIN_3
+#define OUTPUT_LINE4_GPIO_Port GPIOC
+#define Isense_Pin GPIO_PIN_0
+#define Isense_GPIO_Port GPIOA
+#define DTMF_SIGNAL_IN_Pin GPIO_PIN_1
+#define DTMF_SIGNAL_IN_GPIO_Port GPIOA
+#define PS_Monitor_Pin GPIO_PIN_2
+#define PS_Monitor_GPIO_Port GPIOA
 #define SRAM_CS_Pin GPIO_PIN_4
 #define SRAM_CS_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_6
@@ -100,12 +114,12 @@ extern "C" {
 #define TOUCH_CS_GPIO_Port GPIOB
 #define LCD_RESET_Pin GPIO_PIN_1
 #define LCD_RESET_GPIO_Port GPIOE
-/* USER CODE BEGIN Private defines */
+	/* USER CODE BEGIN Private defines */
 #define LINE_STATUS_OFF  0
 #define LINE_STATUS_RUN  1
 #define LINE_STATUS_STOP 2
 
-/* USER CODE END Private defines */
+	/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }
