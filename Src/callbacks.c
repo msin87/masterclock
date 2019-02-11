@@ -260,7 +260,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7);     //°??«  
+				Lcd_Write_Data(0x49E7);          //°??«  
 
 			}
 			mask >>= 1;
@@ -348,9 +348,9 @@ void rtc_write_backup_reg(uint16_t BackupRegister, uint16_t data)
 	RtcHandle.Instance = RTC;
 	HAL_PWR_EnableBkUpAccess();
 	HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
-	bkpCRC = calcCRCofBKP();     //рассчет новой CRC для регистров BKP
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);     //запись старших 16 бит CRC (Маска 0xFFFF0000)
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);     //запись младших 16 бит CRC
+	bkpCRC = calcCRCofBKP();          //рассчет новой CRC для регистров BKP
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);          //запись старших 16 бит CRC (Маска 0xFFFF0000)
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);          //запись младших 16 бит CRC
 
 
 }
@@ -363,13 +363,13 @@ uint16_t rtc_read_backup_reg(uint16_t BackupRegister)
 uint32_t calcCRCofBKP(void)
 {
 	uint32_t dataInBKP[4] = { 0, 0, 0, 0 };
-	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);      //date
-	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);     //line 1
-	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);      //line 2 
-	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);     //line 3
-	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);      //line 4
-	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);     //daylightsaving
-	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);     //daylightsaving
+	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);           //date
+	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);          //line 1
+	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);           //line 2 
+	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);          //line 3
+	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);           //line 4
+	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);          //daylightsaving
+	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);          //daylightsaving
 	CRC->CR |= CRC_CR_RESET;
 	CRC->DR = dataInBKP[0];
 	CRC->DR = dataInBKP[1];
@@ -470,12 +470,12 @@ void saveDaylightSavingToBKP(void)
 	}
 	else
 	{
-		dataToBKP = (~(daylightSaving.timeZone)) & 0xFF;     //если отрицательное, то инверсия и флаг отрицательного.
+		dataToBKP = (~(daylightSaving.timeZone)) & 0xFF;          //если отрицательное, то инверсия и флаг отрицательного.
 		dataToBKP |= 0b10000;
 	}
 	if (daylightSaving.timeShift < 0)
 	{
-		dataToBKP |= (0b10 << 5);     //отрицательный флаг для timeShift
+		dataToBKP |= (0b10 << 5);          //отрицательный флаг для timeShift
 	}
 	else
 	{
@@ -631,24 +631,24 @@ uint8_t flash_ready(void) {
 }
 
 void flash_write(uint32_t address, uint32_t data) {
-	FLASH->CR |= FLASH_CR_PG;     //Разрешаем программирование флеша
-	while(!flash_ready());     //Ожидаем готовности флеша к записи
-	*(__IO uint16_t*)address = (uint16_t)data;     //Пишем младшие 2 бата
+	FLASH->CR |= FLASH_CR_PG;          //Разрешаем программирование флеша
+	while(!flash_ready());          //Ожидаем готовности флеша к записи
+	*(__IO uint16_t*)address = (uint16_t)data;          //Пишем младшие 2 бата
 	while(!flash_ready());
 	address += 2;
 	data >>= 16;
-	*(__IO uint16_t*)address = (uint16_t)data;     //Пишем старшие 2 байта
+	*(__IO uint16_t*)address = (uint16_t)data;          //Пишем старшие 2 байта
 	while(!flash_ready());
-	FLASH->CR &= ~(FLASH_CR_PG);     //Запрещаем программирование флеша
+	FLASH->CR &= ~(FLASH_CR_PG);          //Запрещаем программирование флеша
 }
 
 void flash_erase_page(uint32_t address) {
-	FLASH->CR |= FLASH_CR_PER;     //Устанавливаем бит стирания одной страницы
-	FLASH->AR = address;     // Задаем её адрес
-	FLASH->CR |= FLASH_CR_STRT;     // Запускаем стирание 
+	FLASH->CR |= FLASH_CR_PER;          //Устанавливаем бит стирания одной страницы
+	FLASH->AR = address;          // Задаем её адрес
+	FLASH->CR |= FLASH_CR_STRT;          // Запускаем стирание 
 	while(!flash_ready())
-		;      //Ждем пока страница сотрется. 
-	FLASH->CR &= ~FLASH_CR_PER;     //Сбрасываем бит обратно
+		;           //Ждем пока страница сотрется. 
+	FLASH->CR &= ~FLASH_CR_PER;          //Сбрасываем бит обратно
 }
 uint32_t flash_read(uint32_t address) {
 	return (*(__IO uint32_t*) address);
@@ -656,450 +656,451 @@ uint32_t flash_read(uint32_t address) {
 int LinesTimeOnStartup(Lines* lineToCheck)
 {
 	int diff_Min = 0;
-	float period_Sec = 0;
-	diff_Min = ((sTime.Hours / 2)*sTime.Minutes) - (lineToCheck->Hours / 2)*lineToCheck->Minutes;
-	period_Sec = (0.375*lineToCheck->Width)*diff_Min;
-	//ДОКУРИТЬ АЛГОРИТМ ДЛЯ 12ч табло!!! Пора спать и если бы не... 
-	//sTime=12:00, Line=10:00. 
-	//-10часов. -10ч*60=-600мин. При width = 0.5сек, потребуется 300сек или 5 минут.
-	if(diff_Min >= 0)
+	int period_Min = 0;
+	uint8_t diff_Hour = 0;
+	uint8_t sHour12 = 0, lHour12 = 0;
+	
+	//возможные варианты времени:
+
+	//sTime.Hours		lineToCheck->Hours			
+	//		0,12				0,12				
+	//		0,12				0..12				
+	//		0,12				12..0				
+	//		0..12				0,12				
+	//		0..12				0..12				
+	//		0..12				12..0				
+	//		12..0				0,12				
+	//		12..0				0..12				
+	//		12..0				12..0				
+	//
+	//		
+	
+	
+	diff_Hour = sTime.Hours - lineToCheck->Hours;
+	if (diff_Hour < 0)
 	{
-		if (period_Sec > 1200)
-		{
-			return diff_Min;
-		}
-		else
-		{
-			return -diff_Min;
-		}
+		
 	}
-	else
+	
+	diff_Min = abs(sTime.Minutes - lineToCheck->Minutes);
+	diff_Min = diff_Min + diff_Hour * 60;
+	period_Min = ((0.375*lineToCheck->Width)*diff_Min) / 60;
+	if (period_Min >) }
+	void pollButton(uint16_t id, uint8_t action, int8_t* val)
 	{
-		if (period_Sec > 1200)
+		char str[5];
+		if (action == WM_NOTIFICATION_CLICKED)
 		{
-			return diff_Min;
-		}
-		else
-		{
-			return -diff_Min;
-		}
-	}
-}
-void pollButton(uint16_t id, uint8_t action, int8_t* val)
-{
-	char str[5];
-	if (action == WM_NOTIFICATION_CLICKED)
-	{
-		switch (id)
-		{
-		case ID_BUTTON_LINESETUP_Hminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Hminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_LINESETUP_Mminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Mminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_LINESETUP_Hplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 23;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Hplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_LINESETUP_Mplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 59;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Mplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-			//vv TIMESETUP vv
+			switch (id)
+			{
+			case ID_BUTTON_LINESETUP_Hminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Hminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_LINESETUP_Mminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
+				longPressCNT.headerItem = 1;
+				longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Mminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_LINESETUP_Hplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 23;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Hplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_LINESETUP_Mplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 59;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
+				longPressCNT.headerItem = 1;
+				longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Mplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+				//vv TIMESETUP vv
 		case ID_BUTTON_HOURplus :
 			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 23;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_HOURplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-			break;
-		case ID_BUTTON_MINplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 59;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_MINplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_SECplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 59;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_SECplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_HOURminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_HOURminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_MINminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_MINminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_SECminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_SECminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_LINESETUP_PULSE_MSECplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 15;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_HEADER_LINESETUP_PULSE_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%4d", longPressCNT.value * 200);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_LINESETUP_PULSE_MSECminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_HEADER_LINESETUP_PULSE_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%4d", longPressCNT.value * 200);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_SUMWINSETUP_Zplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 12;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_HEADER_SUMWINSETUP_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_Zplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			if (longPressCNT.value > 0)
-			{
-				sprintf(str, "+%d", longPressCNT.value);
-			}
-			else if (longPressCNT.value <= 0)
-			{
-				sprintf(str, "%d", longPressCNT.value);
-			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_SUMWINSETUP_Zminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = -12;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_HEADER_SUMWINSETUP_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_Zminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			if (longPressCNT.value > 0)
-			{
-				sprintf(str, "+%d", longPressCNT.value);
-			}
-			else if (longPressCNT.value <= 0)
-			{
-				sprintf(str, "%d", longPressCNT.value);
-			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_DTS_Dplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = getLastDayOfMonth((RTC_DateTypeDef*)(val - 2));
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Dplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_DTS_Dminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Dminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_DTS_Mplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 12;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Mplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
+				longPressCNT.upperLimit = 23;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_HOURplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+				break;
+			case ID_BUTTON_MINplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 59;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+				longPressCNT.headerItem = 1;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_MINplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_SECplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 59;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+				longPressCNT.headerItem = 2;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_SECplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_HOURminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_HOURminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_MINminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+				longPressCNT.headerItem = 1;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_MINminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_SECminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+				longPressCNT.headerItem = 2;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_SECminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_LINESETUP_PULSE_MSECplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 15;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_HEADER_LINESETUP_PULSE_VALS);
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%4d", longPressCNT.value * 200);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_LINESETUP_PULSE_MSECminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_HEADER_LINESETUP_PULSE_VALS);
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%4d", longPressCNT.value * 200);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_SUMWINSETUP_Zplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 12;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_HEADER_SUMWINSETUP_VALS);
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_Zplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				if (longPressCNT.value > 0)
+				{
+					sprintf(str, "+%d", longPressCNT.value);
+				}
+				else if (longPressCNT.value <= 0)
+				{
+					sprintf(str, "%d", longPressCNT.value);
+				}
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_SUMWINSETUP_Zminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = -12;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_HEADER_SUMWINSETUP_VALS);
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_Zminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				if (longPressCNT.value > 0)
+				{
+					sprintf(str, "+%d", longPressCNT.value);
+				}
+				else if (longPressCNT.value <= 0)
+				{
+					sprintf(str, "%d", longPressCNT.value);
+				}
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_DTS_Dplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = getLastDayOfMonth((RTC_DateTypeDef*)(val - 2));
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = handles.hHeaderTimeDateSetupVals;
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Dplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_DTS_Dminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = handles.hHeaderTimeDateSetupVals;
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Dminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_DTS_Mplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 12;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = handles.hHeaderTimeDateSetupVals;
+				longPressCNT.headerItem = 1;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Mplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
 
-		case ID_BUTTON_DTS_Mminus:
-			longPressCNT.direction = -1;
-			longPressCNT.upperLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Mminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_DTS_Yplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 99;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Yplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_DTS_Yminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Yminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_TIMECALIBRATE_SECplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 60;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeCalibrVals;
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_SECplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			if (longPressCNT.value > 0)
-			{
-				sprintf(str, "+%d", longPressCNT.value);
-			}
-			else if (longPressCNT.value <= 0)
-			{
-				sprintf(str, "%d", longPressCNT.value);
-			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_TIMECALIBRATE_SECminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = -60;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeCalibrVals;
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_SECminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			if (longPressCNT.value > 0)
-			{
-				sprintf(str, "+%d", longPressCNT.value);
-			}
-			else if (longPressCNT.value <= 0)
-			{
-				sprintf(str, "%d", longPressCNT.value);
-			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_TIMECALIBRATE_DAYplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 0xFF;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeCalibrVals;
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_DAYplus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
-		case ID_BUTTON_TIMECALIBRATE_DAYminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = 0;
-			longPressCNT.itCNT = 0;
-			longPressCNT.value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeCalibrVals;
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_DAYminus);
-			TIM7->CNT = 0;
-			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%02d", longPressCNT.value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
-			break;
+			case ID_BUTTON_DTS_Mminus:
+				longPressCNT.direction = -1;
+				longPressCNT.upperLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = handles.hHeaderTimeDateSetupVals;
+				longPressCNT.headerItem = 1;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Mminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_DTS_Yplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 99;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = handles.hHeaderTimeDateSetupVals;
+				longPressCNT.headerItem = 2;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Yplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_DTS_Yminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = handles.hHeaderTimeDateSetupVals;
+				longPressCNT.headerItem = 2;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Yminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_TIMECALIBRATE_SECplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 60;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = handles.hHeaderTimeCalibrVals;
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_SECplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				if (longPressCNT.value > 0)
+				{
+					sprintf(str, "+%d", longPressCNT.value);
+				}
+				else if (longPressCNT.value <= 0)
+				{
+					sprintf(str, "%d", longPressCNT.value);
+				}
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_TIMECALIBRATE_SECminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = -60;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = handles.hHeaderTimeCalibrVals;
+				longPressCNT.headerItem = 0;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_SECminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				if (longPressCNT.value > 0)
+				{
+					sprintf(str, "+%d", longPressCNT.value);
+				}
+				else if (longPressCNT.value <= 0)
+				{
+					sprintf(str, "%d", longPressCNT.value);
+				}
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_TIMECALIBRATE_DAYplus:
+				longPressCNT.direction = 1;
+				longPressCNT.upperLimit = 0xFF;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val + 1;
+				longPressCNT.header = handles.hHeaderTimeCalibrVals;
+				longPressCNT.headerItem = 1;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_DAYplus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
+			case ID_BUTTON_TIMECALIBRATE_DAYminus:
+				longPressCNT.direction = -1;
+				longPressCNT.lowerLimit = 0;
+				longPressCNT.itCNT = 0;
+				longPressCNT.value = *val - 1;
+				longPressCNT.header = handles.hHeaderTimeCalibrVals;
+				longPressCNT.headerItem = 1;
+				longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_DAYminus);
+				TIM7->CNT = 0;
+				HAL_TIM_Base_Start_IT(&htim7);
+				sprintf(str, "%02d", longPressCNT.value);
+				HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
+				HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
+				gui_Vars.valsChanged = true;
+				break;
 
 
+
+
+			}
+			return;
+		}
+		if (action == WM_NOTIFICATION_RELEASED)
+		{
+
+			longPressCNT.direction = 0;
+			longPressCNT.itCNT = 0;
+			*val = longPressCNT.value;
+			TIM7->CNT = 0;
+			HAL_TIM_Base_Stop_IT(&htim7);
 
 
 		}
-		return;
-	}
-	if (action == WM_NOTIFICATION_RELEASED)
-	{
-
-		longPressCNT.direction = 0;
-		longPressCNT.itCNT = 0;
-		*val = longPressCNT.value;
-		TIM7->CNT = 0;
-		HAL_TIM_Base_Stop_IT(&htim7);
-
 
 	}
-
-}
