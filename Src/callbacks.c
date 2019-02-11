@@ -260,7 +260,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7);     //°??«  
+				Lcd_Write_Data(0x49E7);      //°??«  
 
 			}
 			mask >>= 1;
@@ -348,9 +348,9 @@ void rtc_write_backup_reg(uint16_t BackupRegister, uint16_t data)
 	RtcHandle.Instance = RTC;
 	HAL_PWR_EnableBkUpAccess();
 	HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
-	bkpCRC = calcCRCofBKP();     //рассчет новой CRC для регистров BKP
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);     //запись старших 16 бит CRC (Маска 0xFFFF0000)
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);     //запись младших 16 бит CRC
+	bkpCRC = calcCRCofBKP();      //рассчет новой CRC для регистров BKP
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);      //запись старших 16 бит CRC (Маска 0xFFFF0000)
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);      //запись младших 16 бит CRC
 
 
 }
@@ -363,13 +363,13 @@ uint16_t rtc_read_backup_reg(uint16_t BackupRegister)
 uint32_t calcCRCofBKP(void)
 {
 	uint32_t dataInBKP[4] = { 0, 0, 0, 0 };
-	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);      //date
-	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);     //line 1
-	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);      //line 2 
-	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);     //line 3
-	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);      //line 4
-	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);     //daylightsaving
-	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);     //daylightsaving
+	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);       //date
+	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);      //line 1
+	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);       //line 2 
+	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);      //line 3
+	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);       //line 4
+	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);      //daylightsaving
+	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);      //daylightsaving
 	CRC->CR |= CRC_CR_RESET;
 	CRC->DR = dataInBKP[0];
 	CRC->DR = dataInBKP[1];
@@ -470,12 +470,12 @@ void saveDaylightSavingToBKP(void)
 	}
 	else
 	{
-		dataToBKP = (~(daylightSaving.timeZone)) & 0xFF;     //если отрицательное, то инверсия и флаг отрицательного.
+		dataToBKP = (~(daylightSaving.timeZone)) & 0xFF;      //если отрицательное, то инверсия и флаг отрицательного.
 		dataToBKP |= 0b10000;
 	}
 	if (daylightSaving.timeShift < 0)
 	{
-		dataToBKP |= (0b10 << 5);     //отрицательный флаг для timeShift
+		dataToBKP |= (0b10 << 5);      //отрицательный флаг для timeShift
 	}
 	else
 	{
@@ -631,24 +631,24 @@ uint8_t flash_ready(void) {
 }
 
 void flash_write(uint32_t address, uint32_t data) {
-	FLASH->CR |= FLASH_CR_PG;     //Разрешаем программирование флеша
-	while(!flash_ready());     //Ожидаем готовности флеша к записи
-	*(__IO uint16_t*)address = (uint16_t)data;     //Пишем младшие 2 бата
+	FLASH->CR |= FLASH_CR_PG;      //Разрешаем программирование флеша
+	while(!flash_ready());      //Ожидаем готовности флеша к записи
+	*(__IO uint16_t*)address = (uint16_t)data;      //Пишем младшие 2 бата
 	while(!flash_ready());
 	address += 2;
 	data >>= 16;
-	*(__IO uint16_t*)address = (uint16_t)data;     //Пишем старшие 2 байта
+	*(__IO uint16_t*)address = (uint16_t)data;      //Пишем старшие 2 байта
 	while(!flash_ready());
-	FLASH->CR &= ~(FLASH_CR_PG);     //Запрещаем программирование флеша
+	FLASH->CR &= ~(FLASH_CR_PG);      //Запрещаем программирование флеша
 }
 
 void flash_erase_page(uint32_t address) {
-	FLASH->CR |= FLASH_CR_PER;     //Устанавливаем бит стирания одной страницы
-	FLASH->AR = address;     // Задаем её адрес
-	FLASH->CR |= FLASH_CR_STRT;     // Запускаем стирание 
+	FLASH->CR |= FLASH_CR_PER;      //Устанавливаем бит стирания одной страницы
+	FLASH->AR = address;      // Задаем её адрес
+	FLASH->CR |= FLASH_CR_STRT;      // Запускаем стирание 
 	while(!flash_ready())
-		;      //Ждем пока страница сотрется. 
-	FLASH->CR &= ~FLASH_CR_PER;     //Сбрасываем бит обратно
+		;       //Ждем пока страница сотрется. 
+	FLASH->CR &= ~FLASH_CR_PER;      //Сбрасываем бит обратно
 }
 uint32_t flash_read(uint32_t address) {
 	return (*(__IO uint32_t*) address);
@@ -657,11 +657,13 @@ int LinesTimeOnStartup(Lines* lineToCheck)
 {
 	int diff_Min = 0;
 	float period_Sec = 0;
+	uint8_t diff_Hour = 0;
 	diff_Min = ((sTime.Hours / 2)*sTime.Minutes) - (lineToCheck->Hours / 2)*lineToCheck->Minutes;
 	period_Sec = (0.375*lineToCheck->Width)*diff_Min;
 	//ДОКУРИТЬ АЛГОРИТМ ДЛЯ 12ч табло!!! Пора спать и если бы не... 
 	//sTime=12:00, Line=10:00. 
 	//-10часов. -10ч*60=-600мин. При width = 0.5сек, потребуется 300сек или 5 минут.
+	//
 	if(diff_Min >= 0)
 	{
 		if (period_Sec > 1200)
