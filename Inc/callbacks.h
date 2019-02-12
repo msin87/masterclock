@@ -52,6 +52,7 @@ void readDaylightSavingFromBKP(void);
 void saveTimeCalibrToBKP(void);
 void readTimeCalibrFromBKP(void);
 
+int getDiff_sTimeLine(Lines* lineToCheck);
 uint32_t calkCRCofFlash(void);
 uint32_t calcCRCofBKP(void);
 uint8_t isCRC_OK_BKP(void);
