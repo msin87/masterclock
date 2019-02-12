@@ -57,6 +57,8 @@ uint32_t calcCRCofBKP(void);
 uint8_t isCRC_OK_BKP(void);
 uint8_t isCRC_OK_Flash(void);
 
+int get_sTimeLinesDiff(Lines* lineToCheck);
+
 void flash_unlock(void);
 void flash_lock(void);
 uint8_t flash_ready(void);
