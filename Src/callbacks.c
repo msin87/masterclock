@@ -733,7 +733,10 @@ void pollLinesOutput(uint8_t waitMinutes)
 	{
 		for (i = 0; i < gui_Vars.diffSystemLine; i++)
 		{
-			xSemaphoreGive(xSemaphoreOutput);
+			if (line[0].Status = LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine0);
+			if (line[1].Status = LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine1);
+			if (line[2].Status = LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine2);
+			if (line[3].Status = LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine3);
 		}
 	}
 }

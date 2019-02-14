@@ -47,9 +47,9 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
+  /* USER CODE END Header */
 
-/* Define to prevent recursive inclusion -------------------------------------*/
+  /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
 #define __MAIN_H
 
@@ -57,7 +57,7 @@
 extern "C" {
 #endif
 
-/* Includes ------------------------------------------------------------------*/
+	/* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -69,27 +69,38 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-	SemaphoreHandle_t xSemaphoreOutput;
-/* USER CODE END ET */
+	SemaphoreHandle_t xSemaphoreLine0;
+	SemaphoreHandle_t xSemaphoreLine1;
+	SemaphoreHandle_t xSemaphoreLine2;
+	SemaphoreHandle_t xSemaphoreLine3;
+	/* USER CODE END ET */
 
-/* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
+	/* Exported constants --------------------------------------------------------*/
+	/* USER CODE BEGIN EC */
 
-/* USER CODE END EC */
+	/* USER CODE END EC */
 
-/* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
+	/* Exported macro ------------------------------------------------------------*/
+	/* USER CODE BEGIN EM */
 
-/* USER CODE END EM */
+	/* USER CODE END EM */
 
-/* Exported functions prototypes ---------------------------------------------*/
-void Error_Handler(void);
+	/* Exported functions prototypes ---------------------------------------------*/
+	void Error_Handler(void);
 
-/* USER CODE BEGIN EFP */
+	/* USER CODE BEGIN EFP */
 	void TFT_MainMenu_ShowLineTime(void);
-/* USER CODE END EFP */
+	/* USER CODE END EFP */
 
-/* Private defines -----------------------------------------------------------*/
+	/* Private defines -----------------------------------------------------------*/
+#define LINE0_NEG_OUTPUT_Pin GPIO_PIN_2
+#define LINE0_NEG_OUTPUT_GPIO_Port GPIOE
+#define LINE1_NEG_OUTPUT_Pin GPIO_PIN_3
+#define LINE1_NEG_OUTPUT_GPIO_Port GPIOE
+#define LINE2_NEG_OUTPUT_Pin GPIO_PIN_4
+#define LINE2_NEG_OUTPUT_GPIO_Port GPIOE
+#define LINE3_NEG_OUTPUT_Pin GPIO_PIN_5
+#define LINE3_NEG_OUTPUT_GPIO_Port GPIOE
 #define OUTPUT_LINE1_Pin GPIO_PIN_0
 #define OUTPUT_LINE1_GPIO_Port GPIOC
 #define OUTPUT_LINE2_Pin GPIO_PIN_1
@@ -106,14 +117,14 @@ void Error_Handler(void);
 #define PS_Monitor_GPIO_Port GPIOA
 #define SRAM_CS_Pin GPIO_PIN_4
 #define SRAM_CS_GPIO_Port GPIOA
-#define LINE3_OUTPUT_Pin GPIO_PIN_13
-#define LINE3_OUTPUT_GPIO_Port GPIOD
-#define LINE0_OUTPUT_Pin GPIO_PIN_6
-#define LINE0_OUTPUT_GPIO_Port GPIOC
-#define LINE1_OUTPUT_Pin GPIO_PIN_7
-#define LINE1_OUTPUT_GPIO_Port GPIOC
-#define LINE2_OUTPUT_Pin GPIO_PIN_6
-#define LINE2_OUTPUT_GPIO_Port GPIOD
+#define LINE3_POS_OUTPUT_Pin GPIO_PIN_13
+#define LINE3_POS_OUTPUT_GPIO_Port GPIOD
+#define LINE0_POS_OUTPUT_Pin GPIO_PIN_6
+#define LINE0_POS_OUTPUT_GPIO_Port GPIOC
+#define LINE1_POS_OUTPUT_Pin GPIO_PIN_7
+#define LINE1_POS_OUTPUT_GPIO_Port GPIOC
+#define LINE2_POS_OUTPUT_Pin GPIO_PIN_6
+#define LINE2_POS_OUTPUT_GPIO_Port GPIOD
 #define NOT_PEN_Pin GPIO_PIN_6
 #define NOT_PEN_GPIO_Port GPIOB
 #define TOUCH_CS_Pin GPIO_PIN_7

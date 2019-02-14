@@ -305,9 +305,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (diff > 0)
 				{
 					line[gui_Vars.menuState - 4].Pulses += diff;
+
 					for (diff; diff > 0; diff--)
 					{
-						xSemaphoreGive(xSemaphoreOutput);
+						if ((gui_Vars.menuState - 4) == 0 && (line[0].Status = LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine0);
+						if ((gui_Vars.menuState - 4) == 1 && (line[1].Status = LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine1);;
+						if ((gui_Vars.menuState - 4) == 2 && (line[2].Status = LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine2);;
+						if ((gui_Vars.menuState - 4) == 3 && (line[3].Status = LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine3);;
+
 					}
 				}
 

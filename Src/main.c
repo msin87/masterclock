@@ -111,7 +111,10 @@ SRAM_HandleTypeDef hsram1;
 
 osThreadId defaultTaskHandle;
 osThreadId GUIHandle;
-osThreadId OutputHandle;
+osThreadId TaskLine0Handle;
+osThreadId TaskLine1Handle;
+osThreadId TaskLine2Handle;
+osThreadId TaskLine3Handle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -129,7 +132,10 @@ static void MX_ADC2_Init(void);
 static void MX_ADC3_Init(void);
 void StartDefaultTask(void const * argument);
 void vTaskGUI(void const * argument);
-void vTaskOutput(void const * argument);
+void vTaskLine0(void const * argument);
+void vTaskLine1(void const * argument);
+void vTaskLine2(void const * argument);
+void vTaskLine3(void const * argument);
 
 /* USER CODE BEGIN PFP */
 void delay(uint32_t delayTime);
@@ -304,26 +310,28 @@ int main(void)
 	MX_ADC2_Init();
 	MX_ADC3_Init();
 	/* USER CODE BEGIN 2 */
-	  //GUI_Init();
+		  //GUI_Init();
 	HAL_RTCEx_SetSecond_IT(&hrtc);
 	//Init_SSD1289();
 
 	variables.calibrated = 1;
 	LinesInit();
-	xSemaphoreOutput = xSemaphoreCreateCounting(720, 0);
-
+	xSemaphoreLine0 = xSemaphoreCreateCounting(720, 0);
+	xSemaphoreLine1 = xSemaphoreCreateCounting(720, 0);
+	xSemaphoreLine2 = xSemaphoreCreateCounting(720, 0);
+	xSemaphoreLine3 = xSemaphoreCreateCounting(720, 0);
 	/* USER CODE END 2 */
 
 	/* USER CODE BEGIN RTOS_MUTEX */
-		  /* add mutexes, ... */
+			  /* add mutexes, ... */
 	/* USER CODE END RTOS_MUTEX */
 
 	/* USER CODE BEGIN RTOS_SEMAPHORES */
-		  /* add semaphores, ... */
+			  /* add semaphores, ... */
 	/* USER CODE END RTOS_SEMAPHORES */
 
 	/* USER CODE BEGIN RTOS_TIMERS */
-		  /* start timers, add new ones, ... */
+			  /* start timers, add new ones, ... */
 	/* USER CODE END RTOS_TIMERS */
 
 	/* Create the thread(s) */
@@ -335,16 +343,28 @@ int main(void)
 	osThreadDef(GUI, vTaskGUI, osPriorityNormal, 0, 600);
 	GUIHandle = osThreadCreate(osThread(GUI), NULL);
 
-	/* definition and creation of Output */
-	osThreadDef(Output, vTaskOutput, osPriorityNormal, 0, 128);
-	OutputHandle = osThreadCreate(osThread(Output), NULL);
+	/* definition and creation of TaskLine0 */
+	osThreadDef(TaskLine0, vTaskLine0, osPriorityNormal, 0, 128);
+	TaskLine0Handle = osThreadCreate(osThread(TaskLine0), NULL);
+
+	/* definition and creation of TaskLine1 */
+	osThreadDef(TaskLine1, vTaskLine1, osPriorityNormal, 0, 128);
+	TaskLine1Handle = osThreadCreate(osThread(TaskLine1), NULL);
+
+	/* definition and creation of TaskLine2 */
+	osThreadDef(TaskLine2, vTaskLine2, osPriorityNormal, 0, 128);
+	TaskLine2Handle = osThreadCreate(osThread(TaskLine2), NULL);
+
+	/* definition and creation of TaskLine3 */
+	osThreadDef(TaskLine3, vTaskLine3, osPriorityNormal, 0, 128);
+	TaskLine3Handle = osThreadCreate(osThread(TaskLine3), NULL);
 
 	/* USER CODE BEGIN RTOS_THREADS */
-		  /* add threads, ... */
+			  /* add threads, ... */
 	/* USER CODE END RTOS_THREADS */
 
 	/* USER CODE BEGIN RTOS_QUEUES */
-		  /* add queues, ... */
+			  /* add queues, ... */
 	/* USER CODE END RTOS_QUEUES */
 
 
@@ -762,32 +782,42 @@ static void MX_GPIO_Init(void)
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
 	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOE_CLK_ENABLE();
 	__HAL_RCC_GPIOC_CLK_ENABLE();
 	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOE_CLK_ENABLE();
 	__HAL_RCC_GPIOD_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 
 	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOE, LINE0_NEG_OUTPUT_Pin | LINE1_NEG_OUTPUT_Pin | LINE2_NEG_OUTPUT_Pin | LINE3_NEG_OUTPUT_Pin
+		| LCD_RESET_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOC, OUTPUT_LINE1_Pin | OUTPUT_LINE2_Pin | OUTPUT_LINE3_Pin | OUTPUT_LINE4_Pin
-		| LINE0_OUTPUT_Pin | LINE1_OUTPUT_Pin, GPIO_PIN_RESET);
+		| LINE0_POS_OUTPUT_Pin | LINE1_POS_OUTPUT_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(SRAM_CS_GPIO_Port, SRAM_CS_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOD, LINE3_OUTPUT_Pin | LINE2_OUTPUT_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOD, LINE3_POS_OUTPUT_Pin | LINE2_POS_OUTPUT_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(TOUCH_CS_GPIO_Port, TOUCH_CS_Pin, GPIO_PIN_RESET);
 
-	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_RESET);
+	/*Configure GPIO pins : LINE0_NEG_OUTPUT_Pin LINE1_NEG_OUTPUT_Pin LINE2_NEG_OUTPUT_Pin LINE3_NEG_OUTPUT_Pin
+							 LCD_RESET_Pin */
+	GPIO_InitStruct.Pin = LINE0_NEG_OUTPUT_Pin | LINE1_NEG_OUTPUT_Pin | LINE2_NEG_OUTPUT_Pin | LINE3_NEG_OUTPUT_Pin
+		| LCD_RESET_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : OUTPUT_LINE1_Pin OUTPUT_LINE2_Pin OUTPUT_LINE3_Pin OUTPUT_LINE4_Pin
-							 LINE0_OUTPUT_Pin LINE1_OUTPUT_Pin */
+							 LINE0_POS_OUTPUT_Pin LINE1_POS_OUTPUT_Pin */
 	GPIO_InitStruct.Pin = OUTPUT_LINE1_Pin | OUTPUT_LINE2_Pin | OUTPUT_LINE3_Pin | OUTPUT_LINE4_Pin
-		| LINE0_OUTPUT_Pin | LINE1_OUTPUT_Pin;
+		| LINE0_POS_OUTPUT_Pin | LINE1_POS_OUTPUT_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -800,8 +830,8 @@ static void MX_GPIO_Init(void)
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(SRAM_CS_GPIO_Port, &GPIO_InitStruct);
 
-	/*Configure GPIO pins : LINE3_OUTPUT_Pin LINE2_OUTPUT_Pin */
-	GPIO_InitStruct.Pin = LINE3_OUTPUT_Pin | LINE2_OUTPUT_Pin;
+	/*Configure GPIO pins : LINE3_POS_OUTPUT_Pin LINE2_POS_OUTPUT_Pin */
+	GPIO_InitStruct.Pin = LINE3_POS_OUTPUT_Pin | LINE2_POS_OUTPUT_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -820,13 +850,6 @@ static void MX_GPIO_Init(void)
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(TOUCH_CS_GPIO_Port, &GPIO_InitStruct);
 
-	/*Configure GPIO pin : LCD_RESET_Pin */
-	GPIO_InitStruct.Pin = LCD_RESET_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(LCD_RESET_GPIO_Port, &GPIO_InitStruct);
-
 }
 
 /* FSMC initialization function */
@@ -834,13 +857,14 @@ static void MX_FSMC_Init(void)
 {
 	FSMC_NORSRAM_TimingTypeDef Timing;
 
-
+	/** Perform the SRAM1 memory initialization sequence
+	*/
 	hsram1.Instance = FSMC_NORSRAM_DEVICE;
 	hsram1.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
-
+	/* hsram1.Init */
 	hsram1.Init.NSBank = FSMC_NORSRAM_BANK1;
 	hsram1.Init.DataAddressMux = FSMC_DATA_ADDRESS_MUX_DISABLE;
-	hsram1.Init.MemoryType = FSMC_MEMORY_TYPE_NOR;
+	hsram1.Init.MemoryType = FSMC_MEMORY_TYPE_SRAM;
 	hsram1.Init.MemoryDataWidth = FSMC_NORSRAM_MEM_BUS_WIDTH_16;
 	hsram1.Init.BurstAccessMode = FSMC_BURST_ACCESS_MODE_DISABLE;
 	hsram1.Init.WaitSignalPolarity = FSMC_WAIT_SIGNAL_POLARITY_LOW;
@@ -851,23 +875,23 @@ static void MX_FSMC_Init(void)
 	hsram1.Init.ExtendedMode = FSMC_EXTENDED_MODE_DISABLE;
 	hsram1.Init.AsynchronousWait = FSMC_ASYNCHRONOUS_WAIT_DISABLE;
 	hsram1.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
-
+	/* Timing */
 	Timing.AddressSetupTime = 2;
-	Timing.AddressHoldTime = 0;
+	Timing.AddressHoldTime = 15;
 	Timing.DataSetupTime = 5;
 	Timing.BusTurnAroundDuration = 0;
-	Timing.CLKDivision = 0;
-	Timing.DataLatency = 0;
+	Timing.CLKDivision = 16;
+	Timing.DataLatency = 17;
 	Timing.AccessMode = FSMC_ACCESS_MODE_A;
-
+	/* ExtTiming */
 
 	if (HAL_SRAM_Init(&hsram1, &Timing, NULL) != HAL_OK)
 	{
 		Error_Handler();
 	}
 
-
-
+	/** Disconnect NADV
+	*/
 
 	__HAL_AFIO_FSMCNADV_DISCONNECTED();
 
@@ -979,7 +1003,7 @@ void sendMsgToMainMenu(uint16_t message)
 void vTaskGUI(void const * argument)
 {
 	/* USER CODE BEGIN vTaskGUI */
-	  //int xPos, yPos;
+		  //int xPos, yPos;
 
 	uint16_t i = 0;
 
@@ -1067,7 +1091,10 @@ void vTaskGUI(void const * argument)
 			if (sTimePrev.Seconds == 59) //каждую минуту
 			{
 
-				xSemaphoreGive(xSemaphoreOutput);
+				xSemaphoreGive(xSemaphoreLine0);
+				xSemaphoreGive(xSemaphoreLine1);
+				xSemaphoreGive(xSemaphoreLine2);
+				xSemaphoreGive(xSemaphoreLine3);
 				//for (i = 0; i < sizeof(line) / 3; i++)
 				//{
 				//	if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
@@ -1149,43 +1176,152 @@ void vTaskGUI(void const * argument)
 	/* USER CODE END vTaskGUI */
 }
 
-/* USER CODE BEGIN Header_vTaskOutput */
+/* USER CODE BEGIN Header_vTaskLine0 */
 /**
-* @brief Function implementing the Output thread.
+* @brief Function implementing the TaskLine0 thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_vTaskOutput */
-void vTaskOutput(void const * argument)
+/* USER CODE END Header_vTaskLine0 */
+void vTaskLine0(void const * argument)
 {
-	/* USER CODE BEGIN vTaskOutput */
-		/* Infinite loop */
+	/* USER CODE BEGIN vTaskLine0 */
+	  /* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(xSemaphoreOutput, portMAX_DELAY);
-		if (line[0].Pulses)
+		xSemaphoreTake(xSemaphoreLine0, portMAX_DELAY);
+		if (line[0].Status == LINE_STATUS_RUN)
 		{
-			line[0].Pulses--;
-			GPIOC->BSRR = GPIO_BSRR_BS6;
-
+			gui_Vars.linesPolarity ^= 0b0001;
+			linesIncreaseMinute(0);
+			if (gui_Vars.linesPolarity & 0b0001)
+			{
+				LINE0_POS_OUTPUT_GPIO_Port->BSRR = LINE0_POS_OUTPUT_Pin;
+				osDelay(line[0].Width * 350);
+				LINE0_POS_OUTPUT_GPIO_Port->BSRR = LINE0_POS_OUTPUT_Pin << 16;
+				osDelay(LINE_DEAD_TIME);
+			}
+			else
+			{
+				LINE0_NEG_OUTPUT_GPIO_Port->BSRR = LINE0_NEG_OUTPUT_Pin;
+				osDelay(line[0].Width * 350);
+				LINE0_NEG_OUTPUT_GPIO_Port->BSRR = LINE0_NEG_OUTPUT_Pin << 16;
+				osDelay(LINE_DEAD_TIME);
+			}
 		}
-		if (line[1].Pulses)
-		{
-			line[1].Pulses--;
-		}
-		if (line[2].Pulses)
-		{
-			line[2].Pulses--;
-		}
-		if (line[3].Pulses)
-		{
-			line[3].Pulses--;
-		}
-		GPIOC->BSRR = GPIO_BSRR_BS6;
-		osDelay(350);
-		GPIOC->BSRR = GPIO_BSRR_BR6;
 	}
-	/* USER CODE END vTaskOutput */
+	/* USER CODE END vTaskLine0 */
+}
+
+/* USER CODE BEGIN Header_vTaskLine1 */
+/**
+* @brief Function implementing the TaskLine1 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_vTaskLine1 */
+void vTaskLine1(void const * argument)
+{
+	/* USER CODE BEGIN vTaskLine1 */
+	  /* Infinite loop */
+	for (;;)
+	{
+		xSemaphoreTake(xSemaphoreLine1, portMAX_DELAY);
+		if (line[0].Status == LINE_STATUS_RUN)
+		{
+			gui_Vars.linesPolarity ^= 0b0010;
+			linesIncreaseMinute(1);
+			if (gui_Vars.linesPolarity & 0b0010)
+			{
+				LINE1_POS_OUTPUT_GPIO_Port->BSRR = LINE1_POS_OUTPUT_Pin;
+				osDelay(line[1].Width * 350);
+				LINE1_POS_OUTPUT_GPIO_Port->BSRR = LINE1_POS_OUTPUT_Pin << 16;
+				osDelay(LINE_DEAD_TIME);
+			}
+			else
+			{
+				LINE1_NEG_OUTPUT_GPIO_Port->BSRR = LINE1_NEG_OUTPUT_Pin;
+				osDelay(line[1].Width * 350);
+				LINE1_NEG_OUTPUT_GPIO_Port->BSRR = LINE1_NEG_OUTPUT_Pin << 16;
+				osDelay(LINE_DEAD_TIME);
+			}
+		}
+	}
+	/* USER CODE END vTaskLine1 */
+}
+
+/* USER CODE BEGIN Header_vTaskLine2 */
+/**
+* @brief Function implementing the TaskLine2 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_vTaskLine2 */
+void vTaskLine2(void const * argument)
+{
+	/* USER CODE BEGIN vTaskLine2 */
+	  /* Infinite loop */
+	for (;;)
+	{
+		xSemaphoreTake(xSemaphoreLine2, portMAX_DELAY);
+		if (line[2].Status == LINE_STATUS_RUN)
+		{
+			gui_Vars.linesPolarity ^= 0b0100;
+			linesIncreaseMinute(2);
+			if (gui_Vars.linesPolarity & 0b0100)
+			{
+				LINE2_POS_OUTPUT_GPIO_Port->BSRR = LINE2_POS_OUTPUT_Pin;
+				osDelay(line[2].Width * 350);
+				LINE2_POS_OUTPUT_GPIO_Port->BSRR = LINE2_POS_OUTPUT_Pin << 16;
+				osDelay(LINE_DEAD_TIME);
+			}
+			else
+			{
+				LINE2_NEG_OUTPUT_GPIO_Port->BSRR = LINE2_NEG_OUTPUT_Pin;
+				osDelay(line[2].Width * 350);
+				LINE2_NEG_OUTPUT_GPIO_Port->BSRR = LINE2_NEG_OUTPUT_Pin << 16;
+				osDelay(LINE_DEAD_TIME);
+			}
+		}
+	}
+	/* USER CODE END vTaskLine2 */
+}
+
+/* USER CODE BEGIN Header_vTaskLine3 */
+/**
+* @brief Function implementing the TaskLine3 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_vTaskLine3 */
+void vTaskLine3(void const * argument)
+{
+	/* USER CODE BEGIN vTaskLine3 */
+	  /* Infinite loop */
+	for (;;)
+	{
+		xSemaphoreTake(xSemaphoreLine3, portMAX_DELAY);
+		linesIncreaseMinute(3);
+		if (line[3].Status == LINE_STATUS_RUN)
+		{
+			gui_Vars.linesPolarity ^= 0b1000;
+			if (gui_Vars.linesPolarity & 0b1000)
+			{
+				LINE3_POS_OUTPUT_GPIO_Port->BSRR = LINE3_POS_OUTPUT_Pin;
+				osDelay(line[2].Width * 350);
+				LINE3_POS_OUTPUT_GPIO_Port->BSRR = LINE3_POS_OUTPUT_Pin << 16;
+				osDelay(LINE_DEAD_TIME);
+			}
+			else
+			{
+				LINE3_NEG_OUTPUT_GPIO_Port->BSRR = LINE3_NEG_OUTPUT_Pin;
+				osDelay(line[3].Width * 350);
+				LINE3_NEG_OUTPUT_GPIO_Port->BSRR = LINE3_NEG_OUTPUT_Pin << 16;
+				osDelay(LINE_DEAD_TIME);
+			}
+		}
+	}
+	/* USER CODE END vTaskLine3 */
 }
 
 /**
@@ -1216,7 +1352,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
 	/* USER CODE BEGIN Error_Handler_Debug */
-		  /* User can add his own implementation to report the HAL error return state */
+			  /* User can add his own implementation to report the HAL error return state */
 
 	/* USER CODE END Error_Handler_Debug */
 }
@@ -1232,9 +1368,9 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
 	/* USER CODE BEGIN 6 */
-		  /* User can add his own implementation to report the file name and line number,
-			 tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-			 /* USER CODE END 6 */
+			  /* User can add his own implementation to report the file name and line number,
+				 tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+				 /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 

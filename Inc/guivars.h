@@ -22,6 +22,7 @@
 #define true 1
 #define false 0
 #define LINES_AMOUNT 4
+#define LINE_DEAD_TIME 50
 #define BKP_DATE_OFFSET 1
 #define BKP_LINE1_OFFSET BKP_DATE_OFFSET+1
 #define BKP_LINE2_OFFSET BKP_LINE1_OFFSET+1
@@ -51,7 +52,7 @@ typedef struct
 	uint8_t prevHour;
 	uint8_t timeFrozen;
 	uint8_t valsChanged;
-	uint8_t reserved; //выравнивание 4*uint8 + 4*uint8 = 32бит + 32бит
+	uint8_t linesPolarity; //выравнивание 4*uint8 + 4*uint8 = 32бит + 32бит
 	int16_t	diffSystemLine;
 	uint8_t widthSorted[4];
 	uint8_t lineNumsByWidth[4];
