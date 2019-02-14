@@ -3,7 +3,6 @@
 
 #define u8 uint8_t
 #define u16 uint16_t
-
 #include "DIALOG.h"
 #include "cmsis_os.h"
 #include "stm32f1xx_hal.h"
@@ -42,6 +41,7 @@ unsigned char isDaylightSavingTimeUS(unsigned char day, unsigned char month, uns
 unsigned char isDaylightSavingTimeEU(unsigned char day, unsigned char month, unsigned char dow);
 
 uint8_t increaseDay(RTC_DateTypeDef* Date);
+void linesIncreaseMinute(uint8_t lineNumber);
 uint8_t getLastDayOfMonth(RTC_DateTypeDef* Date);
 void correctDate(RTC_DateTypeDef* Date);
 
@@ -52,7 +52,12 @@ void readDaylightSavingFromBKP(void);
 void saveTimeCalibrToBKP(void);
 void readTimeCalibrFromBKP(void);
 
-int getDiff_sTimeLine(Lines* lineToCheck);
+uint16_t get_LineChangeTimeDiff(Lines* lineOldValue, Lines*  lineNewValue, uint8_t waitMinutes);
+uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes);
+void sortLinesWidth(GUI_Vars* vars);
+
+void pollLinesOutput(uint8_t waitMinutes);
+
 uint32_t calkCRCofFlash(void);
 uint32_t calcCRCofBKP(void);
 uint8_t isCRC_OK_BKP(void);

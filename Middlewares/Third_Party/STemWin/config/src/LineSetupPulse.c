@@ -243,6 +243,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER START (Optionally insert code for reacting on notification message)
 				line[gui_Vars.menuState - 8].Width = width[gui_Vars.menuState - 8];
 				line[gui_Vars.menuState - 8].Polarity = polarity[gui_Vars.menuState - 8];
+				sortLinesWidth(&gui_Vars);
 				gui_Vars.valsChanged = false;
 				saveLineToBKP(gui_Vars.menuState - 8);
 

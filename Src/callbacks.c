@@ -653,62 +653,143 @@ void flash_erase_page(uint32_t address) {
 uint32_t flash_read(uint32_t address) {
 	return (*(__IO uint32_t*) address);
 }
-int getDiff_sTimeLine(Lines* lineToCheck)
+uint16_t get_LineChangeTimeDiff(Lines* lineOldValue, Lines*  lineNewValue, uint8_t waitMinutes)
 {
-	int32_t diff = 0;
-	uint8_t sHour12 = 0, lHour12 = 0;
+	int16_t diff_Min12 = 0;
+	uint8_t oldHour12 = 0, newHour12 = 0;
+	int16_t oldMinutes = 0, newMinutes = 0;
+	oldHour12 = lineOldValue->Hours % 12;
+	if (oldHour12 == 0)
+	{
+		oldHour12 = 12;
+	}
+	newHour12 = lineNewValue->Hours % 12;
+	if (newHour12 == 0)
+	{
+		newHour12 = 12;
+	}
+	diff_Min12 = oldHour12 * 60 + lineOldValue->Minutes - (newHour12 * 60 + lineNewValue->Minutes);
 
-	if (sTime.Hours < 12)
+	if (diff_Min12 < -waitMinutes)
 	{
-		sHour12 = sTime.Hours;
+
+		diff_Min12 = 720 + diff_Min12;
 	}
-	else if (sTime.Hours > 12)
+	oldMinutes = lineOldValue->Hours * 60 + lineOldValue->Minutes;
+	newMinutes = lineNewValue->Hours * 60 + lineNewValue->Minutes;
+	if ((oldMinutes - newMinutes >= 720))
 	{
-		sHour12 = sTime.Hours - 12;
+		lineNewValue->Hours += 12;
 	}
-	else if (sTime.Hours == 0)
+	else
+		if ((oldMinutes - newMinutes) >= -720 && (oldMinutes - newMinutes) < -waitMinutes)
+		{
+			lineNewValue->Hours -= 12;
+		}
+
+	return diff_Min12;
+}
+uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
+{
+	int16_t diff_Min12 = 0;
+	uint8_t sHour12 = 0, lHour12 = 0;
+	int16_t sMinutes = 0, lMinutes = 0;
+	sHour12 = sTime.Hours % 12;
+	if (sHour12 == 0)
 	{
 		sHour12 = 12;
 	}
-	if (lineToCheck->Hours < 12)
-	{
-		lHour12 = lineToCheck->Hours;
-	}
-	else if (lineToCheck->Hours > 12)
-	{
-		lHour12 = lineToCheck->Hours - 12;
-	}
-	else if (lineToCheck->Hours == 0)
+	lHour12 = lineToCheck->Hours % 12;
+	if (lHour12 == 0)
 	{
 		lHour12 = 12;
 	}
+	diff_Min12 = sHour12 * 60 + sTime.Minutes - (lHour12 * 60 + lineToCheck->Minutes);
 
-	diff = sHour12 * 60 + sTime.Minutes - (lHour12 * 60 + lineToCheck->Minutes);
-	if (diff < -20)
+	if (diff_Min12 < -waitMinutes)
 	{
-		diff = 720 + diff;
+
+		diff_Min12 = 720 + diff_Min12;
 	}
-	if (diff >= -20 && diff <= 0)
-	{
-		return diff; //вернуть отрицательное число, что означает "ждать"
-	}
-	if ((sTime.Hours < 12) && (lineToCheck->Hours > 12))
-	{
-		lineToCheck->Hours -= 12;
-	}
-	else if ((sTime.Hours > 12) && (lineToCheck->Hours < 12))
+	sMinutes = sTime.Hours * 60 + sTime.Minutes;
+	lMinutes = lineToCheck->Hours * 60 + lineToCheck->Minutes;
+	if ((sMinutes - lMinutes >= 720))
 	{
 		lineToCheck->Hours += 12;
 	}
-	else if ((sTime.Hours == 0) && (lineToCheck->Hours == 12))
+	else
+		if ((sMinutes - lMinutes) >= -720 && (sMinutes - lMinutes) < -waitMinutes)
+		{
+			lineToCheck->Hours -= 12;
+		}
+
+	return diff_Min12;
+}
+void pollLinesOutput(uint8_t waitMinutes)
+{
+	uint16_t i = 0;
+	gui_Vars.diffSystemLine = get_sTimeLinesDiff(&line[0], waitMinutes);
+	if (gui_Vars.diffSystemLine > 0)
 	{
-		lineToCheck->Hours = 0;
+		for (i = 0; i < gui_Vars.diffSystemLine; i++)
+		{
+			xSemaphoreGive(xSemaphoreOutput);
+		}
 	}
-	else if ((sTime.Hours == 12) && (lineToCheck->Hours == 0))
+}
+void sortLinesWidth(GUI_Vars* vars)
+{
+	uint8_t i = 0, j = 0, temp = 0, ntemp = 0;
+	vars->lineNumsByWidth[0] = 0;
+	vars->lineNumsByWidth[1] = 1;
+	vars->lineNumsByWidth[2] = 2;
+	vars->lineNumsByWidth[3] = 3;
+	for (i = 0; i < 4 - 1; i++)
 	{
-		lineToCheck->Hours = 12;
+		for (j = 0; j < 3 - i; j++) {
+			if (line[j].Width > line[j + 1].Width)
+			{
+				temp = line[j].Width;
+				ntemp = vars->lineNumsByWidth[j];
+				line[j] = line[j + 1];
+				vars->lineNumsByWidth[j] = vars->lineNumsByWidth[j + 1];
+				line[j + 1].Width = temp;
+				vars->lineNumsByWidth[j + 1] = ntemp;
+			}
+		}
 	}
-	return diff;
+
+}
+void linesIncreaseMinute(uint8_t lineNumber)
+{
+	uint8_t i = 0;
+	if (lineNumber < LINES_AMOUNT)
+	{
+		i = lineNumber;
+	}
+	else
+	{
+		lineNumber--;
+	}
+	for (i; i < lineNumber + 1; i++)
+	{
+		if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
+		{
+
+			line[i].Minutes++;
+			if (line[i].Minutes == 60)
+			{
+				line[i].Minutes = 0;
+				line[i].Hours++;
+				if (line[i].Hours == 24)
+				{
+					line[i].Hours = 0;
+				}
+			}
+			saveLineToBKP(i);
+		}
+	}
+	if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
 }
 void pollButton(uint16_t id, uint8_t action, int8_t* val)
 {
