@@ -260,7 +260,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7);                      //°??«  
+				Lcd_Write_Data(0x49E7);           //°??«  
 
 			}
 			mask >>= 1;
@@ -348,9 +348,9 @@ void rtc_write_backup_reg(uint16_t BackupRegister, uint16_t data)
 	RtcHandle.Instance = RTC;
 	HAL_PWR_EnableBkUpAccess();
 	HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
-	bkpCRC = calcCRCofBKP();                      //рассчет новой CRC для регистров BKP
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);                      //запись старших 16 бит CRC (Маска 0xFFFF0000)
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);                      //запись младших 16 бит CRC
+	bkpCRC = calcCRCofBKP();           //рассчет новой CRC для регистров BKP
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);           //запись старших 16 бит CRC (Маска 0xFFFF0000)
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);           //запись младших 16 бит CRC
 
 
 }
@@ -363,13 +363,13 @@ uint16_t rtc_read_backup_reg(uint16_t BackupRegister)
 uint32_t calcCRCofBKP(void)
 {
 	uint32_t dataInBKP[4] = { 0, 0, 0, 0 };
-	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);                       //date
-	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);                      //line 1
-	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);                       //line 2 
-	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);                      //line 3
-	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);                       //line 4
-	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);                      //daylightsaving
-	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);                      //daylightsaving
+	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);            //date
+	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);           //line 1
+	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);            //line 2 
+	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);           //line 3
+	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);            //line 4
+	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);           //daylightsaving
+	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);           //daylightsaving
 	CRC->CR |= CRC_CR_RESET;
 	CRC->DR = dataInBKP[0];
 	CRC->DR = dataInBKP[1];
@@ -470,12 +470,12 @@ void saveDaylightSavingToBKP(void)
 	}
 	else
 	{
-		dataToBKP = (~(daylightSaving.timeZone)) & 0xFF;                      //если отрицательное, то инверсия и флаг отрицательного.
+		dataToBKP = (~(daylightSaving.timeZone)) & 0xFF;           //если отрицательное, то инверсия и флаг отрицательного.
 		dataToBKP |= 0b10000;
 	}
 	if (daylightSaving.timeShift < 0)
 	{
-		dataToBKP |= (0b10 << 5);                      //отрицательный флаг для timeShift
+		dataToBKP |= (0b10 << 5);           //отрицательный флаг для timeShift
 	}
 	else
 	{
@@ -631,84 +631,165 @@ uint8_t flash_ready(void) {
 }
 
 void flash_write(uint32_t address, uint32_t data) {
-	FLASH->CR |= FLASH_CR_PG;                      //Разрешаем программирование флеша
-	while (!flash_ready());                      //Ожидаем готовности флеша к записи
-	*(__IO uint16_t*)address = (uint16_t)data;                      //Пишем младшие 2 бата
+	FLASH->CR |= FLASH_CR_PG;           //Разрешаем программирование флеша
+	while (!flash_ready());           //Ожидаем готовности флеша к записи
+	*(__IO uint16_t*)address = (uint16_t)data;           //Пишем младшие 2 бата
 	while (!flash_ready());
 	address += 2;
 	data >>= 16;
-	*(__IO uint16_t*)address = (uint16_t)data;                      //Пишем старшие 2 байта
+	*(__IO uint16_t*)address = (uint16_t)data;           //Пишем старшие 2 байта
 	while (!flash_ready());
-	FLASH->CR &= ~(FLASH_CR_PG);                      //Запрещаем программирование флеша
+	FLASH->CR &= ~(FLASH_CR_PG);           //Запрещаем программирование флеша
 }
 
 void flash_erase_page(uint32_t address) {
-	FLASH->CR |= FLASH_CR_PER;                      //Устанавливаем бит стирания одной страницы
-	FLASH->AR = address;                      // Задаем её адрес
-	FLASH->CR |= FLASH_CR_STRT;                      // Запускаем стирание 
+	FLASH->CR |= FLASH_CR_PER;           //Устанавливаем бит стирания одной страницы
+	FLASH->AR = address;           // Задаем её адрес
+	FLASH->CR |= FLASH_CR_STRT;           // Запускаем стирание 
 	while (!flash_ready())
-		;                       //Ждем пока страница сотрется. 
-	FLASH->CR &= ~FLASH_CR_PER;                      //Сбрасываем бит обратно
+		;            //Ждем пока страница сотрется. 
+	FLASH->CR &= ~FLASH_CR_PER;           //Сбрасываем бит обратно
 }
 uint32_t flash_read(uint32_t address) {
 	return (*(__IO uint32_t*) address);
 }
-int get_sTimeLinesDiff(Lines* lineToCheck)
+uint16_t get_LineChangeTimeDiff(Lines* lineOldValue, Lines*  lineNewValue, uint8_t waitMinutes)
 {
-	//Если возвращается отрицательное число, то необходимо ждать возвращенное количество минут.
-	//Если положительное, то необходимо добавить к времени на линиях
-	int diff_Min = 0;
-	uint8_t sHour12 = 0, lHour12 = 0;
-	if (sTime.Hours > 12)
+	int16_t diff_Min12 = 0;
+	uint8_t oldHour12 = 0, newHour12 = 0;
+	int16_t oldMinutes = 0, newMinutes = 0;
+	oldHour12 = lineOldValue->Hours % 12;
+	if (oldHour12 == 0)
 	{
-		sHour12 = sTime.Hours - 12;
+		oldHour12 = 12;
 	}
-	else if (sTime.Hours == 0)
+	newHour12 = lineNewValue->Hours % 12;
+	if (newHour12 == 0)
+	{
+		newHour12 = 12;
+	}
+	diff_Min12 = oldHour12 * 60 + lineOldValue->Minutes - (newHour12 * 60 + lineNewValue->Minutes);
+
+	if (diff_Min12 < -waitMinutes)
+	{
+
+		diff_Min12 = 720 + diff_Min12;
+	}
+	oldMinutes = lineOldValue->Hours * 60 + lineOldValue->Minutes;
+	newMinutes = lineNewValue->Hours * 60 + lineNewValue->Minutes;
+	if ((oldMinutes - newMinutes >= 720))
+	{
+		lineNewValue->Hours += 12;
+	}
+	else
+		if ((oldMinutes - newMinutes) >= -720 && (oldMinutes - newMinutes) < -waitMinutes)
+		{
+			lineNewValue->Hours -= 12;
+		}
+
+	return diff_Min12;
+}
+uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
+{
+	int16_t diff_Min12 = 0;
+	uint8_t sHour12 = 0, lHour12 = 0;
+	int16_t sMinutes = 0, lMinutes = 0;
+	sHour12 = sTime.Hours % 12;
+	if (sHour12 == 0)
 	{
 		sHour12 = 12;
 	}
-
-	if (lineToCheck->Hours > 12)
-	{
-		lHour12 = lineToCheck->Hours - 12;
-	}
-	else if (lineToCheck->Hours == 0)
+	lHour12 = lineToCheck->Hours % 12;
+	if (lHour12 == 0)
 	{
 		lHour12 = 12;
 	}
-	diff_Min = sHour12 * 60 + sTime.Minutes - (lHour12 * 60 + lineToCheck->Minutes);
+	diff_Min12 = sHour12 * 60 + sTime.Minutes - (lHour12 * 60 + lineToCheck->Minutes);
 
-	if (diff_Min < -10)
+	if (diff_Min12 < -waitMinutes)
 	{
-		//если ждать более 10 минут
-		diff_Min = 720 - diff_Min;         //крутим стрелки вперед
+
+		diff_Min12 = 720 + diff_Min12;
 	}
-	//корректируем время на линии, подгоняя под системное время для начала инкремента (чтобы не было переполнения часов или недобора)
-	if (sTime.Hours > 12)
+	sMinutes = sTime.Hours * 60 + sTime.Minutes;
+	lMinutes = lineToCheck->Hours * 60 + lineToCheck->Minutes;
+	if ((sMinutes - lMinutes >= 720))
 	{
-		//если системное время более 12ч и до 23ч
-		if (lineToCheck->Hours < 12 && diff_Min>0)
-		{
-			//Если на линии от 0 до 11 часов, и не ждать системное время, 
-			lineToCheck->Hours += 12;   //прибавляем 12 часов к линии
-		}
+		lineToCheck->Hours += 12;
 	}
-	else if (sTime.Hours < 12)
-	{
-		if (lineToCheck->Hours > 12 && diff_Min > 0)
+	else
+		if ((sMinutes - lMinutes) >= -720 && (sMinutes - lMinutes) < -waitMinutes)
 		{
 			lineToCheck->Hours -= 12;
 		}
-	}
-	else if (sTime.Hours == 12 && lineToCheck->Hours == 0)
+
+	return diff_Min12;
+}
+void pollLinesOutput(uint8_t waitMinutes)
+{
+	uint16_t i = 0;
+	gui_Vars.diffSystemLine = get_sTimeLinesDiff(&line[0], waitMinutes);
+	if (gui_Vars.diffSystemLine > 0)
 	{
-		lineToCheck->Hours = 12;
+		for (i = 0; i < gui_Vars.diffSystemLine; i++)
+		{
+			xSemaphoreGive(xSemaphoreOutput);
+		}
 	}
-	else if (sTime.Hours == 0 && lineToCheck->Hours == 12)
+}
+void sortLinesWidth(GUI_Vars* vars)
+{
+	uint8_t i = 0, j = 0, temp = 0, ntemp = 0;
+	vars->lineNumsByWidth[0] = 0;
+	vars->lineNumsByWidth[1] = 1;
+	vars->lineNumsByWidth[2] = 2;
+	vars->lineNumsByWidth[3] = 3;
+	for (i = 0; i < 4 - 1; i++)
 	{
-		lineToCheck->Hours = 0;
+		for (j = 0; j < 3 - i; j++) {
+			if (line[j].Width > line[j + 1].Width)
+			{
+				temp = line[j].Width;
+				ntemp = vars->lineNumsByWidth[j];
+				line[j] = line[j + 1];
+				vars->lineNumsByWidth[j] = vars->lineNumsByWidth[j + 1];
+				line[j + 1].Width = temp;
+				vars->lineNumsByWidth[j + 1] = ntemp;
+			}
+		}
 	}
-	return diff_Min;
+
+}
+void linesIncreaseMinute(uint8_t lineNumber)
+{
+	uint8_t i = 0;
+	if (lineNumber < LINES_AMOUNT)
+	{
+		i = lineNumber;
+	}
+	else
+	{
+		lineNumber--;
+	}
+	for (i; i < lineNumber + 1; i++)
+	{
+		if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
+		{
+
+			line[i].Minutes++;
+			if (line[i].Minutes == 60)
+			{
+				line[i].Minutes = 0;
+				line[i].Hours++;
+				if (line[i].Hours == 24)
+				{
+					line[i].Hours = 0;
+				}
+			}
+			saveLineToBKP(i);
+		}
+	}
+	if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
 }
 void pollButton(uint16_t id, uint8_t action, int8_t* val)
 {

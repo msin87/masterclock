@@ -51,7 +51,10 @@ typedef struct
 	uint8_t prevHour;
 	uint8_t timeFrozen;
 	uint8_t valsChanged;
-
+	uint8_t reserved; //выравнивание 4*uint8 + 4*uint8 = 32бит + 32бит
+	int16_t	diffSystemLine;
+	uint8_t widthSorted[4];
+	uint8_t lineNumsByWidth[4];
 } GUI_Vars;
 typedef struct
 {
@@ -118,6 +121,7 @@ typedef struct
 	uint8_t Status;
 	uint8_t Width;
 	uint8_t Polarity;
+	uint8_t	Pulses;
 	// 15    14    13    12   11   10    9    8    7    6    5    4    3    2    1    0
 	// \status/		\---width--/	\--------------------hours*minutes-----------------/	
 	//    |				  |										|

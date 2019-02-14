@@ -57,39 +57,39 @@
 extern "C" {
 #endif
 
-	/* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
-	/* Private includes ----------------------------------------------------------*/
-	/* USER CODE BEGIN Includes */
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "touch.h"
 #include "sram.h"
 
-	/* USER CODE END Includes */
+/* USER CODE END Includes */
 
-	/* Exported types ------------------------------------------------------------*/
-	/* USER CODE BEGIN ET */
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
 	SemaphoreHandle_t xSemaphoreOutput;
-	/* USER CODE END ET */
+/* USER CODE END ET */
 
-	/* Exported constants --------------------------------------------------------*/
-	/* USER CODE BEGIN EC */
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
 
-	/* USER CODE END EC */
+/* USER CODE END EC */
 
-	/* Exported macro ------------------------------------------------------------*/
-	/* USER CODE BEGIN EM */
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
 
-	/* USER CODE END EM */
+/* USER CODE END EM */
 
-	/* Exported functions prototypes ---------------------------------------------*/
-	void Error_Handler(void);
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
 
-	/* USER CODE BEGIN EFP */
+/* USER CODE BEGIN EFP */
 	void TFT_MainMenu_ShowLineTime(void);
-	/* USER CODE END EFP */
+/* USER CODE END EFP */
 
-	/* Private defines -----------------------------------------------------------*/
+/* Private defines -----------------------------------------------------------*/
 #define OUTPUT_LINE1_Pin GPIO_PIN_0
 #define OUTPUT_LINE1_GPIO_Port GPIOC
 #define OUTPUT_LINE2_Pin GPIO_PIN_1
@@ -106,20 +106,26 @@ extern "C" {
 #define PS_Monitor_GPIO_Port GPIOA
 #define SRAM_CS_Pin GPIO_PIN_4
 #define SRAM_CS_GPIO_Port GPIOA
-#define LED_Pin GPIO_PIN_6
-#define LED_GPIO_Port GPIOC
+#define LINE3_OUTPUT_Pin GPIO_PIN_13
+#define LINE3_OUTPUT_GPIO_Port GPIOD
+#define LINE0_OUTPUT_Pin GPIO_PIN_6
+#define LINE0_OUTPUT_GPIO_Port GPIOC
+#define LINE1_OUTPUT_Pin GPIO_PIN_7
+#define LINE1_OUTPUT_GPIO_Port GPIOC
+#define LINE2_OUTPUT_Pin GPIO_PIN_6
+#define LINE2_OUTPUT_GPIO_Port GPIOD
 #define NOT_PEN_Pin GPIO_PIN_6
 #define NOT_PEN_GPIO_Port GPIOB
 #define TOUCH_CS_Pin GPIO_PIN_7
 #define TOUCH_CS_GPIO_Port GPIOB
 #define LCD_RESET_Pin GPIO_PIN_1
 #define LCD_RESET_GPIO_Port GPIOE
-	/* USER CODE BEGIN Private defines */
+/* USER CODE BEGIN Private defines */
 #define LINE_STATUS_OFF  0
 #define LINE_STATUS_RUN  1
 #define LINE_STATUS_STOP 2
 
-	/* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

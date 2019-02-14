@@ -46,7 +46,7 @@
 
 extern GUI_CONST_STORAGE GUI_CHARINFO GUI_FontArial18_CharInfo[192];
 Lines lineTemp[4];
-
+int16_t diff;
 void lineChangeStatus(uint8_t linenum, uint8_t status)
 {
 	line[linenum].Status = status;
@@ -299,9 +299,20 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				line[gui_Vars.menuState - 4] = lineTemp[gui_Vars.menuState - 4];
+				//line[gui_Vars.menuState - 4] = lineTemp[gui_Vars.menuState - 4];
+				diff = get_LineChangeTimeDiff(&line[gui_Vars.menuState - 4], &lineTemp[gui_Vars.menuState - 4], 10);
+
+				if (diff > 0)
+				{
+					line[gui_Vars.menuState - 4].Pulses += diff;
+					for (diff; diff > 0; diff--)
+					{
+						xSemaphoreGive(xSemaphoreOutput);
+					}
+				}
+
 				gui_Vars.valsChanged = false;
-				saveLineToBKP(gui_Vars.menuState - 4);
+				//saveLineToBKP(gui_Vars.menuState - 4);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
