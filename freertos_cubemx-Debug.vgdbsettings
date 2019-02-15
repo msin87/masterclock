@@ -20,6 +20,7 @@
     <ProjectFile>freertos_cubemx.vcxproj</ProjectFile>
     <RemoteBuildEnvironment>
       <Records />
+      <EnvironmentSetupFiles />
     </RemoteBuildEnvironment>
     <ParallelJobCount>1</ParallelJobCount>
     <SuppressDirectoryChangeMessages>true</SuppressDirectoryChangeMessages>
@@ -44,7 +45,7 @@
   <UserDefinedVariables />
   <ImportedPropertySheets />
   <CodeSense>
-    <Enabled>False</Enabled>
+    <Enabled>True</Enabled>
     <CFLAGS>-Wno-invalid-source-encoding</CFLAGS>
     <CXXFLAGS>-Wno-invalid-source-encoding</CXXFLAGS>
     <ExtraSettings>

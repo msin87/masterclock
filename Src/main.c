@@ -147,7 +147,7 @@ void delay(uint32_t delayTime);
 void delay(uint32_t delayTime)
 {
 	uint32_t i;
-	for (i = 0; i < delayTime; i++);
+	for (i = 0; i < delayTime; i++) ;
 }
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {
@@ -241,7 +241,7 @@ void LinesInit(void)
 	//					0 sec = line status OFF					|
 	//													1440 minutes (1 day)	
 
-	for (i = 0; i < LINES_AMOUNT; i++)
+	for(i = 0 ; i < LINES_AMOUNT ; i++)
 	{
 		dataInBKP = rtc_read_backup_reg(i + BKP_LINE1_OFFSET);
 		line[i].Hours = (dataInBKP & 0b11111111111) / 60;
@@ -249,7 +249,7 @@ void LinesInit(void)
 		line[i].Width = (dataInBKP >> 11) & 0b111;
 		line[i].Status = (dataInBKP >> 14) & 0b11;
 		//Проверка на ошибки, и если что, то все по нулям, и выкл линию. 
-		if ((line[i].Hours > 23) || (line[i].Minutes > 59) || (line[i].Width > 15) || (line[i].Status > 2))
+		if((line[i].Hours > 23) || (line[i].Minutes > 59) || (line[i].Width > 15) || (line[i].Status > 2))
 		{
 			line[i].Minutes = 0;
 			line[i].Hours = 0;
@@ -258,9 +258,9 @@ void LinesInit(void)
 		}
 	}
 	readDaylightSavingFromBKP();
-	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 0 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
+	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
-		doAfterStart = true;
+		doAfterStart = true;  //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
 	}
 	else
 	{
@@ -310,12 +310,13 @@ int main(void)
 	MX_ADC2_Init();
 	MX_ADC3_Init();
 	/* USER CODE BEGIN 2 */
-		  //GUI_Init();
-	HAL_RTCEx_SetSecond_IT(&hrtc);
+	//GUI_Init();
+HAL_RTCEx_SetSecond_IT(&hrtc);
 	//Init_SSD1289();
 
 	variables.calibrated = 1;
 	LinesInit();
+	readLinesPolarityFromBKP();
 	xSemaphoreLine0 = xSemaphoreCreateCounting(720, 0);
 	xSemaphoreLine1 = xSemaphoreCreateCounting(720, 0);
 	xSemaphoreLine2 = xSemaphoreCreateCounting(720, 0);
@@ -789,12 +790,16 @@ static void MX_GPIO_Init(void)
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOE, LINE0_NEG_OUTPUT_Pin | LINE1_NEG_OUTPUT_Pin | LINE2_NEG_OUTPUT_Pin | LINE3_NEG_OUTPUT_Pin
-		| LCD_RESET_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE,
+		LINE0_NEG_OUTPUT_Pin | LINE1_NEG_OUTPUT_Pin | LINE2_NEG_OUTPUT_Pin | LINE3_NEG_OUTPUT_Pin
+		| LCD_RESET_Pin,
+		GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOC, OUTPUT_LINE1_Pin | OUTPUT_LINE2_Pin | OUTPUT_LINE3_Pin | OUTPUT_LINE4_Pin
-		| LINE0_POS_OUTPUT_Pin | LINE1_POS_OUTPUT_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOC,
+		OUTPUT_LINE1_Pin | OUTPUT_LINE2_Pin | OUTPUT_LINE3_Pin | OUTPUT_LINE4_Pin
+		| LINE0_POS_OUTPUT_Pin | LINE1_POS_OUTPUT_Pin,
+		GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(SRAM_CS_GPIO_Port, SRAM_CS_Pin, GPIO_PIN_RESET);
@@ -1003,9 +1008,9 @@ void sendMsgToMainMenu(uint16_t message)
 void vTaskGUI(void const * argument)
 {
 	/* USER CODE BEGIN vTaskGUI */
-		  //int xPos, yPos;
+	//int xPos, yPos;
 
-	uint16_t i = 0;
+uint16_t i = 0;
 
 	GUI_Init();
 	//Calibrate(&variables);
@@ -1023,154 +1028,147 @@ void vTaskGUI(void const * argument)
 		GUI_ALLOC_GetMemInfo(&pInfo);
 
 		if (tickSecond) //см. callback  HAL_RTCEx_RTCEventCallback
-		{
-
-			HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-			//здесь надо реализовать запись секунд в BKP регистр
-
-
-
-			//калибровка
-			if (sTime.Hours == 0 && sTime.Minutes == 0 && sTime.Seconds == 0)
-			{
-				timeCalibr.isCalibrated = false;
-				daylightSaving.needToShift = true;
-			}
-			//коррекция происходит в 01:02:00
-			if (doAfterStart || (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 0))
 			{
 
-				if (timeCalibr.seconds != 0 && timeCalibr.days != 0 && timeCalibr.isCalibrated == false) //если калибровка включена
+				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+				//здесь надо реализовать запись секунд в BKP регистр
+
+
+
+				//калибровка
+				if(sTime.Hours == 0 && sTime.Minutes == 0 && sTime.Seconds == 0)
 				{
-					timeCalibr.daysPassed++;          	//0 => 1
-					if (timeCalibr.daysPassed == timeCalibr.days) //1 == 1
-					{
-						if (timeCalibr.seconds > 0) //если добавить секунды
-						{
-							sTime.Seconds += timeCalibr.seconds;           //прибавили секунды
-							if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
-							{
-								Error_Handler();
-							}
-						}
-						if (timeCalibr.seconds < 0) //если убавить секунды
-						{
-							sTime.Minutes--;
-							; //прибавили минуты
-							if ((timeCalibr.seconds % 60) != 0)
-							{
-								sTime.Seconds = 60 + timeCalibr.seconds;           //прибавили секунды
-							}
-							if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
-							{
-								Error_Handler();
-							}
-							//int8_t -127..0..+127
-							//1 min = 60sec. 127/60=2, 112/60 = 1
-							//00:00:58 00:00:59 00:01:00 => 00:00:00
-						}
-						timeCalibr.daysPassed = 0;           // 1 => 0
-						timeCalibr.isCalibrated = true;
+					timeCalibr.isCalibrated = false;
+					daylightSaving.needToShift = true;
+				}
+				//коррекция происходит в 01:02:00
+				if(doAfterStart || (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30))
+				{
 
+					if (timeCalibr.seconds != 0 && timeCalibr.days != 0 && timeCalibr.isCalibrated == false) //если калибровка включена
+						{
+							timeCalibr.daysPassed++;           	
+							if (timeCalibr.daysPassed == timeCalibr.days) //если настал день калибровки
+								{
+									if (timeCalibr.seconds > 0) //если добавить секунды
+										{
+											sTime.Seconds += timeCalibr.seconds;             //прибавили секунды
+											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+											{
+												Error_Handler();
+											}
+										}
+									if (timeCalibr.seconds < 0) //если убавить секунды
+										{
+											sTime.Seconds += timeCalibr.seconds;              //прибавили секунды
+											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+											{
+												Error_Handler();
+											}
+										}
+									timeCalibr.daysPassed = 0;             // 1 => 0
+									timeCalibr.isCalibrated = true;
+
+								}
+
+						}
+
+					if (doAfterStart || (daylightSaving.needToShift&& daylightSaving.enableDLS&&isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay)))
+					{
+						sTime.Hours += daylightSaving.timeShift;
+						pollLinesOutput(10);
+						daylightSaving.needToShift = false;
+						if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+						{
+							Error_Handler();
+						}
 					}
+					doAfterStart = false;
 
 				}
-
-				if (doAfterStart || (daylightSaving.needToShift&& daylightSaving.enableDLS&&isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay)))
-				{
-					sTime.Hours += daylightSaving.timeShift;
-					daylightSaving.needToShift = false;
-					if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+				if (sTimePrev.Seconds == 59) //каждую минуту
 					{
-						Error_Handler();
+
+						xSemaphoreGive(xSemaphoreLine0);
+						xSemaphoreGive(xSemaphoreLine1);
+						xSemaphoreGive(xSemaphoreLine2);
+						xSemaphoreGive(xSemaphoreLine3);
+						//for (i = 0; i < sizeof(line) / 3; i++)
+						//{
+						//	if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
+						//	{
+
+						//		line[i].Minutes++;
+						//		//здесь нужно реализовать вывод импульса на GPIO
+						//		if (line[i].Minutes == 60)
+						//		{
+						//			line[i].Minutes = 0;
+						//			line[i].Hours++;
+						//			if (line[i].Hours == 24)
+						//			{
+						//				line[i].Hours = 0;
+
+						//			}
+						//		}
+						//		if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
+						//		saveLineToBKP(i);
+						//	}
+						//}
+						/****************конец перебора структур Lines***************************************/
 					}
-				}
-				doAfterStart = false;
+				if (sTimePrev.Hours == 23 && sTime.Hours == 0) //сменился день
+					{
 
-			}
-			if (sTimePrev.Seconds == 59) //каждую минуту
-			{
+						//DateToUpdate.Date = read & 0b11111;
+						//DateToUpdate.Month = (read & 0b111100000) >> 5;
+						//DateToUpdate.Year = (read & 0b1111111000000000) >> 9;
 
-				xSemaphoreGive(xSemaphoreLine0);
-				xSemaphoreGive(xSemaphoreLine1);
-				xSemaphoreGive(xSemaphoreLine2);
-				xSemaphoreGive(xSemaphoreLine3);
-				//for (i = 0; i < sizeof(line) / 3; i++)
-				//{
-				//	if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
-				//	{
-
-				//		line[i].Minutes++;
-				//		//здесь нужно реализовать вывод импульса на GPIO
-				//		if (line[i].Minutes == 60)
-				//		{
-				//			line[i].Minutes = 0;
-				//			line[i].Hours++;
-				//			if (line[i].Hours == 24)
-				//			{
-				//				line[i].Hours = 0;
-
-				//			}
-				//		}
-				//		if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
-				//		saveLineToBKP(i);
-				//	}
-				//}
-				/****************конец перебора структур Lines***************************************/
-			}
-			if (sTimePrev.Hours == 23 && sTime.Hours == 0) //сменился день
-			{
-
-				//DateToUpdate.Date = read & 0b11111;
-				//DateToUpdate.Month = (read & 0b111100000) >> 5;
-				//DateToUpdate.Year = (read & 0b1111111000000000) >> 9;
-
-				saveDateToBKP();
+						saveDateToBKP();
+						switch (gui_Vars.menuState) {
+						case MENU_STATE_MAIN:
+							sendMsg(handles.hMainMenu, WM_DATE_UPDATE);
+							break;
+						case MENU_STATE_TIMEDATESETUP:
+							sendMsg(handles.hTimeDateSetupMenu, WM_DATE_UPDATE);
+							break;
+						}
+					}
 				switch (gui_Vars.menuState) {
 				case MENU_STATE_MAIN:
-					sendMsg(handles.hMainMenu, WM_DATE_UPDATE);
+					sendMsg(handles.hMainMenu, WM_SEC_UPDATE);
 					break;
-				case MENU_STATE_TIMEDATESETUP:
-					sendMsg(handles.hTimeDateSetupMenu, WM_DATE_UPDATE);
+				case MENU_STATE_TIMESETUP:
+					sendMsg(handles.hTimeSetupMenu, WM_SEC_UPDATE);
 					break;
-				}
-			}
-			switch (gui_Vars.menuState) {
-			case MENU_STATE_MAIN:
-				sendMsg(handles.hMainMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_TIMESETUP:
-				sendMsg(handles.hTimeSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE1SETUP:
-				sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE2SETUP:
-				sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE3SETUP:
-				sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE4SETUP:
-				sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE1SETUP_PULSE:
-				sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE2SETUP_PULSE:
-				sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE3SETUP_PULSE:
-				sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE4SETUP_PULSE:
-				sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
-				break;
+				case MENU_STATE_LINE1SETUP:
+					sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE2SETUP:
+					sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE3SETUP:
+					sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE4SETUP:
+					sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE1SETUP_PULSE:
+					sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE2SETUP_PULSE:
+					sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE3SETUP_PULSE:
+					sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE4SETUP_PULSE:
+					sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
+					break;
 
+				}
+				tickSecond = 0;
+				sTimePrev = sTime;
 			}
-			tickSecond = 0;
-			sTimePrev = sTime;
-		}
 
 	}
 	/* USER CODE END vTaskGUI */
@@ -1208,6 +1206,7 @@ void vTaskLine0(void const * argument)
 				LINE0_NEG_OUTPUT_GPIO_Port->BSRR = LINE0_NEG_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}
+			saveLinesPolarityToBKP();
 		}
 	}
 	/* USER CODE END vTaskLine0 */
@@ -1245,6 +1244,7 @@ void vTaskLine1(void const * argument)
 				LINE1_NEG_OUTPUT_GPIO_Port->BSRR = LINE1_NEG_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}
+			saveLinesPolarityToBKP();
 		}
 	}
 	/* USER CODE END vTaskLine1 */
@@ -1282,6 +1282,7 @@ void vTaskLine2(void const * argument)
 				LINE2_NEG_OUTPUT_GPIO_Port->BSRR = LINE2_NEG_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}
+			saveLinesPolarityToBKP();
 		}
 	}
 	/* USER CODE END vTaskLine2 */
@@ -1319,6 +1320,7 @@ void vTaskLine3(void const * argument)
 				LINE3_NEG_OUTPUT_GPIO_Port->BSRR = LINE3_NEG_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}
+			saveLinesPolarityToBKP();
 		}
 	}
 	/* USER CODE END vTaskLine3 */

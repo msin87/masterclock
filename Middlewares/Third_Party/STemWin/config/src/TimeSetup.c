@@ -54,22 +54,22 @@ RTC_TimeTypeDef sTime_tmp;
 *       _aDialogCreate
 */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
-  { WINDOW_CreateIndirect, "Window", ID_WINDOW_TIMESETUP, 1, -3, 320, 240, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_HOURplus, 5, 85, 70, 70, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Header", ID_HEADER_HMS, 0, 20, 240, 30, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Header", ID_HEADER_HMS_VALUE, 0, 50, 240, 30, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_MINplus, 85, 85, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_SECplus, 165, 85, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Ввод", ID_BUTTON_ENTER, 245, 85, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Калибр.", ID_BUTTON_CALIBRATE, 245, 5, 70, 30, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Дата", ID_BUTTON_DATE, 245, 45, 70, 30, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_HOURminus, 5, 165, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_MINminus, 85, 165, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_SECminus, 165, 165, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Назад", ID_BUTTON_BACK, 245, 165, 70, 70, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Header", ID_HEADER_WINDOW_TIMESETUP, 0, 0, 240, 20, 0, 0x0, 0 },
-  // USER START (Optionally insert additional widgets)
-  // USER END
+	{ WINDOW_CreateIndirect, "Window", ID_WINDOW_TIMESETUP, 1, -3, 320, 240, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_HOURplus, 5, 85, 70, 70, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Header", ID_HEADER_HMS, 0, 20, 240, 30, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Header", ID_HEADER_HMS_VALUE, 0, 50, 240, 30, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_MINplus, 85, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_SECplus, 165, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Ввод", ID_BUTTON_ENTER, 245, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Калибр.", ID_BUTTON_CALIBRATE, 245, 5, 70, 30, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Дата", ID_BUTTON_DATE, 245, 45, 70, 30, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_HOURminus, 5, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_MINminus, 85, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_SECminus, 165, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Назад", ID_BUTTON_BACK, 245, 165, 70, 70, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Header", ID_HEADER_WINDOW_TIMESETUP, 0, 0, 240, 20, 0, 0x0, 0 },
+	// USER START (Optionally insert additional widgets)
+	// USER END
 };
 
 /*********************************************************************
@@ -95,7 +95,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	// USER START (Optionally insert additional variables)
 	// USER END
 
-	switch (pMsg->MsgId) {
+	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 		hItem = pMsg->hWin;
 		WINDOW_SetBkColor(hItem, 0x191615);
@@ -139,13 +139,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			sprintf(time, "%02d", sTime.Seconds);
 			HEADER_SetItemText(handles.hHeaderTimeSetupVals, 2, time);
 			if (gui_Vars.prevSecond_H == 5 && gui_Vars.prevSecond_L == 9) //прошла минута
-			{
-				sprintf(time, "%02d", sTime.Hours);
-				HEADER_SetItemText(handles.hHeaderTimeSetupVals, 0, time);
-				sprintf(time, "%02d", sTime.Minutes);
-				HEADER_SetItemText(handles.hHeaderTimeSetupVals, 1, time);
+				{
+					sprintf(time, "%02d", sTime.Hours);
+					HEADER_SetItemText(handles.hHeaderTimeSetupVals, 0, time);
+					sprintf(time, "%02d", sTime.Minutes);
+					HEADER_SetItemText(handles.hHeaderTimeSetupVals, 1, time);
 
-			}
+				}
 			HEADER_SetTextColor(handles.hHeaderTimeSetupVals, GUI_WHITE);
 			pMsg->MsgId = 0;
 			gui_Vars.prevSecond_L = sTime.Seconds % 10;
@@ -158,7 +158,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		NCode = pMsg->Data.v;
 		switch (Id) {
 		case ID_BUTTON_HOURplus: // Notifications sent by 'h+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
@@ -190,7 +190,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 
 		case ID_BUTTON_MINplus: // Notifications sent by 'm+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
@@ -218,7 +218,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_SECplus: // Notifications sent by 's+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
@@ -247,7 +247,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_ENTER: // Notifications sent by 'Enter'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -261,8 +261,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					while (1)
 					{
 						gui_Vars.timeFrozen = 0;
-					};
+					}					
 				}
+				pollLinesOutput(10);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -270,7 +271,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_CALIBRATE: // Notifications sent by 'Calibrate'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -289,7 +290,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_DATE: // Notifications sent by 'Date'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -308,7 +309,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_HOURminus: // Notifications sent by 'h-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
@@ -332,7 +333,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_MINminus: // Notifications sent by 'm-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
@@ -357,7 +358,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_SECminus: // Notifications sent by 's-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
@@ -381,7 +382,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_BACK: // Notifications sent by 'Back'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -402,7 +403,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_HEADER_WINDOW_TIMESETUP: // Notifications sent by 'Header'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -425,7 +426,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 		// USER START (Optionally insert additional message handling)
 		// USER END
-	default:
+	default :
 		WM_DefaultProc(pMsg);
 		break;
 	}
