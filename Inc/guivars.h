@@ -32,6 +32,7 @@
 #define BKP_DAYLIGHTSAVING_OFFSET BKP_LINE4_OFFSET+1
 
 #define BKP_TIMECALIBR_OFFSET BKP_DAYLIGHTSAVING_OFFSET + 1
+#define BKP_LINESPOLARITY_OFFSET BKP_DAYLIGHTSAVING_OFFSET
 #define BKP_CRC_OFFSET_HIGH BKP_TIMECALIBR_OFFSET+1
 #define BKP_CRC_OFFSET_LOW BKP_CRC_OFFSET_HIGH+1
 
@@ -52,10 +53,11 @@ typedef struct
 	uint8_t prevHour;
 	uint8_t timeFrozen;
 	uint8_t valsChanged;
-	uint8_t linesPolarity; //выравнивание 4*uint8 + 4*uint8 = 32бит + 32бит
-	int16_t	diffSystemLine;
+	uint8_t linesPolarity;
 	uint8_t widthSorted[4];
 	uint8_t lineNumsByWidth[4];
+	int16_t	diffSystemLine;
+
 } GUI_Vars;
 typedef struct
 {

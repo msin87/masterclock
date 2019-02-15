@@ -50,20 +50,20 @@
 *       _aDialogCreate
 */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
-  { WINDOW_CreateIndirect, "Window", ID_WINDOW_TIMECALIBRATE, 1, -3, 320, 240, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_SECplus, 5, 85, 70, 70, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "2nd Line", ID_HEADER_TIMECALIBRATE_2ND_LINE, 0, 20, 240, 30, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Values", ID_HEADER_TIMECALIBRATE_VALS, 0, 50, 240, 30, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_DAYplus, 85, 85, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Зима Лето", ID_BUTTON_TIMECALIBRATE_SUMWIN, 245, 5, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Ввод", ID_BUTTON_TIMECALIBRATE_ENTER, 245, 85, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_SECminus, 5, 165, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_DAYminus, 85, 165, 70, 70, 0, 0x0, 0 },
-  //{ BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_DAYminus, 165, 165, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Назад", ID_BUTTON_TIMECALIBRATE_BACK, 245, 165, 70, 70, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Header", ID_HEADER_TIMECALIBRATE, 0, 0, 240, 20, 0, 0x0, 0 },
-  // USER START (Optionally insert additional widgets)
-  // USER END
+	{ WINDOW_CreateIndirect, "Window", ID_WINDOW_TIMECALIBRATE, 1, -3, 320, 240, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_SECplus, 5, 85, 70, 70, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "2nd Line", ID_HEADER_TIMECALIBRATE_2ND_LINE, 0, 20, 240, 30, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Values", ID_HEADER_TIMECALIBRATE_VALS, 0, 50, 240, 30, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_DAYplus, 85, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Зима Лето", ID_BUTTON_TIMECALIBRATE_SUMWIN, 245, 5, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Ввод", ID_BUTTON_TIMECALIBRATE_ENTER, 245, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_SECminus, 5, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_DAYminus, 85, 165, 70, 70, 0, 0x0, 0 },
+	//{ BUTTON_CreateIndirect, "", ID_BUTTON_TIMECALIBRATE_DAYminus, 165, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Назад", ID_BUTTON_TIMECALIBRATE_BACK, 245, 165, 70, 70, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Header", ID_HEADER_TIMECALIBRATE, 0, 0, 240, 20, 0, 0x0, 0 },
+	// USER START (Optionally insert additional widgets)
+	// USER END
 };
 
 /*********************************************************************
@@ -94,7 +94,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	// USER START (Optionally insert additional variables)
 	// USER END
 
-	switch (pMsg->MsgId) {
+	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 		//
 		// Initialization of 'Window'
@@ -154,17 +154,17 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		NCode = pMsg->Data.v;
 		switch (Id) {
 		case ID_BUTTON_TIMECALIBRATE_SECplus: // Notifications sent by '+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
-				if (timeCalibr.seconds != 60)
+				if (timeCalibr.seconds != 29)
 				{
 					pollButton(ID_BUTTON_TIMECALIBRATE_SECplus, WM_NOTIFICATION_CLICKED, (int8_t*)&timeCalibr.seconds);
 				}
 				else
 				{
-					longPressCNT.value = 60;
+					longPressCNT.value = 29;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -183,11 +183,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_TIMECALIBRATE_DAYplus: // Notifications sent by 'd+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
-				if (timeCalibr.seconds != 0xFF)
+				if (timeCalibr.days != 255)
 				{
 					pollButton(ID_BUTTON_TIMECALIBRATE_DAYplus, WM_NOTIFICATION_CLICKED, (int8_t*)&timeCalibr.days);
 				}
@@ -212,7 +212,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_TIMECALIBRATE_ENTER: // Notifications sent by 'Enter'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -232,17 +232,17 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_TIMECALIBRATE_SECminus: // Notifications sent by '-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
-				if (timeCalibr.seconds != -60)
+				if (timeCalibr.seconds != -30)
 				{
 					pollButton(ID_BUTTON_TIMECALIBRATE_SECminus, WM_NOTIFICATION_CLICKED, (int8_t*)&timeCalibr.seconds);
 				}
 				else
 				{
-					longPressCNT.value = -60;
+					longPressCNT.value = -30;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -261,7 +261,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_TIMECALIBRATE_DAYminus: // Notifications sent by 'd-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 1;
@@ -285,7 +285,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_TIMECALIBRATE_BACK: // Notifications sent by 'Back'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -305,7 +305,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_TIMECALIBRATE_SUMWIN: // Notifications sent by 'Back'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -330,7 +330,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 		// USER START (Optionally insert additional message handling)
 		// USER END
-	default:
+	default :
 		WM_DefaultProc(pMsg);
 		break;
 	}
