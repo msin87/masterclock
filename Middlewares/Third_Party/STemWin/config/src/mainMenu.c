@@ -9006,7 +9006,7 @@ static const U8 _acImage_2[3088] = {
 *
 *       _aDialogCreate
 *        																		xPos,yPos,xSize,ySize
-*/ 
+*/
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ WINDOW_CreateIndirect, "Window", ID_MAIN_WINDOW, 0, 0, 320, 240, 0, 0x0, 0 },
 	{ BUTTON_CreateIndirect, "", ID_BUTTON_LINE1, 5, 165, 70, 70, 0, 0x0, 0 },
@@ -9020,17 +9020,17 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
    // { TEXT_CreateIndirect, "Линия 2", ID_TEXT_1, 			90, 170, 60, 20, 0, 0x0, 0 },
    // { TEXT_CreateIndirect, "Линия 3", ID_TEXT_2, 			170, 170, 60, 20, 0, 0x0, 0 },
    // { TEXT_CreateIndirect, "Линия 4", ID_TEXT_3, 			250, 170, 60, 20, 0, 0x0, 0 },
-    { TEXT_CreateIndirect, "--:--", ID_TEXT_HOUR_MIN, 30, 60, 160, 53, 0, 0x0, 0 },
+	{ TEXT_CreateIndirect, "--:--", ID_TEXT_HOUR_MIN, 30, 60, 160, 53, 0, 0x0, 0 },
 	{ TEXT_CreateIndirect, ":-", ID_TEXT_SECONDS_H, 193, 60, 60, 53, 0, 0x0, 0 },
 	{ TEXT_CreateIndirect, "-", ID_TEXT_SECONDS_L, 256, 60, 30, 53, 0, 0x0, 0 },
-	// { TEXT_CreateIndirect, "", ID_TEXT_LINE1, 			15, 209, 50, 20, 0, 0x0, 0 },
-	// { TEXT_CreateIndirect, "17.12.2018 mon",ID_TEXT_DATE,110, 116, 100, 20, 0, 0x0, 0 },
-	// {TEXT_CreateIndirect, "", ID_TEXT_LINE2, 			95, 209, 50, 20, 0, 0x0, 0 },
-	//  { TEXT_CreateIndirect, "", ID_TEXT_LINE3, 			175, 209, 50, 20, 0, 0x0, 0 },
-	 // { TEXT_CreateIndirect, "", ID_TEXT_LINE4, 			255, 209, 50, 20, 0, 0x0, 0 },
-	
-	  // USER START (Optionally insert additional widgets)
-	  // USER END
+	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE1, 			15, 209, 50, 20, 0, 0x0, 0 },
+	{ TEXT_CreateIndirect, "17.12.2018 mon",ID_TEXT_DATE,110, 116, 100, 20, 0, 0x0, 0 },
+	//{TEXT_CreateIndirect, "", ID_TEXT_LINE2, 			95, 209, 50, 20, 0, 0x0, 0 },
+	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE3, 			175, 209, 50, 20, 0, 0x0, 0 },
+	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE4, 			255, 209, 50, 20, 0, 0x0, 0 },
+
+	// USER START (Optionally insert additional widgets)
+	// USER END
 };
 
 /*********************************************************************
@@ -9065,17 +9065,17 @@ static void _cbButton(WM_MESSAGE * pMsg)
 	GUI_RECT Rect;
 	//	static BUTTON_SKINFLEX_PROPS PropsUnpressed;
 		//char str[5];
-		unsigned char lineNum = 0xFF;
+	unsigned char lineNum = 0xFF;
 	int      TextAlign;
 	int id;
-	
 
-	
+
+
 	switch (pMsg->MsgId) {
-		
+
 	case WM_PAINT:
-		BUTTON_Callback(pMsg);	
-  
+		BUTTON_Callback(pMsg);
+
 		id = WM_GetId(pMsg->hWin);
 		WM_GetClientRect(&Rect);
 		GUI_SetFont(&GUI_FontArial18);
@@ -9087,30 +9087,93 @@ static void _cbButton(WM_MESSAGE * pMsg)
 		{
 		case ID_BUTTON_LINE1:
 			GUI_DispStringInRect("Линия 1", &Rect, TextAlign);
-			lineNum = 0;
-			if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime_ex(lineNum);
+			Rect.y0 = 50;
+			Rect.y1 = 60;
+			switch (line[0].Status) {
+			case LINE_STATUS_OFF:
+				GUI_SetColor(GUI_GRAY);
+				strcpy(timeString, "ВЫКЛ");
+				break;
+			case LINE_STATUS_RUN:
+				sprintf(timeString, "%02d:%02d", line[0].Hours, line[0].Minutes);
+				GUI_SetColor(GUI_WHITE);
+				break;
+			case LINE_STATUS_STOP:
+				strcpy(timeString, "СТОП");
+				GUI_SetColor(GUI_RED);
+				break;
+			}
+
+			GUI_DispStringInRect(timeString, &Rect, TextAlign);
+
 			break;
 		case ID_BUTTON_LINE2:
 			GUI_DispStringInRect("Линия 2", &Rect, TextAlign);
-			lineNum = 1;
-			if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime_ex(lineNum);
+			Rect.y0 = 50;
+			Rect.y1 = 60;
+			switch (line[1].Status) {
+			case LINE_STATUS_OFF:
+				GUI_SetColor(GUI_GRAY);
+				strcpy(timeString, "ВЫКЛ");
+				break;
+			case LINE_STATUS_RUN:
+				sprintf(timeString, "%02d:%02d", line[1].Hours, line[1].Minutes);
+				GUI_SetColor(GUI_WHITE);
+				break;
+			case LINE_STATUS_STOP:
+				strcpy(timeString, "СТОП");
+				GUI_SetColor(GUI_RED);
+				break;
+			}
+			GUI_DispStringInRect(timeString, &Rect, TextAlign);
+
 			break;
 		case ID_BUTTON_LINE3:
 			GUI_DispStringInRect("Линия 3", &Rect, TextAlign);
-			lineNum = 2;
-			if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime_ex(lineNum);
+			Rect.y0 = 50;
+			Rect.y1 = 60;
+			switch (line[2].Status) {
+			case LINE_STATUS_OFF:
+				GUI_SetColor(GUI_GRAY);
+				strcpy(timeString, "ВЫКЛ");
+				break;
+			case LINE_STATUS_RUN:
+				sprintf(timeString, "%02d:%02d", line[2].Hours, line[2].Minutes);
+				GUI_SetColor(GUI_WHITE);
+				break;
+			case LINE_STATUS_STOP:
+				strcpy(timeString, "СТОП");
+				GUI_SetColor(GUI_RED);
+				break;
+			}
+			GUI_DispStringInRect(timeString, &Rect, TextAlign);
 			break;
 		case ID_BUTTON_LINE4:
 			GUI_DispStringInRect("Линия 4", &Rect, TextAlign);
-			lineNum = 3;
-			if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime_ex(lineNum);
+			Rect.y0 = 50;
+			Rect.y1 = 60;
+			switch (line[3].Status) {
+			case LINE_STATUS_OFF:
+				GUI_SetColor(GUI_GRAY);
+				strcpy(timeString, "ВЫКЛ");
+				break;
+			case LINE_STATUS_RUN:
+				sprintf(timeString, "%02d:%02d", line[3].Hours, line[3].Minutes);
+				GUI_SetColor(GUI_WHITE);
+				break;
+			case LINE_STATUS_STOP:
+				strcpy(timeString, "СТОП");
+				GUI_SetColor(GUI_RED);
+				break;
+			}
+			GUI_DispStringInRect(timeString, &Rect, TextAlign);
 			break;
 		}
 		//GUI_DispStringInRect(str, &Rect, TextAlign);		
-break;
+		break;
 	default:
 		BUTTON_Callback(pMsg);
-		if (lineNum != 0xFF && gui_Vars.menuState == MENU_STATE_MAIN) 
+		if (lineNum != 0xFF && gui_Vars.menuState == MENU_STATE_MAIN)
 		{
 			TFT_MainMenu_ShowLineTime_ex(lineNum);
 		}
@@ -9138,19 +9201,19 @@ void forceUpdateStrings(void)
 	WM_ShowWindow(handles.hMainMenu);
 	sprintf(timeString, ":%d", sTime.Seconds / 10);
 	TEXT_SetText(handles.hSecondsString_H, timeString);
-	sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes); 
+	sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
 	TEXT_SetText(handles.hHourMinString, timeString);
 	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 	TFT_MainMenu_ShowDate();
 }
-/*static void _cbLocalTimeSetupWindows(WM_MESSAGE * pMsg) 
+/*static void _cbLocalTimeSetupWindows(WM_MESSAGE * pMsg)
 {
 	FRAMEWIN_Handle hItem;
-	
+
 	switch (pMsg->MsgId) {
   case WM_CREATE:
-		
-		
+
+
 		break;
 	}
 }*/
@@ -9159,7 +9222,7 @@ void forceUpdateStrings(void)
 *       _cbDialog
 */
 static void _cbDialog(WM_MESSAGE * pMsg) {
-	
+
 	const void * pData;
 	WM_HWIN      hItem;
 	U32          FileSize;
@@ -9168,9 +9231,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	// USER START (Optionally insert additional variables)
 	// USER END
 
-	switch(pMsg->MsgId) {
+	switch (pMsg->MsgId) {
 	case WM_INIT_DIALOG:
-		
+
 		//
 		// Initialization of 'Window'
 		//
@@ -9185,7 +9248,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	 //
 	 // Initialization of 'Line 2'
 	 //
-	 hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetFont(hItem, &GUI_FontArial18);
@@ -9207,7 +9270,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of ID_TEXT_HOUR_MIN
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_HOUR_MIN);
-		
+
 		handles.hHourMinString = hItem;
 		HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
 		sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
@@ -9218,7 +9281,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//
    // Initialization of ID_TEXT_SECONDS_H
    //
-   hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_SECONDS_H);
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_SECONDS_H);
 		sprintf(timeString, ":%d", sTime.Seconds / 10);
 		TEXT_SetText(hItem, timeString);
 		handles.hSecondsString_H = hItem;
@@ -9228,7 +9291,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//
    // Initialization of ID_TEXT_SECONDS_L
    //
-   hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_SECONDS_L);
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_SECONDS_L);
 		sprintf(timeString, "%d", sTime.Seconds % 10);
 		TEXT_SetText(hItem, timeString);
 		handles.hSecondsString_L = hItem;
@@ -9242,37 +9305,37 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			//handles.hTimeLine1=hItem;
 		//TEXT_SetFont(hItem, &GUI_FontArial18);
 	   // TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	    //
-	    // Initialization of '17.12.2018 mon'
-	    //
-	 // hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_DATE);
-	  //TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	 // TEXT_SetFont(hItem, &GUI_FontArial18 );
-	  //
-	  // Initialization of '_______'
-	  //
-	  //hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE2);
-	  //	handles.hTimeLine2=hItem;
-	  //	TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	//  TEXT_SetFont(hItem, &GUI_FontArial18);
-	  //
-	  // Initialization of '_______'
-	  //
-	  //hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE3);
-		  //handles.hTimeLine3=hItem;
-	 // TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	  //TEXT_SetFont(hItem, &GUI_FontArial18);
-	  //
-	  // Initialization of '_______'
-	  //
-	//  hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE4);
-	  //	handles.hTimeLine4=hItem;
-	//  TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	//  TEXT_SetFont(hItem, &GUI_FontArial18);
-	  //
-	  // Initialization of 'Image'
-	  //
-	  hItem = WM_GetDialogItem(pMsg->hWin, ID_IMAGE_0);
+		//
+		// Initialization of '17.12.2018 mon'
+		//
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_DATE);
+		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+		TEXT_SetFont(hItem, &GUI_FontArial18);
+		//
+		// Initialization of '_______'
+		//
+		//hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE2);
+		//	handles.hTimeLine2=hItem;
+		//	TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+	  //  TEXT_SetFont(hItem, &GUI_FontArial18);
+		//
+		// Initialization of '_______'
+		//
+		//hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE3);
+			//handles.hTimeLine3=hItem;
+	   // TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+		//TEXT_SetFont(hItem, &GUI_FontArial18);
+		//
+		// Initialization of '_______'
+		//
+	  //  hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE4);
+		//	handles.hTimeLine4=hItem;
+	  //  TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+	  //  TEXT_SetFont(hItem, &GUI_FontArial18);
+		//
+		// Initialization of 'Image'
+		//
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_IMAGE_0);
 		pData = _GetImageById(ID_IMAGE_0_IMAGE_0, &FileSize);
 		IMAGE_SetDTA(hItem, pData, FileSize);
 		//
@@ -9292,37 +9355,37 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			//
 		// Initialization of 'ID_BUTTON_LINE1 '
 		//
-			handles.hButtonLine1 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE1);
+		handles.hButtonLine1 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE1);
 		//BUTTON_SetText(handles.hButtonLine1,"1");
 		//BUTTON_SetSkin(handles.hButtonLine1, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE2 '
-    //
+	//
 		handles.hButtonLine2 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE2);
 		//BUTTON_SetText(handles.hButtonLine2,"2");
 		//BUTTON_SetSkin(handles.hButtonLine2, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE3 '
-    //
+	//
 		handles.hButtonLine3 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE3);
 		//BUTTON_SetText(handles.hButtonLine3,"3");
 		//BUTTON_SetSkin(handles.hButtonLine3, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE4 '
-    //
+	//
 		handles.hButtonLine4 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE4);
 		//BUTTON_SetText(handles.hButtonLine4,"4");
 		//BUTTON_SetSkin(handles.hButtonLine4, _DrawSkin_BUTTON);
-    // USER END
-		
-    break;
+	// USER END
+
+		break;
 	case WM_BACKTOMAINMENU:
 		gui_Vars.menuState = MENU_STATE_MAIN;
 		forceUpdateStrings();
 		break;
-		
+
 	case WM_DATE_UPDATE:
 		HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 		if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowDate();
-			
-								
+
+
 		break;
 	case WM_SEC_UPDATE:
 		sprintf(timeString, "%d", sTime.Seconds % 10);
@@ -9333,37 +9396,37 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			sprintf(timeString, ":%d", sTime.Seconds / 10);
 			TEXT_SetText(handles.hSecondsString_H, timeString);
 			if (gui_Vars.prevSecond_H == 5) //прошла минута
-				{
-					sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes); 
-					TEXT_SetText(handles.hHourMinString, timeString);    //обновление строки с часами и минутами
-				
-				}
+			{
+				sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
+				TEXT_SetText(handles.hHourMinString, timeString);      //обновление строки с часами и минутами
+
+			}
 		}
 		pMsg->MsgId = 0;
 		gui_Vars.prevSecond_L = sTime.Seconds % 10;
 		gui_Vars.prevSecond_H = sTime.Seconds / 10;
 		break;
-		
-			
+
+
 
 	case WM_NOTIFY_PARENT:
-		Id    = WM_GetId(pMsg->hWinSrc);
+		Id = WM_GetId(pMsg->hWinSrc);
 		NCode = pMsg->Data.v;
 		switch (Id) {
 		case ID_BUTTON_LINE1: // Notifications sent by ''
-		  switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 						//TFT_ReadBackground(15,209, 18, backgroundBuffer);
-				
+
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-						gui_Vars.menuState = MENU_STATE_LINE1SETUP;
+				gui_Vars.menuState = MENU_STATE_LINE1SETUP;
 				WM_HideWindow(handles.hMainMenu);
-				CreateLineSetupWindow();	
-				
+				CreateLineSetupWindow();
+
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9372,16 +9435,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_LINE2: // Notifications sent by ''
-		  switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-						gui_Vars.menuState = MENU_STATE_LINE2SETUP;
+				gui_Vars.menuState = MENU_STATE_LINE2SETUP;
 				WM_HideWindow(handles.hMainMenu);
-				CreateLineSetupWindow();	
+				CreateLineSetupWindow();
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9389,16 +9452,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_LINE3: // Notifications sent by ''
-		  switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-						gui_Vars.menuState = MENU_STATE_LINE3SETUP;
+				gui_Vars.menuState = MENU_STATE_LINE3SETUP;
 				WM_HideWindow(handles.hMainMenu);
-				CreateLineSetupWindow();	
+				CreateLineSetupWindow();
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9406,16 +9469,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_LINE4: // Notifications sent by ''
-		  switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-						gui_Vars.menuState = MENU_STATE_LINE4SETUP;
+				gui_Vars.menuState = MENU_STATE_LINE4SETUP;
 				WM_HideWindow(handles.hMainMenu);
-				CreateLineSetupWindow();	
+				CreateLineSetupWindow();
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9423,21 +9486,21 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 			// USER START (Optionally insert additional code for further Ids)
-				case ID_IMAGE_1 :    // Notifications sent by Lock
-					switch(NCode) {
+		case ID_IMAGE_1:      // Notifications sent by Lock
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				
+
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.menuLocked = 0;
-				
+
 				WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
 				WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
-				
-				
+
+
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9445,36 +9508,36 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_IMAGE_2: // Notifications sent by Unlock
-			switch(NCode) {
-			case WM_NOTIFICATION_CLICKED:
-				// USER START (Optionally insert code for reacting on notification message)
-				// USER END
-			break;
-			case WM_NOTIFICATION_RELEASED:
-				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuLocked = 1;
-				WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
-				WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
-				// USER END
-			break;
-				// USER START (Optionally insert additional code for further notification handling)
-				// USER END
-			}
-			break;
-		case ID_TEXT_HOUR_MIN: // Notifications sent by Unlock
-		switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-					gui_Vars.menuState = MENU_STATE_TIMESETUP;
+				gui_Vars.menuLocked = 1;
+				WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
+				WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_TEXT_HOUR_MIN: // Notifications sent by Unlock
+			switch (NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+				gui_Vars.menuState = MENU_STATE_TIMESETUP;
 				WM_HideWindow(handles.hMainMenu);
-				CreateTimeSetupWindow();	
-				
-				
-				
+				CreateTimeSetupWindow();
+
+
+
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9485,10 +9548,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		}
 		break;
 		// USER START (Optionally insert additional message handling)
-   
+
 		// USER END
-		default :
-		  WM_DefaultProc(pMsg);
+	default:
+		WM_DefaultProc(pMsg);
 		if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowDate();
 		break;
 	}
@@ -9513,17 +9576,17 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
  // int      TextAlign;
 //	int id;
   switch (pMsg->MsgId) {
-		
+
 		case WM_PAINT:
-			
+
 			for (y=180;y<220;y++)
 			{
 				for (x=210;x<230;x++)
 					{
 						plotpx(x,y,0xFFFF);
-					}	
+					}
 			}
-			
+
 			TEXT_Callback(pMsg);
 			//str[0]=0;
 			break;
@@ -9532,29 +9595,29 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 void TFT_ReadBackground(u16 x, u16 y, uint8_t fontsize, uint16_t* backgroundBuffer)
 {
 	unsigned char i;
-	for (i = 0; i < fontsize; i++) 
+	for (i = 0; i < fontsize; i++)
 	{
 		backgroundBuffer[i] = readPixel(y + i, x);
 	}
 }
 void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
-{       
-	
+{
+
 	GUI_CHARINFO charinfo;
 	u8 mask;
 	//	uint16_t test=0;
-		u8 pos, t, backgrline = 0, xlimit, step = 0;
-	unsigned char* p;	
+	u8 pos, t, backgrline = 0, xlimit, step = 0;
+	unsigned char* p;
 
 	//num=num-0x20;
 	charinfo = GUI_FontArial18_CharInfo[num];
 	//if(x>MAX_CHAR_POSX||y>MAX_CHAR_POSY)return;
 	//??¶??»????·?????µ????? 
 	//??±?????
-	  
+
   //writeLCDCommand(32, y);
   //writeLCDCommand(33, y+11);
-	
+
 	Set_Work_Area(y, x, y + (charinfo.XSize - 1), x + fontsize);
 	//for lgdp4531 lgdp4532
 	//writeLCDCommand(0x0050, x); // Horizontal GRAM Start Address
@@ -9563,14 +9626,14 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 	//writeLCDCommand(0x0053, y+(charinfo.XSize-1)); // Vertical GRAM Start Address	 
 	//writeLCDCommand(32, x); //lgdp4532
 	//writeLCDCommand(33, y);	// lgdp4532
-	
+
 	//Lcd_Write_Reg(0x004e,x);
 	//Lcd_Write_Reg(0x004f,y);
 	Lcd_Write_Index(0x22);
-   
+
 	p = (unsigned char*)GUI_FontArial18_CharInfo[num].pData;
-   
-	if (charinfo.XSize < 9) 
+
+	if (charinfo.XSize < 9)
 	{
 		xlimit = charinfo.XSize;
 	}
@@ -9579,29 +9642,29 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 		xlimit = 8;
 	}
 	//  LCD_SetPos(x,x+5,y,y+11);//320x240
-   
-	
+
+
 	   //;//µ?µ??«????µ??µ
-	   for(pos = 0 ; pos < fontsize*charinfo.BytesPerLine ; pos++)
+	for (pos = 0; pos < fontsize*charinfo.BytesPerLine; pos++)
 	{
 		mask = 0x80;
 		for (t = 0; t < xlimit; t++)
-		{                 
-			if (step == charinfo.XSize&&(charinfo.XSize > 8))
+		{
+			if (step == charinfo.XSize && (charinfo.XSize > 8))
 			{
 				step = 0;
 				break;
 			}
-			if (p[pos]&mask)
+			if (p[pos] & mask)
 			{
 				Lcd_Write_Data(color);
 			}
-			else 
+			else
 			{
-						
-				Lcd_Write_Data(backgroundBuffer[backgrline]);   //°??«  
-					
-			}						
+
+				Lcd_Write_Data(backgroundBuffer[backgrline]);     //°??«  
+
+			}
 			mask >>= 1;
 			step++;
 		}
@@ -9614,9 +9677,9 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 	x = 0;
 	x |= 239 << 8;
 	Set_Work_Area(0, 0, 319, 239);
-	
 
-}  	 
+
+}
 WM_HWIN CreateMainMenu(void) {
 	WM_HWIN hWin;
 	gui_Vars.menuLocked = 1;
@@ -9641,7 +9704,7 @@ WM_HWIN CreateMainMenu(void) {
 	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_ENABLED);
 	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_DISABLED);
 	BUTTON_SetSkinFlexProps(&Props, BUTTON_SKINFLEX_PI_FOCUSSED);
-	
+
 	BUTTON_SetDefaultFont(&GUI_FontArial18);
 	BUTTON_SetDefaultTextColor(GUI_WHITE, BUTTON_CI_DISABLED);
 	BUTTON_SetDefaultTextColor(GUI_WHITE, BUTTON_CI_PRESSED);
@@ -9656,8 +9719,8 @@ WM_HWIN CreateMainMenu(void) {
 	HEADER_SetDefaultFont(&GUI_FontArial18);
 	HEADER_SetSkinFlexProps(&Header_Props, 0);
 	//BUTTON_SetDefaultSkin(_DarkGraySkin_BUTTON);
-	
-  hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
+
+	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
 	//handles.hButtonLine4=WM_CreateWindowAsChild(0,160,320,80,&hWin,WM_CF_SHOW,
 
 
@@ -9667,61 +9730,79 @@ WM_HWIN CreateMainMenu(void) {
 	WM_SetCallback(handles.hButtonLine4, _cbButton);
 
 	handles.hMainMenu = hWin;
-	
-	
-	
-	
+
+
+
+
 	return hWin;
 }
 void TFT_MainMenu_ShowLineTime()
 {
-	taskENTER_CRITICAL();
-	uint8_t i = 0;
 
-	for (i = 0; i < 4; i++)
-	{
-		TFT_ReadBackground(TEXT_TIME_LINE_X - 8 + 80*i, 209, 18, backgroundBuffer);    //80-ширина кнопок, 2-отступ, чтобы попасть точно на фон
-		switch(line[i].Status) { 
-		case LINE_STATUS_OFF:	
-			TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80*i, 209, "ВЫКЛ ", 18, 0x8410);   //цвет 0x8410 BGR
-			break;
-		case LINE_STATUS_RUN:		
-			sprintf(timeString, "%02d:%02d", line[i].Hours, line[i].Minutes);
-			strcat(timeString, " ");
-			TFT_ShowString(TEXT_TIME_LINE_X + 80*i, 209, timeString, 18, 0xFFFF);   //0x00
-			break;
-		case LINE_STATUS_STOP:
-			TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80*i, 209, "СТОП ", 18, 0x1F);   //0xF800
-			break;
-		}
-	}
-	taskEXIT_CRITICAL();
+	//uint8_t i = 0;
+
+	//for (i = 0; i < 4; i++)
+	//{
+	//	TFT_ReadBackground(TEXT_TIME_LINE_X - 8 + 80 * i, 209, 18, backgroundBuffer);      //80-ширина кнопок, 2-отступ, чтобы попасть точно на фон
+	//	switch (line[i].Status) {
+	//	case LINE_STATUS_OFF:
+	//		TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "ВЫКЛ ", 18, 0x8410);     //цвет 0x8410 BGR
+	//		break;
+	//	case LINE_STATUS_RUN:
+	//		sprintf(timeString, "%02d:%02d", line[i].Hours, line[i].Minutes);
+	//		strcat(timeString, " ");
+	//		TFT_ShowString(TEXT_TIME_LINE_X + 80 * i, 209, timeString, 18, 0xFFFF);     //0x00
+	//		break;
+	//	case LINE_STATUS_STOP:
+	//		TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "СТОП ", 18, 0x1F);     //0xF800
+	//		break;
+	//	}
+	//}
+
 }
 void TFT_MainMenu_ShowLineTime_ex(uint8_t i)
 {
-	taskENTER_CRITICAL();
-	TFT_ReadBackground(TEXT_TIME_LINE_X - 8 + 80*i, 209, 18, backgroundBuffer);
-	switch (line[i].Status) {
-	case LINE_STATUS_OFF:	
-		TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80*i, 209, "ВЫКЛ ", 18, 0x8410);
-		break;
-	case LINE_STATUS_RUN:		
-		sprintf(timeString, "%02d:%02d", line[i].Hours, line[i].Minutes);
-		strcat(timeString, " ");
-		TFT_ShowString(TEXT_TIME_LINE_X + 80*i, 209, timeString, 18, 0xFFFF);
-		break;
-	case LINE_STATUS_STOP:
-		//																											R			R			R			R			R			G			G			G		G			G		G			B		B			B		B		B
-		TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80*i, 209, "СТОП ", 18, 0x1F);
-		break;
-	}
-	taskEXIT_CRITICAL();
+
+	//TFT_ReadBackground(TEXT_TIME_LINE_X - 8 + 80 * i, 209, 18, backgroundBuffer);
+	//switch (line[i].Status) {
+	//case LINE_STATUS_OFF:
+	//	TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "ВЫКЛ ", 18, 0x8410);
+	//	break;
+	//case LINE_STATUS_RUN:
+	//	sprintf(timeString, "%02d:%02d", line[i].Hours, line[i].Minutes);
+	//	strcat(timeString, " ");
+	//	TFT_ShowString(TEXT_TIME_LINE_X + 80 * i, 209, timeString, 18, 0xFFFF);
+	//	break;
+	//case LINE_STATUS_STOP:
+	//	//																											R			R			R			R			R			G			G			G		G			G		G			B		B			B		B		B
+	//	TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "СТОП ", 18, 0x1F);
+	//	break;
+	//}
+
+}
+void TFT_MainMenu_ShowLineTime_ex2(uint8_t i, uint8_t Hours, uint8_t Minutes)
+{
+	//TFT_ReadBackground(TEXT_TIME_LINE_X - 8 + 80 * i, 209, 18, backgroundBuffer);
+	//switch (line[i].Status) {
+	//case LINE_STATUS_OFF:
+	//	TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "ВЫКЛ ", 18, 0x8410);
+	//	break;
+	//case LINE_STATUS_RUN:
+	//	sprintf(timeString, "%02d:%02d", Hours, Minutes);
+	//	strcat(timeString, " ");
+	//	TFT_ShowString(TEXT_TIME_LINE_X + 80 * i, 209, timeString, 18, 0xFFFF);
+	//	break;
+	//case LINE_STATUS_STOP:
+	//	//																											R			R			R			R			R			G			G			G		G			G		G			B		B			B		B		B
+	//	TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "СТОП ", 18, 0x1F);
+	//	break;
+	//}
 }
 void TFT_MainMenu_ShowDate(void)
 {
-	
+
 	char str[15];
-	TFT_ReadBackground(TEXT_DATE_X - 5, TEXT_DATE_Y, 18, backgroundBuffer);
+
 	sprintf(str, "%02d.%02d.%d ", sDate.Date, sDate.Month, sDate.Year);
 	switch (sDate.WeekDay)
 	{
@@ -9747,11 +9828,12 @@ void TFT_MainMenu_ShowDate(void)
 		strcat(str, "вс ");
 		break;
 	}
-	TFT_ShowString(110, 116, str, 18, 0xFFFF);
-	
+	TEXT_SetText(WM_GetDialogItem(handles.hMainMenu, ID_TEXT_DATE), str);
+	TEXT_SetTextColor(WM_GetDialogItem(handles.hMainMenu, ID_TEXT_DATE), GUI_WHITE);
+
 }
 void TFT_ShowString(uint16_t x, uint16_t y, char *p, uint8_t fontsize, uint16_t color)
-{         
+{
 	GUI_CHARINFO chinfo;
 	uint8_t first1, first2, last1;
 	first1 = GUI_FontDigital7Mono70_Prop1.First;
@@ -9759,12 +9841,12 @@ void TFT_ShowString(uint16_t x, uint16_t y, char *p, uint8_t fontsize, uint16_t 
 
 	first2 = GUI_FontDigital7Mono70_Prop2.First;
 	char ch = '\0';
-	
+
 	while (*p != '\0')
-	{       
+	{
 		//if(x>MAX_CHAR_POSX){x=0;y+=12;}
 		//if(y>MAX_CHAR_POSY){y=x=0;}
-				ch = (*p);
+		ch = (*p);
 		if (ch > last1)
 		{
 			ch = *p - (first2 - last1 + first1 - 1);
@@ -9777,10 +9859,10 @@ void TFT_ShowString(uint16_t x, uint16_t y, char *p, uint8_t fontsize, uint16_t 
 
 		}
 		chinfo = GUI_FontArial18_CharInfo[ch];
-        
+
 		x += chinfo.XSize;
 		p++;
-	}  
+	}
 }
 
 // USER START (Optionally insert additional public code)

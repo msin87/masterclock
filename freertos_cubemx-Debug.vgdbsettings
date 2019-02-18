@@ -45,7 +45,7 @@
   <UserDefinedVariables />
   <ImportedPropertySheets />
   <CodeSense>
-    <Enabled>True</Enabled>
+    <Enabled>False</Enabled>
     <CFLAGS>-Wno-invalid-source-encoding</CFLAGS>
     <CXXFLAGS>-Wno-invalid-source-encoding</CXXFLAGS>
     <ExtraSettings>

@@ -47,6 +47,7 @@
 extern GUI_CONST_STORAGE GUI_CHARINFO GUI_FontArial18_CharInfo[192];
 Lines lineTemp[4];
 int16_t diff;
+WM_MESSAGE message;
 void lineChangeStatus(uint8_t linenum, uint8_t status)
 {
 	line[linenum].Status = status;
@@ -127,7 +128,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	// USER START (Optionally insert additional variables)
 	// USER END
 
-	switch(pMsg->MsgId) {
+	switch (pMsg->MsgId) {
 	case WM_SEC_UPDATE:
 		sprintf(str, "%02d:%02d:%02d", sTime.Hours, sTime.Minutes, sTime.Seconds);
 		TFT_LineSetupShowString(173, 17, str, 18, 0xFFFF);
@@ -230,11 +231,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		NCode = pMsg->Data.v;
 		switch (Id) {
 		case ID_BUTTON_LINESETUP_Hplus: // Notifications sent by 'h+'
-			switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 
-				if(lineTemp[gui_Vars.menuState - 4].Hours != 23)
+				if (lineTemp[gui_Vars.menuState - 4].Hours != 23)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Hplus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Hours);
 					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
@@ -261,10 +262,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_LINESETUP_Mplus: // Notifications sent by 'm+'
-			switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if(lineTemp[gui_Vars.menuState - 4].Minutes != 59)
+				if (lineTemp[gui_Vars.menuState - 4].Minutes != 59)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Mplus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Minutes);
 					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
@@ -291,7 +292,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_LINESETUP_ENTER: // Notifications sent by 'Enter'
-			switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 
@@ -311,14 +312,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_LINESETUP_RUNSTOP: // Notifications sent by 'RUN/STOP'
-			switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				switch(line[gui_Vars.menuState - 4].Status)
+				switch (line[gui_Vars.menuState - 4].Status)
 				{
 				case LINE_STATUS_RUN:
 					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
@@ -338,8 +339,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					while (diff > 0)
 					{
 						if ((gui_Vars.menuState - 4) == 0 && (line[0].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine0);
-						if ((gui_Vars.menuState - 4) == 1 && (line[1].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine1); 
-						if ((gui_Vars.menuState - 4) == 2 && (line[2].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine2); 						
+						if ((gui_Vars.menuState - 4) == 1 && (line[1].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine1);
+						if ((gui_Vars.menuState - 4) == 2 && (line[2].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine2);
 						if ((gui_Vars.menuState - 4) == 3 && (line[3].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine3);
 						diff--;
 					}
@@ -352,7 +353,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_LINESETUP_PULSE: // Notifications sent by 'Pulse->'
-			switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -370,11 +371,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_LINESETUP_Hminus: // Notifications sent by 'h-'
-			switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 
-				if(lineTemp[gui_Vars.menuState - 4].Hours != 0)
+				if (lineTemp[gui_Vars.menuState - 4].Hours != 0)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Hminus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Hours);
 					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
@@ -397,10 +398,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_LINESETUP_Mminus: // Notifications sent by 'm-'
-			switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if(lineTemp[gui_Vars.menuState - 4].Minutes != 0)
+				if (lineTemp[gui_Vars.menuState - 4].Minutes != 0)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Mminus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Minutes);
 					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
@@ -423,7 +424,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_LINESETUP_BACK: // Notifications sent by 'Back'
-			switch(NCode) {
+			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -432,8 +433,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.menuState = MENU_STATE_MAIN;
 				gui_Vars.valsChanged = false;
+				message.MsgId = WM_BACKTOMAINMENU;
+				message.Data.v = 0xFF;
+				gui_Vars.valsChanged = false;
+				WM_SendMessage(handles.hMainMenu, &message);
 				WM_DeleteWindow(handles.hLineSetupMenu);
-				WM_ShowWindow(handles.hMainMenu);
+
 
 				// USER END
 				break;
@@ -445,7 +450,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 		// USER START (Optionally insert additional message handling)
 		// USER END
-	default :
+	default:
 		WM_DefaultProc(pMsg);
 		break;
 	}

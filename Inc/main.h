@@ -73,6 +73,7 @@ extern "C" {
 	SemaphoreHandle_t xSemaphoreLine1;
 	SemaphoreHandle_t xSemaphoreLine2;
 	SemaphoreHandle_t xSemaphoreLine3;
+
 	/* USER CODE END ET */
 
 	/* Exported constants --------------------------------------------------------*/
@@ -89,7 +90,7 @@ extern "C" {
 	void Error_Handler(void);
 
 	/* USER CODE BEGIN EFP */
-	
+
 	/* USER CODE END EFP */
 
 	/* Private defines -----------------------------------------------------------*/

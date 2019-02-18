@@ -115,6 +115,8 @@ osThreadId TaskLine0Handle;
 osThreadId TaskLine1Handle;
 osThreadId TaskLine2Handle;
 osThreadId TaskLine3Handle;
+osThreadId LCD_LinesTimeHandle;
+osMessageQId queueLCDLinesTimeHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -136,6 +138,7 @@ void vTaskLine0(void const * argument);
 void vTaskLine1(void const * argument);
 void vTaskLine2(void const * argument);
 void vTaskLine3(void const * argument);
+void vTaskLCDLinesTime(void const * argument);
 
 /* USER CODE BEGIN PFP */
 void delay(uint32_t delayTime);
@@ -260,7 +263,7 @@ void LinesInit(void)
 	readDaylightSavingFromBKP();
 	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
-		doAfterStart = true;      //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
+		doAfterStart = true;       //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
 	}
 	else
 	{
@@ -324,15 +327,15 @@ int main(void)
 	/* USER CODE END 2 */
 
 	/* USER CODE BEGIN RTOS_MUTEX */
-			  /* add mutexes, ... */
+				/* add mutexes, ... */
 	/* USER CODE END RTOS_MUTEX */
 
 	/* USER CODE BEGIN RTOS_SEMAPHORES */
-			  /* add semaphores, ... */
+				/* add semaphores, ... */
 	/* USER CODE END RTOS_SEMAPHORES */
 
 	/* USER CODE BEGIN RTOS_TIMERS */
-			  /* start timers, add new ones, ... */
+				/* start timers, add new ones, ... */
 	/* USER CODE END RTOS_TIMERS */
 
 	/* Create the thread(s) */
@@ -360,12 +363,21 @@ int main(void)
 	osThreadDef(TaskLine3, vTaskLine3, osPriorityNormal, 0, 128);
 	TaskLine3Handle = osThreadCreate(osThread(TaskLine3), NULL);
 
+	/* definition and creation of LCD_LinesTime */
+	//osThreadDef(LCD_LinesTime, vTaskLCDLinesTime, osPriorityNormal, 0, 128);
+	//LCD_LinesTimeHandle = osThreadCreate(osThread(LCD_LinesTime), NULL);
+
 	/* USER CODE BEGIN RTOS_THREADS */
-			  /* add threads, ... */
+				/* add threads, ... */
 	/* USER CODE END RTOS_THREADS */
 
+	/* Create the queue(s) */
+	/* definition and creation of queueLCDLinesTime */
+	//osMessageQDef(queueLCDLinesTime, 4, int16_t);
+	//queueLCDLinesTimeHandle = osMessageCreate(osMessageQ(queueLCDLinesTime), NULL);
+
 	/* USER CODE BEGIN RTOS_QUEUES */
-			  /* add queues, ... */
+				/* add queues, ... */
 	/* USER CODE END RTOS_QUEUES */
 
 
@@ -754,7 +766,7 @@ static void MX_TIM7_Init(void)
 
 	/* USER CODE END TIM7_Init 1 */
 	htim7.Instance = TIM7;
-	htim7.Init.Prescaler = 100;
+	htim7.Init.Prescaler = 50;
 	htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
 	htim7.Init.Period = 62999;
 	htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -863,14 +875,13 @@ static void MX_FSMC_Init(void)
 {
 	FSMC_NORSRAM_TimingTypeDef Timing;
 
-	/** Perform the SRAM1 memory initialization sequence
-	*/
+
 	hsram1.Instance = FSMC_NORSRAM_DEVICE;
 	hsram1.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
-	/* hsram1.Init */
+
 	hsram1.Init.NSBank = FSMC_NORSRAM_BANK1;
 	hsram1.Init.DataAddressMux = FSMC_DATA_ADDRESS_MUX_DISABLE;
-	hsram1.Init.MemoryType = FSMC_MEMORY_TYPE_SRAM;
+	hsram1.Init.MemoryType = FSMC_MEMORY_TYPE_NOR;
 	hsram1.Init.MemoryDataWidth = FSMC_NORSRAM_MEM_BUS_WIDTH_16;
 	hsram1.Init.BurstAccessMode = FSMC_BURST_ACCESS_MODE_DISABLE;
 	hsram1.Init.WaitSignalPolarity = FSMC_WAIT_SIGNAL_POLARITY_LOW;
@@ -881,23 +892,23 @@ static void MX_FSMC_Init(void)
 	hsram1.Init.ExtendedMode = FSMC_EXTENDED_MODE_DISABLE;
 	hsram1.Init.AsynchronousWait = FSMC_ASYNCHRONOUS_WAIT_DISABLE;
 	hsram1.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
-	/* Timing */
+
 	Timing.AddressSetupTime = 2;
-	Timing.AddressHoldTime = 15;
+	Timing.AddressHoldTime = 0;
 	Timing.DataSetupTime = 5;
 	Timing.BusTurnAroundDuration = 0;
-	Timing.CLKDivision = 16;
-	Timing.DataLatency = 17;
+	Timing.CLKDivision = 0;
+	Timing.DataLatency = 0;
 	Timing.AccessMode = FSMC_ACCESS_MODE_A;
-	/* ExtTiming */
+
 
 	if (HAL_SRAM_Init(&hsram1, &Timing, NULL) != HAL_OK)
 	{
 		Error_Handler();
 	}
 
-	/** Disconnect NADV
-	*/
+
+
 
 	__HAL_AFIO_FSMCNADV_DISCONNECTED();
 
@@ -1053,7 +1064,7 @@ void vTaskGUI(void const * argument)
 					{
 						if (timeCalibr.seconds > 0) //если добавить секунды
 						{
-							sTime.Seconds += timeCalibr.seconds;                 //прибавили секунды
+							sTime.Seconds += timeCalibr.seconds;                  //прибавили секунды
 							if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 							{
 								Error_Handler();
@@ -1061,13 +1072,13 @@ void vTaskGUI(void const * argument)
 						}
 						if (timeCalibr.seconds < 0) //если убавить секунды
 						{
-							sTime.Seconds += timeCalibr.seconds;                  //прибавили секунды
+							sTime.Seconds += timeCalibr.seconds;                   //прибавили секунды
 							if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 							{
 								Error_Handler();
 							}
 						}
-						timeCalibr.daysPassed = 0;                 // 1 => 0
+						timeCalibr.daysPassed = 0;                  // 1 => 0
 						timeCalibr.isCalibrated = true;
 
 					}
@@ -1186,7 +1197,7 @@ void vTaskGUI(void const * argument)
 void vTaskLine0(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine0 */
-	  /* Infinite loop */
+		/* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(xSemaphoreLine0, portMAX_DELAY);
@@ -1194,6 +1205,7 @@ void vTaskLine0(void const * argument)
 		{
 			gui_Vars.linesPolarity ^= 0b0001;
 			linesIncreaseMinute(0);
+			WM_Invalidate(handles.hButtonLine1);
 			if (gui_Vars.linesPolarity & 0b0001)
 			{
 				GPIOC->BSRR = GPIO_BSRR_BS6;
@@ -1209,6 +1221,7 @@ void vTaskLine0(void const * argument)
 				osDelay(LINE_DEAD_TIME);
 			}
 			saveLinesPolarityToBKP();
+
 		}
 	}
 	/* USER CODE END vTaskLine0 */
@@ -1224,7 +1237,7 @@ void vTaskLine0(void const * argument)
 void vTaskLine1(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine1 */
-	  /* Infinite loop */
+		/* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(xSemaphoreLine1, portMAX_DELAY);
@@ -1232,8 +1245,10 @@ void vTaskLine1(void const * argument)
 		{
 			gui_Vars.linesPolarity ^= 0b0010;
 			linesIncreaseMinute(1);
+			WM_Invalidate(handles.hButtonLine2);
 			if (gui_Vars.linesPolarity & 0b0010)
 			{
+
 				GPIOD->BSRR = GPIO_BSRR_BS13;
 				//LINE1_POS_OUTPUT_GPIO_Port->BSRR = LINE1_POS_OUTPUT_Pin;
 				osDelay(line[1].Width * 350);
@@ -1251,6 +1266,7 @@ void vTaskLine1(void const * argument)
 				osDelay(LINE_DEAD_TIME);
 			}
 			saveLinesPolarityToBKP();
+
 		}
 	}
 	/* USER CODE END vTaskLine1 */
@@ -1266,7 +1282,7 @@ void vTaskLine1(void const * argument)
 void vTaskLine2(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine2 */
-	  /* Infinite loop */
+		/* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(xSemaphoreLine2, portMAX_DELAY);
@@ -1274,6 +1290,7 @@ void vTaskLine2(void const * argument)
 		{
 			gui_Vars.linesPolarity ^= 0b0100;
 			linesIncreaseMinute(2);
+			WM_Invalidate(handles.hButtonLine3);
 			if (gui_Vars.linesPolarity & 0b0100)
 			{
 				//LINE2_POS_OUTPUT_GPIO_Port->BSRR = LINE2_POS_OUTPUT_Pin;
@@ -1289,6 +1306,7 @@ void vTaskLine2(void const * argument)
 				osDelay(LINE_DEAD_TIME);
 			}
 			saveLinesPolarityToBKP();
+
 		}
 	}
 	/* USER CODE END vTaskLine2 */
@@ -1304,7 +1322,7 @@ void vTaskLine2(void const * argument)
 void vTaskLine3(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine3 */
-	  /* Infinite loop */
+		/* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(xSemaphoreLine3, portMAX_DELAY);
@@ -1312,11 +1330,12 @@ void vTaskLine3(void const * argument)
 		if (line[3].Status == LINE_STATUS_RUN)
 		{
 			linesIncreaseMinute(3);
+			WM_Invalidate(handles.hButtonLine4);
 			gui_Vars.linesPolarity ^= 0b1000;
 			if (gui_Vars.linesPolarity & 0b1000)
 			{
 				//LINE3_POS_OUTPUT_GPIO_Port->BSRR = LINE3_POS_OUTPUT_Pin;
-				osDelay(line[2].Width * 350);
+				osDelay(line[3].Width * 350);
 				//LINE3_POS_OUTPUT_GPIO_Port->BSRR = LINE3_POS_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}
@@ -1328,9 +1347,35 @@ void vTaskLine3(void const * argument)
 				osDelay(LINE_DEAD_TIME);
 			}
 			saveLinesPolarityToBKP();
+
 		}
 	}
 	/* USER CODE END vTaskLine3 */
+}
+
+/* USER CODE BEGIN Header_vTaskLCDLinesTime */
+/**
+* @brief Function implementing the LCD_LinesTime thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_vTaskLCDLinesTime */
+void vTaskLCDLinesTime(void const * argument)
+{
+	osEvent  evt;
+	LineMessage  message;
+	/* USER CODE BEGIN vTaskLCDLinesTime */
+	/* Infinite loop */
+	for (;;)
+	{
+
+
+
+
+
+
+	}
+	/* USER CODE END vTaskLCDLinesTime */
 }
 
 /**
@@ -1361,7 +1406,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
 	/* USER CODE BEGIN Error_Handler_Debug */
-			  /* User can add his own implementation to report the HAL error return state */
+				/* User can add his own implementation to report the HAL error return state */
 
 	/* USER CODE END Error_Handler_Debug */
 }
@@ -1377,9 +1422,9 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
 	/* USER CODE BEGIN 6 */
-			  /* User can add his own implementation to report the file name and line number,
-				 tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-				 /* USER CODE END 6 */
+				/* User can add his own implementation to report the file name and line number,
+				   tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+				   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 

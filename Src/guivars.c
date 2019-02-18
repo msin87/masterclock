@@ -5,6 +5,7 @@ Lines line[4];
 TimeCalibration timeCalibr;
 LongPressCNT longPressCNT;
 DaylightSaving daylightSaving;
+LineMessage lineMessage;
 void sendMsg(WM_HWIN handle, uint16_t message)
 {
 	WM_MESSAGE msgStruct;

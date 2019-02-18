@@ -28,9 +28,10 @@ extern RTC_TimeTypeDef sTime;
 
 
 extern Lines line[4];
+extern LineMessage lineMessage;
 extern GUI_Vars gui_Vars;
 extern DaylightSaving daylightSaving;
-
+extern osMessageQId queueLCDLinesTimeHandle;
 extern GUI_CONST_STORAGE GUI_CHARINFO GUI_FontArial18_CharInfo[192];
 extern GUI_CONST_STORAGE GUI_FONT_PROP GUI_FontArial18_Prop2;
 extern GUI_CONST_STORAGE GUI_FONT_PROP GUI_FontArial18_Prop1;

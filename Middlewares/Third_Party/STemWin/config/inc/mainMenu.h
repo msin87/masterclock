@@ -17,14 +17,15 @@
 #include "button76x76Skin.h"
 #include "guivars.h"
 
-	WM_HWIN CreateMainMenu(void);
-	
-	extern RTC_HandleTypeDef hrtc;
-	extern RTC_TimeTypeDef sTime;
-	extern RTC_DateTypeDef sDate;
-	void TFT_ShowString(uint16_t x,uint16_t y,char *p,uint8_t fontsize, uint16_t color);
-	void TFT_ReadBackground(uint16_t x, uint16_t y, uint8_t fontsize, uint16_t* backgroundBuffer);
-	void TFT_MainMenu_ShowLineTime (void);
-	void TFT_MainMenu_ShowLineTime_ex (uint8_t i);
-	void TFT_MainMenu_ShowDate(void);
+WM_HWIN CreateMainMenu(void);
+
+extern RTC_HandleTypeDef hrtc;
+extern RTC_TimeTypeDef sTime;
+extern RTC_DateTypeDef sDate;
+void TFT_ShowString(uint16_t x, uint16_t y, char *p, uint8_t fontsize, uint16_t color);
+void TFT_ReadBackground(uint16_t x, uint16_t y, uint8_t fontsize, uint16_t* backgroundBuffer);
+void TFT_MainMenu_ShowLineTime(void);
+void TFT_MainMenu_ShowLineTime_ex(uint8_t i);
+void TFT_MainMenu_ShowLineTime_ex2(uint8_t i, uint8_t Hours, uint8_t Minutes);
+void TFT_MainMenu_ShowDate(void);
 #endif

@@ -120,6 +120,7 @@ typedef struct
 } Handles;
 typedef struct
 {
+
 	uint8_t Hours;
 	uint8_t Minutes;
 	uint8_t Status;
@@ -135,6 +136,12 @@ typedef struct
 	//					0 sec = line status OFF					|
 	//													1440 minutes (1 day)			
 } Lines;
+typedef struct
+{
+	uint8_t id;
+	uint8_t Minutes;
+	uint8_t Hours;
+} LineMessage;
 typedef struct
 {
 	char timeZone;
