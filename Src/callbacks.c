@@ -684,7 +684,7 @@ uint16_t get_LineChangeTimeDiff(Lines* lineOldValue, Lines*  lineNewValue, uint8
 	{
 		newHour12 = 12;
 	}
-	diff_Min12 = oldHour12 * 60 + lineOldValue->Minutes - (newHour12 * 60 + lineNewValue->Minutes);
+	diff_Min12 = -(oldHour12 * 60 + lineOldValue->Minutes) + (newHour12 * 60 + lineNewValue->Minutes);
 
 	if (diff_Min12 < -waitMinutes)
 	{
@@ -755,29 +755,6 @@ void pollLinesOutput(uint8_t waitMinutes)
 			if (line[3].Status == LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine3);
 		}
 	}
-}
-void sortLinesWidth(GUI_Vars* vars)
-{
-	uint8_t i = 0, j = 0, temp = 0, ntemp = 0;
-	vars->lineNumsByWidth[0] = 0;
-	vars->lineNumsByWidth[1] = 1;
-	vars->lineNumsByWidth[2] = 2;
-	vars->lineNumsByWidth[3] = 3;
-	for (i = 0; i < 4 - 1; i++)
-	{
-		for (j = 0; j < 3 - i; j++) {
-			if (line[j].Width > line[j + 1].Width)
-			{
-				temp = line[j].Width;
-				ntemp = vars->lineNumsByWidth[j];
-				line[j] = line[j + 1];
-				vars->lineNumsByWidth[j] = vars->lineNumsByWidth[j + 1];
-				line[j + 1].Width = temp;
-				vars->lineNumsByWidth[j + 1] = ntemp;
-			}
-		}
-	}
-
 }
 void linesIncreaseMinute(uint8_t lineNumber)
 {
@@ -977,7 +954,7 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%4d", longPressCNT.value * 200);
+			sprintf(str, "%4d", longPressCNT.value * 375);
 			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
 			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
 			gui_Vars.valsChanged = true;
@@ -992,7 +969,7 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%4d", longPressCNT.value * 200);
+			sprintf(str, "%4d", longPressCNT.value * 375);
 			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
 			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
 			gui_Vars.valsChanged = true;

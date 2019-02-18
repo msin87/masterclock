@@ -44,7 +44,7 @@
     <AllDependencies>
       <ProjectDependency>
         <RelativePath>freertos_cubemx.gpdsc</RelativePath>
-        <Timestamp>131949539733236077</Timestamp>
+        <Timestamp>131949868384081568</Timestamp>
       </ProjectDependency>
     </AllDependencies>
     <RootDirectory>
@@ -431,14 +431,14 @@
       <ImportedConfiguration>
         <Settings>
           <IncludeDirectories>
-            <string>C:\stm32\Inc</string>
-            <string>C:\stm32\Drivers\CMSIS\Device\ST\STM32F1xx\Include</string>
-            <string>C:\stm32\Drivers\STM32F1xx_HAL_Driver\Inc</string>
-            <string>C:\stm32\Drivers\STM32F1xx_HAL_Driver\Src</string>
-            <string>C:\stm32\Middlewares\Third_Party\FreeRTOS\Source\include</string>
-            <string>C:\stm32\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</string>
-            <string>C:\stm32\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3</string>
-            <string>C:\stm32\Drivers\STM32F1xx_HAL_Driver\Inc\Legacy</string>
+            <string>C:\stm32\masterclock\Inc</string>
+            <string>C:\stm32\masterclock\Drivers\CMSIS\Device\ST\STM32F1xx\Include</string>
+            <string>C:\stm32\masterclock\Drivers\STM32F1xx_HAL_Driver\Inc</string>
+            <string>C:\stm32\masterclock\Drivers\STM32F1xx_HAL_Driver\Src</string>
+            <string>C:\stm32\masterclock\Middlewares\Third_Party\FreeRTOS\Source\include</string>
+            <string>C:\stm32\masterclock\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</string>
+            <string>C:\stm32\masterclock\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3</string>
+            <string>C:\stm32\masterclock\Drivers\STM32F1xx_HAL_Driver\Inc\Legacy</string>
           </IncludeDirectories>
           <PreprocessorMacros>
             <string>$$com.sysprogs.bspoptions.primary_memory$$_layout</string>

@@ -191,7 +191,7 @@ void longPressControl(void)
 			longPressCNT.value += longPressCNT.direction;
 			if (gui_Vars.menuState >= MENU_STATE_LINE1SETUP_PULSE && gui_Vars.menuState <= MENU_STATE_LINE4SETUP_PULSE)
 			{
-				sprintf(text, "%4d", longPressCNT.value * 200);
+				sprintf(text, "%4d", longPressCNT.value * 375);
 			}
 			else if (gui_Vars.menuState == MENU_STATE_TIME_SUMWIN || gui_Vars.menuState == MENU_STATE_TIMECALIBRATION)
 			{
@@ -269,7 +269,6 @@ void LinesInit(void)
 	{
 		doAfterStart = false;
 	}
-	sortLinesWidth(&gui_Vars);
 	//Проверка отставания времени на Линии1 по отношению к системному времени, взятому из BKP
 
 
@@ -1101,10 +1100,23 @@ void vTaskGUI(void const * argument)
 			if (sTimePrev.Seconds == 59) //каждую минуту
 			{
 
-				xSemaphoreGive(xSemaphoreLine0);
-				xSemaphoreGive(xSemaphoreLine1);
-				xSemaphoreGive(xSemaphoreLine2);
-				xSemaphoreGive(xSemaphoreLine3);
+				if (++line[0].Pulses > 0)
+				{
+					xSemaphoreGive(xSemaphoreLine0);
+				}
+
+				if (++line[1].Pulses > 0)
+				{
+					xSemaphoreGive(xSemaphoreLine1);
+				}
+				if (++line[2].Pulses > 0)
+				{
+					xSemaphoreGive(xSemaphoreLine2);
+				}
+				if (++line[3].Pulses > 0)
+				{
+					xSemaphoreGive(xSemaphoreLine3);
+				}
 				//for (i = 0; i < sizeof(line) / 3; i++)
 				//{
 				//	if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
@@ -1209,14 +1221,14 @@ void vTaskLine0(void const * argument)
 			if (gui_Vars.linesPolarity & 0b0001)
 			{
 				GPIOC->BSRR = GPIO_BSRR_BS6;
-				osDelay(line[0].Width * 350);
+				osDelay(line[0].Width * 375);
 				GPIOC->BSRR = GPIO_BSRR_BR6;
 				osDelay(LINE_DEAD_TIME);
 			}
 			else
 			{
 				GPIOC->BSRR = GPIO_BSRR_BS7;
-				osDelay(line[0].Width * 350);
+				osDelay(line[0].Width * 375);
 				GPIOC->BSRR = GPIO_BSRR_BR7;
 				osDelay(LINE_DEAD_TIME);
 			}
@@ -1251,7 +1263,7 @@ void vTaskLine1(void const * argument)
 
 				GPIOD->BSRR = GPIO_BSRR_BS13;
 				//LINE1_POS_OUTPUT_GPIO_Port->BSRR = LINE1_POS_OUTPUT_Pin;
-				osDelay(line[1].Width * 350);
+				osDelay(line[1].Width * 375);
 				GPIOD->BSRR = GPIO_BSRR_BR13;
 				//LINE1_POS_OUTPUT_GPIO_Port->BSRR = LINE1_POS_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
@@ -1260,7 +1272,7 @@ void vTaskLine1(void const * argument)
 			{
 				GPIOD->BSRR = GPIO_BSRR_BS6;
 				//LINE1_NEG_OUTPUT_GPIO_Port->BSRR = LINE1_NEG_OUTPUT_Pin;
-				osDelay(line[1].Width * 350);
+				osDelay(line[1].Width * 375);
 				GPIOD->BSRR = GPIO_BSRR_BR6;
 				//LINE1_NEG_OUTPUT_GPIO_Port->BSRR = LINE1_NEG_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
@@ -1294,14 +1306,14 @@ void vTaskLine2(void const * argument)
 			if (gui_Vars.linesPolarity & 0b0100)
 			{
 				//LINE2_POS_OUTPUT_GPIO_Port->BSRR = LINE2_POS_OUTPUT_Pin;
-				osDelay(line[2].Width * 350);
+				osDelay(line[2].Width * 375);
 				//LINE2_POS_OUTPUT_GPIO_Port->BSRR = LINE2_POS_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}
 			else
 			{
 				//LINE2_NEG_OUTPUT_GPIO_Port->BSRR = LINE2_NEG_OUTPUT_Pin;
-				osDelay(line[2].Width * 350);
+				osDelay(line[2].Width * 375);
 				//LINE2_NEG_OUTPUT_GPIO_Port->BSRR = LINE2_NEG_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}
@@ -1335,14 +1347,14 @@ void vTaskLine3(void const * argument)
 			if (gui_Vars.linesPolarity & 0b1000)
 			{
 				//LINE3_POS_OUTPUT_GPIO_Port->BSRR = LINE3_POS_OUTPUT_Pin;
-				osDelay(line[3].Width * 350);
+				osDelay(line[3].Width * 375);
 				//LINE3_POS_OUTPUT_GPIO_Port->BSRR = LINE3_POS_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}
 			else
 			{
 				//LINE3_NEG_OUTPUT_GPIO_Port->BSRR = LINE3_NEG_OUTPUT_Pin;
-				osDelay(line[3].Width * 350);
+				osDelay(line[3].Width * 375);
 				//LINE3_NEG_OUTPUT_GPIO_Port->BSRR = LINE3_NEG_OUTPUT_Pin << 16;
 				osDelay(LINE_DEAD_TIME);
 			}

@@ -119,7 +119,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Header'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS);
-		sprintf(str, "%4d", line[gui_Vars.menuState - 8].Width * 200);
+		sprintf(str, "%4d", line[gui_Vars.menuState - 8].Width * 375);
 		HEADER_AddItem(hItem, 80, str, 14);
 
 		if (line[gui_Vars.menuState - 8].Polarity)
@@ -243,7 +243,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER START (Optionally insert code for reacting on notification message)
 				line[gui_Vars.menuState - 8].Width = width[gui_Vars.menuState - 8];
 				line[gui_Vars.menuState - 8].Polarity = polarity[gui_Vars.menuState - 8];
-				sortLinesWidth(&gui_Vars);
 				gui_Vars.valsChanged = false;
 				saveLineToBKP(gui_Vars.menuState - 8);
 

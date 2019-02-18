@@ -238,7 +238,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (lineTemp[gui_Vars.menuState - 4].Hours != 23)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Hplus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Hours);
-					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+					//lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
 				}
 				else
 				{
@@ -268,7 +268,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (lineTemp[gui_Vars.menuState - 4].Minutes != 59)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Mplus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Minutes);
-					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+					//lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
 				}
 				else
 				{
@@ -300,8 +300,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				line[gui_Vars.menuState - 4] = lineTemp[gui_Vars.menuState - 4];
 				diff = get_LineChangeTimeDiff(&line[gui_Vars.menuState - 4], &lineTemp[gui_Vars.menuState - 4], 10);
+				line[gui_Vars.menuState - 4] = lineTemp[gui_Vars.menuState - 4];
+
 
 				gui_Vars.valsChanged = false;
 				saveLineToBKP(gui_Vars.menuState - 4);
@@ -345,6 +346,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						diff--;
 					}
 				}
+				else
+				{
+					line[gui_Vars.menuState - 4].Pulses = diff;
+				}
 
 				// USER END
 				break;
@@ -378,7 +383,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (lineTemp[gui_Vars.menuState - 4].Hours != 0)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Hminus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Hours);
-					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+					//lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -404,7 +409,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (lineTemp[gui_Vars.menuState - 4].Minutes != 0)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Mminus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Minutes);
-					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+					//lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
