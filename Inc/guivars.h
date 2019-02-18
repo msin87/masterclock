@@ -54,6 +54,7 @@ typedef struct
 	uint8_t timeFrozen;
 	uint8_t valsChanged;
 	uint8_t linesPolarity;
+	uint8_t linesTimeChanged;
 	uint8_t widthSorted[4];
 	uint8_t lineNumsByWidth[4];
 	int16_t	diffSystemLine;
