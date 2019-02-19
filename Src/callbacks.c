@@ -669,42 +669,7 @@ void flash_erase_page(uint32_t address) {
 uint32_t flash_read(uint32_t address) {
 	return (*(__IO uint32_t*) address);
 }
-uint16_t get_LineChangeTimeDiff(Lines* lineOldValue, Lines*  lineNewValue, uint8_t waitMinutes)
-{
-	int16_t diff_Min12 = 0;
-	uint8_t oldHour12 = 0, newHour12 = 0;
-	int16_t oldMinutes = 0, newMinutes = 0;
-	oldHour12 = lineOldValue->Hours % 12;
-	if (oldHour12 == 0)
-	{
-		oldHour12 = 12;
-	}
-	newHour12 = lineNewValue->Hours % 12;
-	if (newHour12 == 0)
-	{
-		newHour12 = 12;
-	}
-	diff_Min12 = -(oldHour12 * 60 + lineOldValue->Minutes) + (newHour12 * 60 + lineNewValue->Minutes);
 
-	if (diff_Min12 < -waitMinutes)
-	{
-
-		diff_Min12 = 720 + diff_Min12;
-	}
-	oldMinutes = lineOldValue->Hours * 60 + lineOldValue->Minutes;
-	newMinutes = lineNewValue->Hours * 60 + lineNewValue->Minutes;
-	if ((oldMinutes - newMinutes >= 720))
-	{
-		lineNewValue->Hours += 12;
-	}
-	else
-		if ((oldMinutes - newMinutes) >= -720 && (oldMinutes - newMinutes) < -waitMinutes)
-		{
-			lineNewValue->Hours -= 12;
-		}
-
-	return diff_Min12;
-}
 uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
 {
 	int16_t diff_Min12 = 0;

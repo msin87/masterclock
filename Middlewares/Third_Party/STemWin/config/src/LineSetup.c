@@ -300,10 +300,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				diff = get_LineChangeTimeDiff(&line[gui_Vars.menuState - 4], &lineTemp[gui_Vars.menuState - 4], 10);
+				diff = get_sTimeLinesDiff(&lineTemp[gui_Vars.menuState - 4], 10);
 				line[gui_Vars.menuState - 4] = lineTemp[gui_Vars.menuState - 4];
-
-
 				gui_Vars.valsChanged = false;
 				saveLineToBKP(gui_Vars.menuState - 4);
 				// USER END
@@ -332,7 +330,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_OFF);
 					break;
 				}
-				if (gui_Vars.valsChanged == true) diff = get_LineChangeTimeDiff(&line[gui_Vars.menuState - 4], &lineTemp[gui_Vars.menuState - 4], 10);
+				if (gui_Vars.valsChanged == true) diff = get_sTimeLinesDiff(&lineTemp[gui_Vars.menuState - 4], 10);
 
 				if (diff > 0)
 				{

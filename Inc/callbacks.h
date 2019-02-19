@@ -55,7 +55,6 @@ void readTimeCalibrFromBKP(void);
 void saveLinesPolarityToBKP(void);
 void readLinesPolarityFromBKP(void);
 
-uint16_t get_LineChangeTimeDiff(Lines* lineOldValue, Lines*  lineNewValue, uint8_t waitMinutes);
 uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes);
 
 void pollLinesOutput(uint8_t waitMinutes);
