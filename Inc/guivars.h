@@ -5,6 +5,7 @@
 
 #include "cmsis_os.h"
 #include "DIALOG.h"
+#include "stm32f1xx_hal.h"
 
 #define MENU_STATE_MAIN 0
 #define MENU_STATE_TIMESETUP 1
@@ -22,7 +23,8 @@
 #define true 1
 #define false 0
 #define LINES_AMOUNT 4
-#define LINE_DEAD_TIME 50
+#define LINES_DEAD_TIME 50
+#define LINE_WIDTH_MULT 375
 #define BKP_DATE_OFFSET 1
 #define BKP_LINE1_OFFSET BKP_DATE_OFFSET+1
 #define BKP_LINE2_OFFSET BKP_LINE1_OFFSET+1
@@ -35,6 +37,7 @@
 #define BKP_LINESPOLARITY_OFFSET BKP_DAYLIGHTSAVING_OFFSET
 #define BKP_CRC_OFFSET_HIGH BKP_TIMECALIBR_OFFSET+1
 #define BKP_CRC_OFFSET_LOW BKP_CRC_OFFSET_HIGH+1
+
 
 #define FLASH_CALIA_OFFSET 0x0807F800 + 0
 #define FLASH_CALIB_OFFSET 0x0807F800 + 4
@@ -101,17 +104,12 @@ typedef struct
 	HEADER_Handle hLocalTimeNames;
 	HEADER_Handle hLocalTimeHMS;
 
-	BUTTON_Handle hButtonLine1;
-	BUTTON_Handle hButtonLine2;
-	BUTTON_Handle hButtonLine3;
-	BUTTON_Handle hButtonLine4;
+	BUTTON_Handle hButtonLine[4];
 	BUTTON_Handle hButtonDTSenter;
 	BUTTON_Handle hButtonLSenter;
 
-	TEXT_Handle hTimeLine1;
-	TEXT_Handle hTimeLine2;
-	TEXT_Handle hTimeLine3;
-	TEXT_Handle hTimeLine4;
+	TEXT_Handle hLineSetupVals;
+
 
 	FRAMEWIN_Handle hLocalTimeSeupWindow;
 
@@ -127,6 +125,11 @@ typedef struct
 	uint8_t Width;
 	uint8_t Polarity;
 	uint8_t	Pulses;
+	GPIO_TypeDef* LineGPIOpos;
+	GPIO_TypeDef* LineGPIOneg;
+	uint32_t LinePinPos;
+	uint32_t LinePinNeg;
+	SemaphoreHandle_t xSemaphore;
 	// 15    14    13    12   11   10    9    8    7    6    5    4    3    2    1    0
 	// \status/		\---width--/	\--------------------hours*minutes-----------------/	
 	//    |				  |										|

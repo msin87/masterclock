@@ -9188,10 +9188,10 @@ void sendMsgToMainLineButtons(uint16_t message)
 	if (handles.hMainMenu != 0)
 	{
 		msgButton.MsgId = message;
-		WM_SendMessage(handles.hButtonLine1, &msgButton);
-		WM_SendMessage(handles.hButtonLine2, &msgButton);
-		WM_SendMessage(handles.hButtonLine3, &msgButton);
-		WM_SendMessage(handles.hButtonLine4, &msgButton);
+		WM_SendMessage(handles.hButtonLine[0], &msgButton);
+		WM_SendMessage(handles.hButtonLine[1], &msgButton);
+		WM_SendMessage(handles.hButtonLine[2], &msgButton);
+		WM_SendMessage(handles.hButtonLine[3], &msgButton);
 	}
 }
 void forceUpdateStrings(void)
@@ -9355,22 +9355,22 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			//
 		// Initialization of 'ID_BUTTON_LINE1 '
 		//
-		handles.hButtonLine1 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE1);
+		handles.hButtonLine[0] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE1);
 		//BUTTON_SetText(handles.hButtonLine1,"1");
 		//BUTTON_SetSkin(handles.hButtonLine1, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE2 '
 	//
-		handles.hButtonLine2 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE2);
+		handles.hButtonLine[1] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE2);
 		//BUTTON_SetText(handles.hButtonLine2,"2");
 		//BUTTON_SetSkin(handles.hButtonLine2, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE3 '
 	//
-		handles.hButtonLine3 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE3);
+		handles.hButtonLine[2] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE3);
 		//BUTTON_SetText(handles.hButtonLine3,"3");
 		//BUTTON_SetSkin(handles.hButtonLine3, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE4 '
 	//
-		handles.hButtonLine4 = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE4);
+		handles.hButtonLine[3] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE4);
 		//BUTTON_SetText(handles.hButtonLine4,"4");
 		//BUTTON_SetSkin(handles.hButtonLine4, _DrawSkin_BUTTON);
 	// USER END
@@ -9724,10 +9724,10 @@ WM_HWIN CreateMainMenu(void) {
 	//handles.hButtonLine4=WM_CreateWindowAsChild(0,160,320,80,&hWin,WM_CF_SHOW,
 
 
-	WM_SetCallback(handles.hButtonLine1, _cbButton);
-	WM_SetCallback(handles.hButtonLine2, _cbButton);
-	WM_SetCallback(handles.hButtonLine3, _cbButton);
-	WM_SetCallback(handles.hButtonLine4, _cbButton);
+	WM_SetCallback(handles.hButtonLine[0], _cbButton);
+	WM_SetCallback(handles.hButtonLine[1], _cbButton);
+	WM_SetCallback(handles.hButtonLine[2], _cbButton);
+	WM_SetCallback(handles.hButtonLine[3], _cbButton);
 
 	handles.hMainMenu = hWin;
 

@@ -122,7 +122,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	int     NCode;
 	int     Id;
 	char str[9];
-
+	uint8_t i = 0;
 	uint8_t valsChangedOld = false;
 
 	// USER START (Optionally insert additional variables)
@@ -156,6 +156,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Header'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_VALS);
+		handles.hLineSetupVals = hItem;
 		sprintf(str, "%02d", line[gui_Vars.menuState - 4].Hours);
 		HEADER_AddItem(hItem, 80, str, 14);
 		sprintf(str, "%02d", line[gui_Vars.menuState - 4].Minutes);
@@ -337,10 +338,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					line[gui_Vars.menuState - 4].Pulses += diff;
 					while (diff > 0)
 					{
-						if ((gui_Vars.menuState - 4) == 0 && (line[0].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine0);
-						if ((gui_Vars.menuState - 4) == 1 && (line[1].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine1);
-						if ((gui_Vars.menuState - 4) == 2 && (line[2].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine2);
-						if ((gui_Vars.menuState - 4) == 3 && (line[3].Status == LINE_STATUS_RUN)) xSemaphoreGive(xSemaphoreLine3);
+						for (i = 0; i < LINES_AMOUNT; ++i)
+						{
+							if ((gui_Vars.menuState - 4) == i && (line[i].Status == LINE_STATUS_RUN))
+							{
+								xSemaphoreGive(line[i].xSemaphore);
+							}
+						}
 						diff--;
 					}
 				}

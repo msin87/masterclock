@@ -138,7 +138,7 @@ void vTaskLine0(void const * argument);
 void vTaskLine1(void const * argument);
 void vTaskLine2(void const * argument);
 void vTaskLine3(void const * argument);
-void vTaskLCDLinesTime(void const * argument);
+
 
 /* USER CODE BEGIN PFP */
 void delay(uint32_t delayTime);
@@ -191,7 +191,7 @@ void longPressControl(void)
 			longPressCNT.value += longPressCNT.direction;
 			if (gui_Vars.menuState >= MENU_STATE_LINE1SETUP_PULSE && gui_Vars.menuState <= MENU_STATE_LINE4SETUP_PULSE)
 			{
-				sprintf(text, "%4d", longPressCNT.value * 375);
+				sprintf(text, "%4d", longPressCNT.value * LINE_WIDTH_MULT);
 			}
 			else if (gui_Vars.menuState == MENU_STATE_TIME_SUMWIN || gui_Vars.menuState == MENU_STATE_TIMECALIBRATION)
 			{
@@ -243,6 +243,30 @@ void LinesInit(void)
 	//				 (0..7)*375	= 0,375...3000 sec. 			|
 	//					0 sec = line status OFF					|
 	//													1440 minutes (1 day)	
+	line[0].xSemaphore = xSemaphoreCreateCounting(720, 0);
+	line[1].xSemaphore = xSemaphoreCreateCounting(720, 0);
+	line[2].xSemaphore = xSemaphoreCreateCounting(720, 0);
+	line[3].xSemaphore = xSemaphoreCreateCounting(720, 0);
+
+	line[0].LineGPIOpos = LINE0_POS_OUTPUT_GPIO_Port;
+	line[0].LineGPIOneg = LINE0_NEG_OUTPUT_GPIO_Port;
+	line[0].LinePinPos = LINE0_POS_OUTPUT_Pin;
+	line[0].LinePinNeg = LINE0_NEG_OUTPUT_Pin;
+
+	line[1].LineGPIOpos = LINE1_POS_OUTPUT_GPIO_Port;
+	line[1].LineGPIOneg = LINE1_NEG_OUTPUT_GPIO_Port;
+	line[1].LinePinPos = LINE1_POS_OUTPUT_Pin;
+	line[1].LinePinNeg = LINE1_NEG_OUTPUT_Pin;
+
+	line[2].LineGPIOpos = LINE2_POS_OUTPUT_GPIO_Port;
+	line[2].LineGPIOneg = LINE2_NEG_OUTPUT_GPIO_Port;
+	line[2].LinePinPos = LINE2_POS_OUTPUT_Pin;
+	line[2].LinePinNeg = LINE2_NEG_OUTPUT_Pin;
+
+	line[3].LineGPIOpos = LINE3_POS_OUTPUT_GPIO_Port;
+	line[3].LineGPIOneg = LINE3_NEG_OUTPUT_GPIO_Port;
+	line[3].LinePinPos = LINE3_POS_OUTPUT_Pin;
+	line[3].LinePinNeg = LINE3_NEG_OUTPUT_Pin;
 
 	for (i = 0; i < LINES_AMOUNT; i++)
 	{
@@ -319,10 +343,7 @@ int main(void)
 	variables.calibrated = 1;
 	LinesInit();
 	readLinesPolarityFromBKP();
-	xSemaphoreLine0 = xSemaphoreCreateCounting(720, 0);
-	xSemaphoreLine1 = xSemaphoreCreateCounting(720, 0);
-	xSemaphoreLine2 = xSemaphoreCreateCounting(720, 0);
-	xSemaphoreLine3 = xSemaphoreCreateCounting(720, 0);
+
 	/* USER CODE END 2 */
 
 	/* USER CODE BEGIN RTOS_MUTEX */
@@ -1099,24 +1120,14 @@ void vTaskGUI(void const * argument)
 			}
 			if (sTimePrev.Seconds == 59) //каждую минуту
 			{
-
-				if (++line[0].Pulses > 0)
+				for (i = 0; i < LINES_AMOUNT; ++i)
 				{
-					xSemaphoreGive(xSemaphoreLine0);
+					if (++line[i].Pulses > 0)
+					{
+						xSemaphoreGive(line[i].xSemaphore);
+					}
 				}
 
-				if (++line[1].Pulses > 0)
-				{
-					xSemaphoreGive(xSemaphoreLine1);
-				}
-				if (++line[2].Pulses > 0)
-				{
-					xSemaphoreGive(xSemaphoreLine2);
-				}
-				if (++line[3].Pulses > 0)
-				{
-					xSemaphoreGive(xSemaphoreLine3);
-				}
 				//for (i = 0; i < sizeof(line) / 3; i++)
 				//{
 				//	if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
@@ -1212,29 +1223,8 @@ void vTaskLine0(void const * argument)
 		/* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(xSemaphoreLine0, portMAX_DELAY);
-		if (line[0].Status == LINE_STATUS_RUN)
-		{
-			gui_Vars.linesPolarity ^= 0b0001;
-			linesIncreaseMinute(0);
-			WM_Invalidate(handles.hButtonLine1);
-			if (gui_Vars.linesPolarity & 0b0001)
-			{
-				GPIOC->BSRR = GPIO_BSRR_BS6;
-				osDelay(line[0].Width * 375);
-				GPIOC->BSRR = GPIO_BSRR_BR6;
-				osDelay(LINE_DEAD_TIME);
-			}
-			else
-			{
-				GPIOC->BSRR = GPIO_BSRR_BS7;
-				osDelay(line[0].Width * 375);
-				GPIOC->BSRR = GPIO_BSRR_BR7;
-				osDelay(LINE_DEAD_TIME);
-			}
-			saveLinesPolarityToBKP();
-
-		}
+		xSemaphoreTake(line[0].xSemaphore, portMAX_DELAY);
+		lineSendSignal(0);
 	}
 	/* USER CODE END vTaskLine0 */
 }
@@ -1252,34 +1242,8 @@ void vTaskLine1(void const * argument)
 		/* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(xSemaphoreLine1, portMAX_DELAY);
-		if (line[0].Status == LINE_STATUS_RUN)
-		{
-			gui_Vars.linesPolarity ^= 0b0010;
-			linesIncreaseMinute(1);
-			WM_Invalidate(handles.hButtonLine2);
-			if (gui_Vars.linesPolarity & 0b0010)
-			{
-
-				GPIOD->BSRR = GPIO_BSRR_BS13;
-				//LINE1_POS_OUTPUT_GPIO_Port->BSRR = LINE1_POS_OUTPUT_Pin;
-				osDelay(line[1].Width * 375);
-				GPIOD->BSRR = GPIO_BSRR_BR13;
-				//LINE1_POS_OUTPUT_GPIO_Port->BSRR = LINE1_POS_OUTPUT_Pin << 16;
-				osDelay(LINE_DEAD_TIME);
-			}
-			else
-			{
-				GPIOD->BSRR = GPIO_BSRR_BS6;
-				//LINE1_NEG_OUTPUT_GPIO_Port->BSRR = LINE1_NEG_OUTPUT_Pin;
-				osDelay(line[1].Width * 375);
-				GPIOD->BSRR = GPIO_BSRR_BR6;
-				//LINE1_NEG_OUTPUT_GPIO_Port->BSRR = LINE1_NEG_OUTPUT_Pin << 16;
-				osDelay(LINE_DEAD_TIME);
-			}
-			saveLinesPolarityToBKP();
-
-		}
+		xSemaphoreTake(line[1].xSemaphore, portMAX_DELAY);
+		lineSendSignal(1);
 	}
 	/* USER CODE END vTaskLine1 */
 }
@@ -1297,29 +1261,8 @@ void vTaskLine2(void const * argument)
 		/* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(xSemaphoreLine2, portMAX_DELAY);
-		if (line[2].Status == LINE_STATUS_RUN)
-		{
-			gui_Vars.linesPolarity ^= 0b0100;
-			linesIncreaseMinute(2);
-			WM_Invalidate(handles.hButtonLine3);
-			if (gui_Vars.linesPolarity & 0b0100)
-			{
-				//LINE2_POS_OUTPUT_GPIO_Port->BSRR = LINE2_POS_OUTPUT_Pin;
-				osDelay(line[2].Width * 375);
-				//LINE2_POS_OUTPUT_GPIO_Port->BSRR = LINE2_POS_OUTPUT_Pin << 16;
-				osDelay(LINE_DEAD_TIME);
-			}
-			else
-			{
-				//LINE2_NEG_OUTPUT_GPIO_Port->BSRR = LINE2_NEG_OUTPUT_Pin;
-				osDelay(line[2].Width * 375);
-				//LINE2_NEG_OUTPUT_GPIO_Port->BSRR = LINE2_NEG_OUTPUT_Pin << 16;
-				osDelay(LINE_DEAD_TIME);
-			}
-			saveLinesPolarityToBKP();
-
-		}
+		xSemaphoreTake(line[2].xSemaphore, portMAX_DELAY);
+		lineSendSignal(2);
 	}
 	/* USER CODE END vTaskLine2 */
 }
@@ -1337,30 +1280,8 @@ void vTaskLine3(void const * argument)
 		/* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(xSemaphoreLine3, portMAX_DELAY);
-
-		if (line[3].Status == LINE_STATUS_RUN)
-		{
-			linesIncreaseMinute(3);
-			WM_Invalidate(handles.hButtonLine4);
-			gui_Vars.linesPolarity ^= 0b1000;
-			if (gui_Vars.linesPolarity & 0b1000)
-			{
-				//LINE3_POS_OUTPUT_GPIO_Port->BSRR = LINE3_POS_OUTPUT_Pin;
-				osDelay(line[3].Width * 375);
-				//LINE3_POS_OUTPUT_GPIO_Port->BSRR = LINE3_POS_OUTPUT_Pin << 16;
-				osDelay(LINE_DEAD_TIME);
-			}
-			else
-			{
-				//LINE3_NEG_OUTPUT_GPIO_Port->BSRR = LINE3_NEG_OUTPUT_Pin;
-				osDelay(line[3].Width * 375);
-				//LINE3_NEG_OUTPUT_GPIO_Port->BSRR = LINE3_NEG_OUTPUT_Pin << 16;
-				osDelay(LINE_DEAD_TIME);
-			}
-			saveLinesPolarityToBKP();
-
-		}
+		xSemaphoreTake(line[3].xSemaphore, portMAX_DELAY);
+		lineSendSignal(3);
 	}
 	/* USER CODE END vTaskLine3 */
 }
@@ -1372,23 +1293,7 @@ void vTaskLine3(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_vTaskLCDLinesTime */
-void vTaskLCDLinesTime(void const * argument)
-{
-	osEvent  evt;
-	LineMessage  message;
-	/* USER CODE BEGIN vTaskLCDLinesTime */
-	/* Infinite loop */
-	for (;;)
-	{
 
-
-
-
-
-
-	}
-	/* USER CODE END vTaskLCDLinesTime */
-}
 
 /**
   * @brief  Period elapsed callback in non blocking mode

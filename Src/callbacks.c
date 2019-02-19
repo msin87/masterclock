@@ -709,21 +709,50 @@ uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
 void pollLinesOutput(uint8_t waitMinutes)
 {
 	uint16_t i = 0;
+	uint8_t lineNum = 0;
 	gui_Vars.diffSystemLine = get_sTimeLinesDiff(&line[0], waitMinutes);
 	if (gui_Vars.diffSystemLine > 0)
 	{
 		for (i = 0; i < gui_Vars.diffSystemLine; i++)
 		{
-			if (line[0].Status == LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine0);
-			if (line[1].Status == LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine1);
-			if (line[2].Status == LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine2);
-			if (line[3].Status == LINE_STATUS_RUN) xSemaphoreGive(xSemaphoreLine3);
+			for (lineNum = 0; lineNum < LINES_AMOUNT; ++lineNum)
+			{
+				if (line[lineNum].Status == LINE_STATUS_RUN) xSemaphoreGive(line[lineNum].xSemaphore);
+			}
 		}
+	}
+}
+
+void lineSendSignal(uint8_t lineNumber)
+{
+	uint8_t outputMask = 1 << lineNumber;
+	if (line[lineNumber].Status == LINE_STATUS_RUN)
+	{
+		gui_Vars.linesPolarity ^= outputMask;
+		linesIncreaseMinute(lineNumber);
+		WM_Invalidate(handles.hButtonLine[lineNumber]);
+		if (gui_Vars.linesPolarity & outputMask)
+		{
+			line[lineNumber].LineGPIOpos->BSRR = line[lineNumber].LinePinPos;		//set
+			osDelay(line[lineNumber].Width * LINE_WIDTH_MULT);
+			line[lineNumber].LineGPIOpos->BSRR = line[lineNumber].LinePinPos << 16; //reset
+			osDelay(LINES_DEAD_TIME);
+		}
+		else
+		{
+			line[lineNumber].LineGPIOneg->BSRR = line[lineNumber].LinePinNeg;		//set
+			osDelay(line[lineNumber].Width * LINE_WIDTH_MULT);
+			line[lineNumber].LineGPIOneg->BSRR = line[lineNumber].LinePinNeg << 16; //reset
+			osDelay(LINES_DEAD_TIME);
+		}
+		saveLinesPolarityToBKP();
+
 	}
 }
 void linesIncreaseMinute(uint8_t lineNumber)
 {
 	uint8_t i = 0;
+	char str[3];
 	if (lineNumber < LINES_AMOUNT)
 	{
 		i = lineNumber;
@@ -741,6 +770,7 @@ void linesIncreaseMinute(uint8_t lineNumber)
 		{
 			line[i].Minutes = 0;
 			line[i].Hours++;
+
 			if (line[i].Hours == 24)
 			{
 				line[i].Hours = 0;
@@ -919,7 +949,7 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%4d", longPressCNT.value * 375);
+			sprintf(str, "%4d", longPressCNT.value * LINE_WIDTH_MULT);
 			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
 			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
 			gui_Vars.valsChanged = true;
@@ -934,7 +964,7 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
-			sprintf(str, "%4d", longPressCNT.value * 375);
+			sprintf(str, "%4d", longPressCNT.value * LINE_WIDTH_MULT);
 			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
 			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
 			gui_Vars.valsChanged = true;

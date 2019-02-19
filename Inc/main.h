@@ -69,10 +69,8 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-	SemaphoreHandle_t xSemaphoreLine0;
-	SemaphoreHandle_t xSemaphoreLine1;
-	SemaphoreHandle_t xSemaphoreLine2;
-	SemaphoreHandle_t xSemaphoreLine3;
+	//SemaphoreHandle_t xSemaphoreLine[4];
+
 
 	/* USER CODE END ET */
 

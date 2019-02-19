@@ -119,7 +119,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Header'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS);
-		sprintf(str, "%4d", line[gui_Vars.menuState - 8].Width * 375);
+		sprintf(str, "%4d", line[gui_Vars.menuState - 8].Width * LINE_WIDTH_MULT);
 		HEADER_AddItem(hItem, 80, str, 14);
 
 		if (line[gui_Vars.menuState - 8].Polarity)

@@ -58,6 +58,7 @@ void readLinesPolarityFromBKP(void);
 uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes);
 
 void pollLinesOutput(uint8_t waitMinutes);
+void lineSendSignal(uint8_t lineNumber);
 
 uint32_t calkCRCofFlash(void);
 uint32_t calcCRCofBKP(void);
