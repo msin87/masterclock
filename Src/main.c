@@ -193,7 +193,7 @@ void longPressControl(void)
 			{
 				sprintf(text, "%4d", longPressCNT.value * LINE_WIDTH_MULT);
 			}
-			else if (gui_Vars.menuState == MENU_STATE_TIME_SUMWIN || gui_Vars.menuState == MENU_STATE_TIMECALIBRATION)
+			else if ((gui_Vars.menuState == MENU_STATE_TIME_SUMWIN || gui_Vars.menuState == MENU_STATE_TIMECALIBRATION || (gui_Vars.menuState >= MENU_STATE_LINE1SETUP && gui_Vars.menuState <= MENU_STATE_LINE4SETUP)) && longPressCNT.lowerLimit < 0)
 			{
 				if (longPressCNT.value > 0)
 				{
@@ -234,6 +234,7 @@ void LinesInit(void)
 {
 	uint8_t i = 0;
 	uint16_t dataInBKP;
+	uint16_t buff;
 	//2 байта * 4 = 8 байт
 	// 15    14    13    12   11   10    9    8    7    6    5    4    3    2    1    0
 	// \status/		\---width--/	\--------------------hours*minutes-----------------/	
@@ -268,7 +269,7 @@ void LinesInit(void)
 	line[3].LinePinPos = LINE3_POS_OUTPUT_Pin;
 	line[3].LinePinNeg = LINE3_NEG_OUTPUT_Pin;
 
-	for (i = 0; i < LINES_AMOUNT; i++)
+	for (i = 0; i < LINES_AMOUNT; ++i)
 	{
 		dataInBKP = rtc_read_backup_reg(i + BKP_LINE1_OFFSET);
 		line[i].Hours = (dataInBKP & 0b11111111111) / 60;
@@ -283,7 +284,22 @@ void LinesInit(void)
 			line[i].Width = 0;
 			line[i].Status = LINE_STATUS_OFF;
 		}
+
 	}
+	dataInBKP = rtc_read_backup_reg(BKP_LINES_TIMEZONE_OFFSET);
+	for (i = 1; i < LINES_AMOUNT; ++i)
+	{
+		buff = (dataInBKP >> ((i - 1) * 5));
+		if (buff & 0b10000)
+		{
+			line[i].TimeZone = (char)(~(buff & 0b1111));
+		}
+		else
+		{
+			line[i].TimeZone = (char)(buff & 0b1111);
+		}
+	}
+
 	readDaylightSavingFromBKP();
 	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
@@ -1122,9 +1138,13 @@ void vTaskGUI(void const * argument)
 			{
 				for (i = 0; i < LINES_AMOUNT; ++i)
 				{
-					if (++line[i].Pulses > 0)
+					if (line[i].Pulses >= 0)
 					{
 						xSemaphoreGive(line[i].xSemaphore);
+					}
+					else
+					{
+						line[i].Pulses++;
 					}
 				}
 

@@ -55,19 +55,22 @@ void lineChangeStatus(uint8_t linenum, uint8_t status)
 	switch (status) {
 	case LINE_STATUS_STOP:
 		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
+		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_RED);
+		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_RED);
+		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
 		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_WHITE);
 		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_WHITE);
 		BUTTON_SetText(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), "СТАРТ");
-		HEADER_SetItemText(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), 2, "СТОП");
-		HEADER_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), GUI_WHITE);
+		//HEADER_SetItemText(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), 2, "СТОП");
+		//HEADER_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), GUI_WHITE);
 		break;
 	case LINE_STATUS_RUN:
 		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
-		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_RED);
-		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_RED);
+		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_WHITE);
+		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_WHITE);
 		BUTTON_SetText(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), "СТОП");
-		HEADER_SetItemText(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), 2, "СТАРТ");
-		HEADER_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), GUI_WHITE);
+		//HEADER_SetItemText(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), 2, "СТАРТ");
+		//HEADER_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), GUI_WHITE);
 		break;
 	case LINE_STATUS_OFF:
 		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
@@ -95,6 +98,8 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ BUTTON_CreateIndirect, "", ID_BUTTON_LINESETUP_PULSE, 245, 45, 70, 30, 0, 0x0, 0 },
 	{ BUTTON_CreateIndirect, "", ID_BUTTON_LINESETUP_Hminus, 5, 165, 70, 70, 0, 0x0, 0 },
 	{ BUTTON_CreateIndirect, "", ID_BUTTON_LINESETUP_Mminus, 85, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_LINESETUP_Zplus, 165, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_LINESETUP_Zminus,165, 165, 70, 70, 0, 0x0, 0 },
 	//{ BUTTON_CreateIndirect, "", ID_BUTTON_LINESETUP_Sminus, 165, 165, 70, 70, 0, 0x0, 0 },
 	{ BUTTON_CreateIndirect, "Назад", ID_BUTTON_LINESETUP_BACK, 245, 165, 70, 70, 0, 0x0, 0 },
 	{ HEADER_CreateIndirect, "Header", ID_HEADER_LINESETUP_STATVALS, 0, 20, 240, 20, 0, 0x0, 0 },
@@ -150,7 +155,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_VALSNAMES);
 		HEADER_AddItem(hItem, 80, "ЧАС", 14);
 		HEADER_AddItem(hItem, 80, "МИН", 14);
-		HEADER_AddItem(hItem, 80, "СТАТУС:", 14);
+		//**************************************************************************************************//
+		//для независимых временных зон на линиях требуется переработка GUI. В данной версии этого не будет.
+		//if (gui_Vars.menuState != MENU_STATE_LINE1SETUP) HEADER_AddItem(hItem, 80, "ПОЯС:", 14);
+		//**************************************************************************************************//
 		HEADER_SetTextColor(hItem, GUI_WHITE);
 		//
 		// Initialization of 'Header'
@@ -161,6 +169,22 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		HEADER_AddItem(hItem, 80, str, 14);
 		sprintf(str, "%02d", line[gui_Vars.menuState - 4].Minutes);
 		HEADER_AddItem(hItem, 80, str, 14);
+
+
+		if ((int8_t)line[gui_Vars.menuState - 4].TimeZone > 0)
+		{
+			sprintf(str, "+%d", line[gui_Vars.menuState - 4].TimeZone);
+		}
+		else if ((int8_t)line[gui_Vars.menuState - 4].TimeZone <= 0)
+		{
+			sprintf(str, "%d", (int8_t)line[gui_Vars.menuState - 4].TimeZone);
+		}
+		//**************************************************************************************************//
+		//для независимых временных зон на линиях требуется переработка GUI. В данной версии этого не будет.
+		//if (gui_Vars.menuState != MENU_STATE_LINE1SETUP) HEADER_AddItem(hItem, 80, str, 14);
+		WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Zminus));
+		WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Zplus));
+		//**************************************************************************************************//
 		switch (line[gui_Vars.menuState - 4].Status)
 		{
 		case LINE_STATUS_RUN:
@@ -168,30 +192,35 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_RED);
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_RED);
 			BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), "СТОП");
-			HEADER_AddItem(hItem, 80, "СТАРТ", 14);
+
 			break;
 		case LINE_STATUS_STOP:
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_WHITE);
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_WHITE);
 			BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), "СТАРТ");
-			HEADER_AddItem(hItem, 80, "СТОП", 14);
+
 			break;
 		case LINE_STATUS_OFF:
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_WHITE);
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_WHITE);
 			BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), " ");
-			HEADER_AddItem(hItem, 80, "ВЫКЛ", 14);
+
 			HEADER_SetItemText(hItem, 0, "");
 			HEADER_SetItemText(hItem, 1, "");
+			HEADER_SetItemText(hItem, 2, "");
 			WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Hminus));
 			WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Hplus));
 			WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Mminus));
 			WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Mplus));
+			WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Zminus));
+			WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Zplus));
 
 			break;
 		}
+
+
 
 		HEADER_SetTextColor(hItem, GUI_WHITE);
 		//
@@ -239,7 +268,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (lineTemp[gui_Vars.menuState - 4].Hours != 23)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Hplus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Hours);
-					//lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
 				}
 				else
 				{
@@ -269,7 +298,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (lineTemp[gui_Vars.menuState - 4].Minutes != 59)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Mplus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Minutes);
-					//lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
 				}
 				else
 				{
@@ -332,10 +361,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					break;
 				}
 				if (gui_Vars.valsChanged == true) diff = get_sTimeLinesDiff(&lineTemp[gui_Vars.menuState - 4], 10);
-
+				line[gui_Vars.menuState - 4].Pulses = diff;
 				if (diff > 0)
 				{
-					line[gui_Vars.menuState - 4].Pulses += diff;
+
 					while (diff > 0)
 					{
 						for (i = 0; i < LINES_AMOUNT; ++i)
@@ -348,10 +377,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						diff--;
 					}
 				}
-				else
-				{
-					line[gui_Vars.menuState - 4].Pulses = diff;
-				}
+
 
 				// USER END
 				break;
@@ -385,7 +411,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (lineTemp[gui_Vars.menuState - 4].Hours != 0)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Hminus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Hours);
-					//lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -411,7 +437,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (lineTemp[gui_Vars.menuState - 4].Minutes != 0)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Mminus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Minutes);
-					//lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -422,6 +448,64 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				pollButton(ID_BUTTON_LINESETUP_Mminus, WM_NOTIFICATION_RELEASED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].Minutes);
+
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_LINESETUP_Zminus: // Notifications sent by 'm-'
+			switch (NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				if (lineTemp[gui_Vars.menuState - 4].TimeZone != -12)
+				{
+					pollButton(ID_BUTTON_LINESETUP_Zminus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].TimeZone);
+					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+				}
+				else
+				{
+					longPressCNT.value = -12;
+				}
+				if (valsChangedOld != gui_Vars.valsChanged)
+				{
+					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_ENTER));
+				}
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+				pollButton(ID_BUTTON_LINESETUP_Zminus, WM_NOTIFICATION_RELEASED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].TimeZone);
+
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_LINESETUP_Zplus: // Notifications sent by 'm-'
+			switch (NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				if (lineTemp[gui_Vars.menuState - 4].Minutes != 12)
+				{
+					pollButton(ID_BUTTON_LINESETUP_Zplus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].TimeZone);
+					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
+				}
+				else
+				{
+					longPressCNT.value = 12;
+				}
+				if (valsChangedOld != gui_Vars.valsChanged)
+				{
+					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_ENTER));
+				}
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+				pollButton(ID_BUTTON_LINESETUP_Zplus, WM_NOTIFICATION_RELEASED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].TimeZone);
 
 				// USER END
 				break;
@@ -482,13 +566,14 @@ WM_HWIN CreateLineSetupWindow(void) {
 	handles.hLineSetupMenu = hWin;
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_Hplus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_Mplus), _cbArrowUpButton);
-	//WM_SetCallback(WM_GetDialogItem(hWin,ID_BUTTON_LINESETUP_Splus),_cbArrowUpButton);
+	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_Zplus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_Hminus), _cbArrowDownButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_Mminus), _cbArrowDownButton);
-	//WM_SetCallback(WM_GetDialogItem(hWin,ID_BUTTON_LINESETUP_Sminus),_cbArrowDownButton);
+	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_Zminus), _cbArrowDownButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_ENTER), _cbEnterButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_HEADER_LINESETUP_STATVALS), _cbLineSetupSystemTime);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_PULSE), _cbPulseSetupButton);
+
 	handles.hButtonLSenter = WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_ENTER);
 	return hWin;
 }

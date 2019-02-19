@@ -35,7 +35,11 @@
 
 #define BKP_TIMECALIBR_OFFSET BKP_DAYLIGHTSAVING_OFFSET + 1
 #define BKP_LINESPOLARITY_OFFSET BKP_DAYLIGHTSAVING_OFFSET
-#define BKP_CRC_OFFSET_HIGH BKP_TIMECALIBR_OFFSET+1
+
+#define BKP_LINES_TIMEZONE_OFFSET BKP_TIMECALIBR_OFFSET+1
+
+
+#define BKP_CRC_OFFSET_HIGH BKP_LINES_TIMEZONE_OFFSET+1
 #define BKP_CRC_OFFSET_LOW BKP_CRC_OFFSET_HIGH+1
 
 
@@ -58,8 +62,6 @@ typedef struct
 	uint8_t valsChanged;
 	uint8_t linesPolarity;
 	uint8_t linesTimeChanged;
-	uint8_t widthSorted[4];
-	uint8_t lineNumsByWidth[4];
 	int16_t	diffSystemLine;
 
 } GUI_Vars;
@@ -75,6 +77,7 @@ typedef struct
 	uint8_t it;
 	uint8_t itPrev;
 	uint8_t itCNT;
+
 } LongPressCNT;
 typedef struct
 {
@@ -124,7 +127,8 @@ typedef struct
 	uint8_t Status;
 	uint8_t Width;
 	uint8_t Polarity;
-	uint8_t	Pulses;
+	int8_t	Pulses;
+	int8_t TimeZone;
 	GPIO_TypeDef* LineGPIOpos;
 	GPIO_TypeDef* LineGPIOneg;
 	uint32_t LinePinPos;
