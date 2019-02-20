@@ -286,6 +286,7 @@ void LinesInit(void)
 		}
 
 	}
+
 	dataInBKP = rtc_read_backup_reg(BKP_LINES_TIMEZONE_OFFSET);
 	for (i = 1; i < LINES_AMOUNT; ++i)
 	{
@@ -301,6 +302,8 @@ void LinesInit(void)
 	}
 
 	readDaylightSavingFromBKP();
+
+
 	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
 		doAfterStart = true;       //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
@@ -1065,6 +1068,7 @@ void vTaskGUI(void const * argument)
 	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 	CreateMainMenu();
 	HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+	line[0].TimeZone = daylightSaving.timeZone;
 	pollLinesOutput(10);
 
 

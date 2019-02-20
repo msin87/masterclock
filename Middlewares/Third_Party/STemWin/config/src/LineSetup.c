@@ -57,9 +57,7 @@ void lineChangeStatus(uint8_t linenum, uint8_t status)
 		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
 		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_RED);
 		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_RED);
-		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
-		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_WHITE);
-		BUTTON_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_WHITE);
+
 		BUTTON_SetText(WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_RUNSTOP), "СТАРТ");
 		//HEADER_SetItemText(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), 2, "СТОП");
 		//HEADER_SetTextColor(WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS), GUI_WHITE);
@@ -144,6 +142,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		lineTemp[1] = line[1];
 		lineTemp[2] = line[2];
 		lineTemp[3] = line[3];
+
 		//
 	// Initialization of Main Window
 	//
@@ -155,10 +154,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_VALSNAMES);
 		HEADER_AddItem(hItem, 80, "ЧАС", 14);
 		HEADER_AddItem(hItem, 80, "МИН", 14);
-		//**************************************************************************************************//
-		//для независимых временных зон на линиях требуется переработка GUI. В данной версии этого не будет.
-		//if (gui_Vars.menuState != MENU_STATE_LINE1SETUP) HEADER_AddItem(hItem, 80, "ПОЯС:", 14);
-		//**************************************************************************************************//
+
+		HEADER_AddItem(hItem, 80, "ПОЯС:", 14);
+
 		HEADER_SetTextColor(hItem, GUI_WHITE);
 		//
 		// Initialization of 'Header'
@@ -179,25 +177,28 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		{
 			sprintf(str, "%d", (int8_t)line[gui_Vars.menuState - 4].TimeZone);
 		}
-		//**************************************************************************************************//
-		//для независимых временных зон на линиях требуется переработка GUI. В данной версии этого не будет.
-		//if (gui_Vars.menuState != MENU_STATE_LINE1SETUP) HEADER_AddItem(hItem, 80, str, 14);
-		WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Zminus));
-		WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Zplus));
-		//**************************************************************************************************//
+
+		HEADER_AddItem(hItem, 80, str, 14);
+		if (gui_Vars.menuState == MENU_STATE_LINE1SETUP)
+		{
+			WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Zminus));
+			WM_DisableWindow(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_Zplus));
+		}
+
+
 		switch (line[gui_Vars.menuState - 4].Status)
 		{
 		case LINE_STATUS_RUN:
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
-			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_RED);
-			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_RED);
+			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_WHITE);
+			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_WHITE);
 			BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), "СТОП");
 
 			break;
 		case LINE_STATUS_STOP:
 			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_DISABLED, GUI_GRAY);
-			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_WHITE);
-			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_WHITE);
+			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_PRESSED, GUI_RED);
+			BUTTON_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), BUTTON_CI_UNPRESSED, GUI_RED);
 			BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_RUNSTOP), "СТАРТ");
 
 			break;
@@ -259,6 +260,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_NOTIFY_PARENT:
 		Id = WM_GetId(pMsg->hWinSrc);
 		NCode = pMsg->Data.v;
+
 		switch (Id) {
 		case ID_BUTTON_LINESETUP_Hplus: // Notifications sent by 'h+'
 			switch (NCode) {
@@ -361,10 +363,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					break;
 				}
 				if (gui_Vars.valsChanged == true) diff = get_sTimeLinesDiff(&lineTemp[gui_Vars.menuState - 4], 10);
-				line[gui_Vars.menuState - 4].Pulses = diff;
+
 				if (diff > 0)
 				{
-
+					line[0].pTemp = (uint32_t*)&lineTemp[0];
+					line[1].pTemp = (uint32_t*)&lineTemp[1];
+					line[2].pTemp = (uint32_t*)&lineTemp[2];
+					line[3].pTemp = (uint32_t*)&lineTemp[3];
+					line[gui_Vars.menuState - 4].Pulses = 0;
 					while (diff > 0)
 					{
 						for (i = 0; i < LINES_AMOUNT; ++i)
@@ -376,6 +382,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						}
 						diff--;
 					}
+				}
+				else
+				{
+					line[gui_Vars.menuState - 4].Pulses = diff;
 				}
 
 
