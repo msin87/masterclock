@@ -140,12 +140,12 @@ void _cbLineSetupSystemTime(WM_MESSAGE * pMsg)
 
 	case WM_PAINT:
 		HEADER_Callback(pMsg);
-		sprintf(str, "%02d:%02d:%02d", sTime.Hours, sTime.Minutes, sTime.Seconds);
+		sprintf(str, "%02d:%02d:%02d", hoursToUTC(sTime.Hours, daylightSaving.timeZone), sTime.Minutes, sTime.Seconds);
 		TFT_LineSetupShowString(173, 17, str, 18, 0xFFFF);
 		break;
 	default:
 		HEADER_Callback(pMsg);
-		sprintf(str, "%02d:%02d:%02d", sTime.Hours, sTime.Minutes, sTime.Seconds);
+		sprintf(str, "%02d:%02d:%02d", hoursToUTC(sTime.Hours, daylightSaving.timeZone), sTime.Minutes, sTime.Seconds);
 		TFT_LineSetupShowString(173, 17, str, 18, 0xFFFF);
 		break;
 	}

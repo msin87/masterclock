@@ -97,7 +97,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 	switch (pMsg->MsgId) {
 	case WM_SEC_UPDATE:
-		sprintf(str, "%02d:%02d:%02d", sTime.Hours, sTime.Minutes, sTime.Seconds);
+		sprintf(str, "%02d:%02d:%02d", hoursToUTC(sTime.Hours, daylightSaving.timeZone), sTime.Minutes, sTime.Seconds);
 		TFT_LineSetupShowString(173, 17, str, 18, 0xFFFF);
 		break;
 	case WM_INIT_DIALOG:
@@ -152,7 +152,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Header'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_STATUS);
-		HEADER_AddItem(hItem, 160, "Системное время:", 14);
+		HEADER_AddItem(hItem, 160, "Время UTC(+0): ", 14);
 		HEADER_AddItem(hItem, 80, "", 14);
 		HEADER_SetTextColor(hItem, GUI_WHITE);
 		//

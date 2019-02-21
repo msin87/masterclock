@@ -45,6 +45,7 @@ uint8_t increaseDay(RTC_DateTypeDef* Date);
 void linesIncreaseMinute(uint8_t lineNumber);
 uint8_t getLastDayOfMonth(RTC_DateTypeDef* Date);
 void correctDate(RTC_DateTypeDef* Date);
+uint8_t hoursToUTC(int8_t hours, int8_t timeZone);
 
 void saveDateToBKP(void);
 void saveLineToBKP(uint8_t lineNumber);

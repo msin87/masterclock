@@ -133,7 +133,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 	switch (pMsg->MsgId) {
 	case WM_SEC_UPDATE:
-		sprintf(str, "%02d:%02d:%02d", sTime.Hours, sTime.Minutes, sTime.Seconds);
+		sprintf(str, "%02d:%02d:%02d", hoursToUTC(sTime.Hours, daylightSaving.timeZone), sTime.Minutes, sTime.Seconds);
 		TFT_LineSetupShowString(173, 17, str, 18, 0xFFFF);
 		break;
 	case WM_INIT_DIALOG:
@@ -229,7 +229,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_STATVALS);
 
-		HEADER_AddItem(hItem, 160, "Системное время:", 14);
+		HEADER_AddItem(hItem, 160, "Время UTC(+0): ", 14);
 		HEADER_AddItem(hItem, 80, " ", 14);
 		HEADER_SetTextColor(hItem, GUI_WHITE);
 
@@ -498,7 +498,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if (lineTemp[gui_Vars.menuState - 4].Minutes != 12)
+				if (lineTemp[gui_Vars.menuState - 4].TimeZone != 12)
 				{
 					pollButton(ID_BUTTON_LINESETUP_Zplus, WM_NOTIFICATION_CLICKED, (int8_t*)&lineTemp[gui_Vars.menuState - 4].TimeZone);
 					lineChangeStatus(gui_Vars.menuState - 4, LINE_STATUS_STOP);
