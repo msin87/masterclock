@@ -286,6 +286,7 @@ void LinesInit(void)
 		}
 
 	}
+
 	dataInBKP = rtc_read_backup_reg(BKP_LINES_TIMEZONE_OFFSET);
 	for (i = 1; i < LINES_AMOUNT; ++i)
 	{
@@ -301,6 +302,8 @@ void LinesInit(void)
 	}
 
 	readDaylightSavingFromBKP();
+
+
 	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
 		doAfterStart = true;       //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
@@ -445,14 +448,24 @@ void SystemClock_Config(void)
 
 	/**Initializes the CPU, AHB and APB busses clocks
 	*/
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
+	if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
+	{
+		RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
+		RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+	}
+	else
+	{
+		RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+	}
+	//RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
 	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
 	RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
-	RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+	//RCC_OscInitStruct.LSEState = RCC_LSE_ON;
 	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
 	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+
 	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
 	{
 		Error_Handler();
@@ -470,8 +483,17 @@ void SystemClock_Config(void)
 	{
 		Error_Handler();
 	}
-	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC;
-	PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+	if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
+	{
+		PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC;
+		PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+	}
+	else
+	{
+		PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+	}
+	//PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC;
+	//PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
 	PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
 	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
 	{
@@ -665,11 +687,24 @@ static void MX_RTC_Init(void)
 	hrtc.Instance = RTC;
 	hrtc.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 	hrtc.Init.OutPut = RTC_OUTPUTSOURCE_ALARM;
-	if (HAL_RTC_Init(&hrtc) != HAL_OK)
-	{
-		Error_Handler();
-	}
 
+	if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
+	{
+		if (HAL_RTC_Init(&hrtc) != HAL_OK)
+		{
+			Error_Handler();
+		}
+	}
+	else
+	{
+		HAL_PWR_EnableBkUpAccess();
+		__HAL_RCC_BKP_CLK_ENABLE();
+		/* Peripheral clock enable */
+		__HAL_RCC_RTC_ENABLE();
+		/* RTC interrupt Init */
+		HAL_NVIC_SetPriority(RTC_IRQn, 15, 0);
+		HAL_NVIC_EnableIRQ(RTC_IRQn);
+	}
 	/* USER CODE BEGIN Check_RTC_BKUP */
 	read = rtc_read_backup_reg(BKP_DATE_OFFSET);
 	if (!isCRC_OK_BKP())
@@ -1065,6 +1100,7 @@ void vTaskGUI(void const * argument)
 	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 	CreateMainMenu();
 	HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+	line[0].TimeZone = daylightSaving.timeZone;
 	pollLinesOutput(10);
 
 

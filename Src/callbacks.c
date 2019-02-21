@@ -470,6 +470,7 @@ void saveLineToBKP(uint8_t lineNumber)
 	//		10000 = -16
 	rtc_write_backup_reg(lineNumber + BKP_LINE1_OFFSET, ((line[lineNumber].Hours * 60) + line[lineNumber].Minutes) | (line[lineNumber].Width << 11) | line[lineNumber].Status << 14);
 	if (lineNumber == 0) return;
+
 	for (i = 1; i < LINES_AMOUNT; ++i)
 	{
 
@@ -694,21 +695,27 @@ void flash_erase_page(uint32_t address) {
 uint32_t flash_read(uint32_t address) {
 	return (*(__IO uint32_t*) address);
 }
-//uint8_t hoursZoneToLocal(int8_t hours, int8_t timeZone)
-//{
-//	hours=hours
-//}
+uint8_t hoursToUTC(int8_t hours, int8_t timeZone)
+{
+	hours %= 24;
+	hours = hours - timeZone;
+	if (hours < 0)
+	{
+		hours = 24 + hours;
+	}
+	return hours % 24;
+}
 uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
 {
 	int16_t diff_Min12 = 0;
 	uint8_t sHour12 = 0, lHour12 = 0;
 	int16_t sMinutes = 0, lMinutes = 0;
-	sHour12 = sTime.Hours % 12;
+	sHour12 = hoursToUTC(sTime.Hours, daylightSaving.timeZone) % 12;
 	if (sHour12 == 0)
 	{
 		sHour12 = 12;
 	}
-	lHour12 = lineToCheck->Hours % 12;
+	lHour12 = hoursToUTC(lineToCheck->Hours, lineToCheck->TimeZone) % 12;
 	if (lHour12 == 0)
 	{
 		lHour12 = 12;
@@ -720,8 +727,8 @@ uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
 
 		diff_Min12 = 720 + diff_Min12;
 	}
-	sMinutes = sTime.Hours * 60 + sTime.Minutes;
-	lMinutes = lineToCheck->Hours * 60 + lineToCheck->Minutes;
+	sMinutes = hoursToUTC(sTime.Hours, daylightSaving.timeZone) * 60 + sTime.Minutes;
+	lMinutes = hoursToUTC(lineToCheck->Hours, lineToCheck->TimeZone) * 60 + lineToCheck->Minutes;
 	if ((sMinutes - lMinutes >= 720))
 	{
 		lineToCheck->Hours += 12;
@@ -730,8 +737,9 @@ uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
 		if ((sMinutes - lMinutes) >= -720 && (sMinutes - lMinutes) < -waitMinutes)
 		{
 			lineToCheck->Hours -= 12;
+			if (lineToCheck->Hours < 0) lineToCheck->Hours = -lineToCheck->Hours;
 		}
-
+	lineToCheck->Hours %= 24;
 	return diff_Min12;
 }
 void pollLinesOutput(uint8_t waitMinutes)
@@ -764,11 +772,20 @@ void lineSendSignal(uint8_t lineNumber)
 {
 
 	uint8_t outputMask = 1 << lineNumber;
+	Lines *lTemp;
+	uint16_t count = uxSemaphoreGetCount(line[lineNumber].xSemaphore);
 
 	if (line[lineNumber].Status == LINE_STATUS_RUN)
 	{
 		gui_Vars.linesPolarity ^= outputMask;
 		linesIncreaseMinute(lineNumber);
+
+		if (count == 0 && line[lineNumber].pTemp)
+		{
+			lTemp = (Lines*)line[lineNumber].pTemp;
+			lTemp->Hours = line[lineNumber].Hours;
+			lTemp->Minutes = line[lineNumber].Minutes;
+		}
 		if (gui_Vars.menuState == lineNumber + 4)
 			lineSetupMenuUpdateVals();
 		WM_Invalidate(handles.hButtonLine[lineNumber]);

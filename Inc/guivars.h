@@ -134,6 +134,7 @@ typedef struct
 	uint32_t LinePinPos;
 	uint32_t LinePinNeg;
 	SemaphoreHandle_t xSemaphore;
+	uint32_t *pTemp;
 	// 15    14    13    12   11   10    9    8    7    6    5    4    3    2    1    0
 	// \status/		\---width--/	\--------------------hours*minutes-----------------/	
 	//    |				  |										|
