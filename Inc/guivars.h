@@ -122,12 +122,12 @@ typedef struct
 typedef struct
 {
 
-	uint8_t Hours;
-	uint8_t Minutes;
+	int8_t Hours;
+	int8_t Minutes;
 	uint8_t Status;
 	uint8_t Width;
 	uint8_t Polarity;
-	int8_t	Pulses;
+	int16_t	Pulses;
 	int8_t TimeZone;
 	GPIO_TypeDef* LineGPIOpos;
 	GPIO_TypeDef* LineGPIOneg;
