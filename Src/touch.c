@@ -4,7 +4,7 @@
 //unsigned int Xs_1=0,Xs_2=0,Xs_3=0,Xs_4=0,Ys_1=0,Ys_2=0,Ys_3=0,Ys_4=0; //јЗВјґҐЧш±кЦµ
 char s[10];
 GUI_PID_STATE touchState;
-volatile int32_t cali_A, cali_B, cali_C, cali_D, cali_E, cali_F;
+volatile int32_t cali_A = 0, cali_B = 0, cali_C = 0, cali_D = 0, cali_E = 0, cali_F = 0;
 
 void Draw_Point(uint16_t x, uint16_t y, uint16_t color, uint8_t size)
 {

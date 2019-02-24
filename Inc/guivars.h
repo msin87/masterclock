@@ -20,11 +20,13 @@
 #define MENU_STATE_LINE3SETUP_PULSE 10
 #define MENU_STATE_LINE4SETUP_PULSE 11
 #define MENU_STATE_TIME_SUMWIN 12
-#define true 1
-#define false 0
+
 #define LINES_AMOUNT 4
 #define LINES_DEAD_TIME 50
 #define LINE_WIDTH_MULT 375
+#define LINE_STATUS_OFF  0
+#define LINE_STATUS_RUN  1
+#define LINE_STATUS_STOP 2
 #define BKP_DATE_OFFSET 1
 #define BKP_LINE1_OFFSET BKP_DATE_OFFSET+1
 #define BKP_LINE2_OFFSET BKP_LINE1_OFFSET+1
@@ -144,12 +146,7 @@ typedef struct
 	//					0 sec = line status OFF					|
 	//													1440 minutes (1 day)			
 } Lines;
-typedef struct
-{
-	uint8_t id;
-	uint8_t Minutes;
-	uint8_t Hours;
-} LineMessage;
+
 typedef struct
 {
 	char timeZone;
@@ -159,9 +156,17 @@ typedef struct
 
 } DaylightSaving;
 
-
+typedef struct
+{
+	GUI_Vars* guiVars;
+	LongPressCNT* longPressCNT;
+	TimeCalibration* timeCalibration;
+	Handles* handles;
+	Lines line[4];
+	DaylightSaving* daylightSaving;
+} MasterClock;
 
 void sendMsg(WM_HWIN handle, uint16_t message);
-
+void initStructures(void);
 #endif
 

@@ -94,6 +94,7 @@
     <ClCompile Include="Src\Arial16.c" />
     <ClCompile Include="Src\Arial18.c" />
     <ClCompile Include="Src\arrow.c" />
+    <ClCompile Include="Src\backup.c" />
     <ClCompile Include="Src\button76x76Skin.c" />
     <ClCompile Include="Src\callbacks.c" />
     <ClCompile Include="Src\Digital-7 Mono70.c" />
@@ -101,6 +102,7 @@
     <ClCompile Include="Src\freertos.c" />
     <ClCompile Include="Src\guivars.c" />
     <ClCompile Include="Src\lcdcmd.c" />
+    <ClCompile Include="Src\lines.c" />
     <ClCompile Include="Src\skinning.c" />
     <ClCompile Include="Src\sram.c" />
     <ClCompile Include="Src\stm32f1xx_it.c" />
@@ -135,7 +137,9 @@
     <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_tim.c" />
     <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_tim_ex.c" />
     <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_dma.c" />
+    <ClCompile Include="Src\timedate.c" />
     <ClCompile Include="Src\touch.c" />
+    <ClInclude Include="Inc\lines.h" />
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\BUTTON.h" />
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\BUTTON_Private.h" />
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\CALENDAR.h" />

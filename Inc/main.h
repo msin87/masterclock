@@ -131,9 +131,7 @@ extern "C" {
 #define LCD_RESET_Pin GPIO_PIN_1
 #define LCD_RESET_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
-#define LINE_STATUS_OFF  0
-#define LINE_STATUS_RUN  1
-#define LINE_STATUS_STOP 2
+
 
 /* USER CODE END Private defines */
 

@@ -19,19 +19,9 @@
 #define ID_BUTTON_TIMESETUP_ZONE   (GUI_ID_USER + 0x2E)
 
 
-	#include "DIALOG.h"
-	#include "guivars.h"
-	#include "string.h"
-	#include "stdio.h"
-	#include "stm32f1xx_hal.h"
-	#include "cmsis_os.h"
-	#include "TimeCalibrate.h"
-	#include "callbacks.h"
-	#include "TimeDateSetup.h"
-	
-	WM_HWIN CreateTimeSetupWindow(void);
-	extern RTC_HandleTypeDef hrtc;
-	extern GUI_Vars gui_Vars;
-	extern RTC_TimeTypeDef sTime;
-	extern RTC_DateTypeDef sDate;
+#include "DIALOG.h"
+
+
+WM_HWIN CreateTimeSetupWindow(void);
+
 #endif

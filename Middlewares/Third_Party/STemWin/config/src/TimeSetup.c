@@ -22,7 +22,21 @@
 // USER END
 
 #include "TimeSetup.h"
+#include "guivars.h"
+#include "string.h"
+#include "stdio.h"
+#include "stm32f1xx_hal.h"
+#include "cmsis_os.h"
+#include "TimeCalibrate.h"
+#include "callbacks.h"
+#include "TimeDateSetup.h"
+#include "lines.h"
+#include <stdbool.h>
+extern RTC_HandleTypeDef hrtc;
 
+extern RTC_TimeTypeDef sTime;
+extern RTC_DateTypeDef sDate;
+extern MasterClock masterClock;
 /*********************************************************************
 *
 *       Defines
@@ -43,7 +57,7 @@
 */
 
 // USER START (Optionally insert additional static data)
-extern Handles handles;
+
 WM_MESSAGE message;
 char time[3];
 RTC_TimeTypeDef sTime_tmp;
@@ -168,7 +182,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				}
 				else
 				{
-					longPressCNT.value = 23;
+					masterClock.longPressCNT->value = 23;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -200,7 +214,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				}
 				else
 				{
-					longPressCNT.value = 59;
+					masterClock.longPressCNT->value = 59;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -228,7 +242,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				}
 				else
 				{
-					longPressCNT.value = 59;
+					masterClock.longPressCNT->value = 59;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -280,7 +294,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 0;
-				gui_Vars.menuState = MENU_STATE_TIMECALIBRATION;
+				masterClock.guiVars->menuState = MENU_STATE_TIMECALIBRATION;
 				gui_Vars.valsChanged = false;
 				CreateTimeCalibrateWindow();
 				WM_DeleteWindow(pMsg->hWin);
@@ -299,7 +313,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				gui_Vars.timeFrozen = 0;
-				gui_Vars.menuState = MENU_STATE_TIMEDATESETUP;
+				masterClock.guiVars->menuState = MENU_STATE_TIMEDATESETUP;
 				gui_Vars.valsChanged = false;
 				CreateTimeDateWindow();
 				WM_DeleteWindow(pMsg->hWin);

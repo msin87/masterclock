@@ -22,7 +22,7 @@
 // USER END
 
 #include "TimeCalibrate.h"
-
+extern LongPressCNT longPressCNT;
 /*********************************************************************
 *
 *       Defines
@@ -164,7 +164,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				}
 				else
 				{
-					longPressCNT.value = 29;
+					masterClock.longPressCNT->value = 29;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -193,7 +193,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				}
 				else
 				{
-					longPressCNT.value = 0xFF;
+					masterClock.longPressCNT->value = 0xFF;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -242,7 +242,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				}
 				else
 				{
-					longPressCNT.value = -30;
+					masterClock.longPressCNT->value = -30;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -271,7 +271,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				}
 				else
 				{
-					longPressCNT.value = 0;
+					masterClock.longPressCNT->value = 0;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -296,7 +296,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_TIMESETUP;
+				masterClock.guiVars->menuState = MENU_STATE_TIMESETUP;
 				gui_Vars.valsChanged = false;
 				CreateTimeSetupWindow();
 				WM_DeleteWindow(pMsg->hWin);
@@ -316,7 +316,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_TIME_SUMWIN;
+				masterClock.guiVars->menuState = MENU_STATE_TIME_SUMWIN;
 				gui_Vars.valsChanged = false;
 				CreateTimeSumWinSetupWindow();
 				WM_HideWindow(pMsg->hWin);

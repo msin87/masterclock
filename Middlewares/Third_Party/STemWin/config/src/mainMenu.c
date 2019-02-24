@@ -9173,7 +9173,7 @@ static void _cbButton(WM_MESSAGE * pMsg)
 		break;
 	default:
 		BUTTON_Callback(pMsg);
-		if (lineNum != 0xFF && gui_Vars.menuState == MENU_STATE_MAIN)
+		if (lineNum != 0xFF && masterClock.guiVars->menuState == MENU_STATE_MAIN)
 		{
 			TFT_MainMenu_ShowLineTime_ex(lineNum);
 		}
@@ -9188,10 +9188,10 @@ void sendMsgToMainLineButtons(uint16_t message)
 	if (handles.hMainMenu != 0)
 	{
 		msgButton.MsgId = message;
-		WM_SendMessage(handles.hButtonLine[0], &msgButton);
-		WM_SendMessage(handles.hButtonLine[1], &msgButton);
-		WM_SendMessage(handles.hButtonLine[2], &msgButton);
-		WM_SendMessage(handles.hButtonLine[3], &msgButton);
+		WM_SendMessage(masterClock.handles->hButtonLine[0], &msgButton);
+		WM_SendMessage(masterClock.handles->hButtonLine[1], &msgButton);
+		WM_SendMessage(masterClock.handles->hButtonLine[2], &msgButton);
+		WM_SendMessage(masterClock.handles->hButtonLine[3], &msgButton);
 	}
 }
 void forceUpdateStrings(void)
@@ -9355,35 +9355,35 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			//
 		// Initialization of 'ID_BUTTON_LINE1 '
 		//
-		handles.hButtonLine[0] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE1);
-		//BUTTON_SetText(handles.hButtonLine1,"1");
-		//BUTTON_SetSkin(handles.hButtonLine1, _DrawSkin_BUTTON);
+		masterClock.handles->hButtonLine[0] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE1);
+		//BUTTON_SetText(masterClock.handles->hButtonLine1,"1");
+		//BUTTON_SetSkin(masterClock.handles->hButtonLine1, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE2 '
 	//
-		handles.hButtonLine[1] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE2);
-		//BUTTON_SetText(handles.hButtonLine2,"2");
-		//BUTTON_SetSkin(handles.hButtonLine2, _DrawSkin_BUTTON);
+		masterClock.handles->hButtonLine[1] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE2);
+		//BUTTON_SetText(masterClock.handles->hButtonLine2,"2");
+		//BUTTON_SetSkin(masterClock.handles->hButtonLine2, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE3 '
 	//
-		handles.hButtonLine[2] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE3);
-		//BUTTON_SetText(handles.hButtonLine3,"3");
-		//BUTTON_SetSkin(handles.hButtonLine3, _DrawSkin_BUTTON);
+		masterClock.handles->hButtonLine[2] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE3);
+		//BUTTON_SetText(masterClock.handles->hButtonLine3,"3");
+		//BUTTON_SetSkin(masterClock.handles->hButtonLine3, _DrawSkin_BUTTON);
 		// Initialization of 'ID_BUTTON_LINE4 '
 	//
-		handles.hButtonLine[3] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE4);
-		//BUTTON_SetText(handles.hButtonLine4,"4");
-		//BUTTON_SetSkin(handles.hButtonLine4, _DrawSkin_BUTTON);
+		masterClock.handles->hButtonLine[3] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE4);
+		//BUTTON_SetText(masterClock.handles->hButtonLine4,"4");
+		//BUTTON_SetSkin(masterClock.handles->hButtonLine4, _DrawSkin_BUTTON);
 	// USER END
 
 		break;
 	case WM_BACKTOMAINMENU:
-		gui_Vars.menuState = MENU_STATE_MAIN;
+		masterClock.guiVars->menuState = MENU_STATE_MAIN;
 		forceUpdateStrings();
 		break;
 
 	case WM_DATE_UPDATE:
 		HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-		if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowDate();
+		if (masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowDate();
 
 
 		break;
@@ -9423,7 +9423,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_LINE1SETUP;
+				masterClock.guiVars->menuState = MENU_STATE_LINE1SETUP;
 				WM_HideWindow(handles.hMainMenu);
 				CreateLineSetupWindow();
 
@@ -9442,7 +9442,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_LINE2SETUP;
+				masterClock.guiVars->menuState = MENU_STATE_LINE2SETUP;
 				WM_HideWindow(handles.hMainMenu);
 				CreateLineSetupWindow();
 				// USER END
@@ -9459,7 +9459,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_LINE3SETUP;
+				masterClock.guiVars->menuState = MENU_STATE_LINE3SETUP;
 				WM_HideWindow(handles.hMainMenu);
 				CreateLineSetupWindow();
 				// USER END
@@ -9476,7 +9476,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_LINE4SETUP;
+				masterClock.guiVars->menuState = MENU_STATE_LINE4SETUP;
 				WM_HideWindow(handles.hMainMenu);
 				CreateLineSetupWindow();
 				// USER END
@@ -9532,7 +9532,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_TIMESETUP;
+				masterClock.guiVars->menuState = MENU_STATE_TIMESETUP;
 				WM_HideWindow(handles.hMainMenu);
 				CreateTimeSetupWindow();
 
@@ -9552,7 +9552,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// USER END
 	default:
 		WM_DefaultProc(pMsg);
-		if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowDate();
+		if (masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowDate();
 		break;
 	}
 }
@@ -9721,13 +9721,13 @@ WM_HWIN CreateMainMenu(void) {
 	//BUTTON_SetDefaultSkin(_DarkGraySkin_BUTTON);
 
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
-	//handles.hButtonLine4=WM_CreateWindowAsChild(0,160,320,80,&hWin,WM_CF_SHOW,
+	//masterClock.handles->hButtonLine4=WM_CreateWindowAsChild(0,160,320,80,&hWin,WM_CF_SHOW,
 
 
-	WM_SetCallback(handles.hButtonLine[0], _cbButton);
-	WM_SetCallback(handles.hButtonLine[1], _cbButton);
-	WM_SetCallback(handles.hButtonLine[2], _cbButton);
-	WM_SetCallback(handles.hButtonLine[3], _cbButton);
+	WM_SetCallback(masterClock.handles->hButtonLine[0], _cbButton);
+	WM_SetCallback(masterClock.handles->hButtonLine[1], _cbButton);
+	WM_SetCallback(masterClock.handles->hButtonLine[2], _cbButton);
+	WM_SetCallback(masterClock.handles->hButtonLine[3], _cbButton);
 
 	handles.hMainMenu = hWin;
 

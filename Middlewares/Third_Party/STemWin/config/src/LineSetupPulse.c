@@ -22,6 +22,19 @@
 // USER END
 
 #include "LineSetupPulse.h"
+#include "timedate.h"
+#include <stdbool.h>
+#include "guivars.h"
+#include "callbacks.h"
+#include "string.h"
+#include "stdio.h"
+#include "stm32f1xx_hal.h"
+#include "cmsis_os.h"
+#include "sram.h"
+#include "LineSetup.h"
+
+extern MasterClock masterClock;
+extern RTC_TimeTypeDef sTime;
 
 /*********************************************************************
 *
@@ -97,12 +110,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 	switch (pMsg->MsgId) {
 	case WM_SEC_UPDATE:
-		sprintf(str, "%02d:%02d:%02d", hoursToUTC(sTime.Hours, daylightSaving.timeZone), sTime.Minutes, sTime.Seconds);
+		sprintf(str, "%02d:%02d:%02d", hoursToUTC(sTime.Hours, masterClock.daylightSaving->timeZone), sTime.Minutes, sTime.Seconds);
 		TFT_LineSetupShowString(173, 17, str, 18, 0xFFFF);
 		break;
 	case WM_INIT_DIALOG:
-		width[gui_Vars.menuState - 8] = line[gui_Vars.menuState - 8].Width;
-		polarity[gui_Vars.menuState - 8] = line[gui_Vars.menuState - 8].Polarity;
+		width[masterClock.guiVars->menuState - 8] = line[masterClock.guiVars->menuState - 8].Width;
+		polarity[masterClock.guiVars->menuState - 8] = line[masterClock.guiVars->menuState - 8].Polarity;
 		// Initialization of Main Window
 		//
 		hItem = pMsg->hWin;
@@ -119,10 +132,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Header'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS);
-		sprintf(str, "%4d", line[gui_Vars.menuState - 8].Width * LINE_WIDTH_MULT);
+		sprintf(str, "%4d", line[masterClock.guiVars->menuState - 8].Width * LINE_WIDTH_MULT);
 		HEADER_AddItem(hItem, 80, str, 14);
 
-		if (line[gui_Vars.menuState - 8].Polarity)
+		if (line[masterClock.guiVars->menuState - 8].Polarity)
 		{
 			HEADER_AddItem(hItem, 80, "Постоян.", 14);
 		}
@@ -131,7 +144,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			HEADER_AddItem(hItem, 80, "Перемен.", 14);
 		}
 
-		switch (line[gui_Vars.menuState - 8].Status)
+		switch (line[masterClock.guiVars->menuState - 8].Status)
 		{
 		case LINE_STATUS_RUN:
 			HEADER_AddItem(hItem, 80, "СТАРТ", 14);
@@ -159,7 +172,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Header'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE);
-		switch (gui_Vars.menuState)
+		switch (masterClock.guiVars->menuState)
 		{
 		case MENU_STATE_LINE1SETUP_PULSE:
 			HEADER_AddItem(hItem, 240, "Линия 1. Настройка импульса", 14);
@@ -187,13 +200,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if (width[gui_Vars.menuState - 8] != 15)
+				if (width[masterClock.guiVars->menuState - 8] != 15)
 				{
-					pollButton(ID_BUTTON_LINESETUP_PULSE_MSECplus, WM_NOTIFICATION_CLICKED, (int8_t*)&width[gui_Vars.menuState - 8]);
+					pollButton(ID_BUTTON_LINESETUP_PULSE_MSECplus, WM_NOTIFICATION_CLICKED, (int8_t*)&width[masterClock.guiVars->menuState - 8]);
 				}
 				else
 				{
-					longPressCNT.value = 15;
+					masterClock.longPressCNT->value = 15;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -203,7 +216,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				pollButton(ID_BUTTON_LINESETUP_PULSE_MSECplus, WM_NOTIFICATION_RELEASED, (int8_t*)&width[gui_Vars.menuState - 8]);
+				pollButton(ID_BUTTON_LINESETUP_PULSE_MSECplus, WM_NOTIFICATION_RELEASED, (int8_t*)&width[masterClock.guiVars->menuState - 8]);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -219,7 +232,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				polarity[gui_Vars.menuState - 8] = 1;  //Переменная полярность
+				polarity[masterClock.guiVars->menuState - 8] = 1;  //Переменная полярность
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_PULSE_ENTER));
@@ -241,10 +254,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				line[gui_Vars.menuState - 8].Width = width[gui_Vars.menuState - 8];
-				line[gui_Vars.menuState - 8].Polarity = polarity[gui_Vars.menuState - 8];
+				line[masterClock.guiVars->menuState - 8].Width = width[masterClock.guiVars->menuState - 8];
+				line[masterClock.guiVars->menuState - 8].Polarity = polarity[masterClock.guiVars->menuState - 8];
 				gui_Vars.valsChanged = false;
-				saveLineToBKP(gui_Vars.menuState - 8);
+				saveLineToBKP(masterClock.guiVars->menuState - 8);
 
 				// USER END
 				break;
@@ -260,10 +273,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if (line[gui_Vars.menuState - 8].Status == LINE_STATUS_OFF)
+				if (line[masterClock.guiVars->menuState - 8].Status == LINE_STATUS_OFF)
 				{
 					BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_PULSE_ONOFF), "ВКЛ");
-					line[gui_Vars.menuState - 8].Status = LINE_STATUS_STOP;
+					line[masterClock.guiVars->menuState - 8].Status = LINE_STATUS_STOP;
 					HEADER_SetItemText(WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS), 2, "СТОП");
 					HEADER_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS), GUI_WHITE);
 
@@ -271,7 +284,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				else
 				{
 					BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_PULSE_ONOFF), "ВЫКЛ");
-					line[gui_Vars.menuState - 8].Status = LINE_STATUS_OFF;
+					line[masterClock.guiVars->menuState - 8].Status = LINE_STATUS_OFF;
 					HEADER_SetItemText(WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS), 2, "ВЫКЛ");
 					HEADER_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS), GUI_WHITE);
 				}
@@ -286,9 +299,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if (width[gui_Vars.menuState - 8] != 0)
+				if (width[masterClock.guiVars->menuState - 8] != 0)
 				{
-					pollButton(ID_BUTTON_LINESETUP_PULSE_MSECminus, WM_NOTIFICATION_CLICKED, (int8_t*)&width[gui_Vars.menuState - 8]);
+					pollButton(ID_BUTTON_LINESETUP_PULSE_MSECminus, WM_NOTIFICATION_CLICKED, (int8_t*)&width[masterClock.guiVars->menuState - 8]);
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -298,7 +311,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				pollButton(ID_BUTTON_LINESETUP_PULSE_MSECminus, WM_NOTIFICATION_RELEASED, (int8_t*)&width[gui_Vars.menuState - 8]);
+				pollButton(ID_BUTTON_LINESETUP_PULSE_MSECminus, WM_NOTIFICATION_RELEASED, (int8_t*)&width[masterClock.guiVars->menuState - 8]);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -313,7 +326,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				polarity[gui_Vars.menuState - 8] = 0;  //постоянная полярность.
+				polarity[masterClock.guiVars->menuState - 8] = 0;  //постоянная полярность.
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_PULSE_ENTER));
@@ -335,7 +348,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState -= 4;
+				masterClock.guiVars->menuState -= 4;
 				gui_Vars.valsChanged = false;
 				CreateLineSetupWindow();
 				WM_DeleteWindow(pMsg->hWin);

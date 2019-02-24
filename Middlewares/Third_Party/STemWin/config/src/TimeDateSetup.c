@@ -22,7 +22,19 @@
 // USER END
 
 #include "TimeDateSetup.h"
-
+#include "timedate.h"
+#include "callbacks.h"
+#include "guivars.h"
+#include "string.h"
+#include "stdio.h"
+#include "stm32f1xx_hal.h"
+#include "cmsis_os.h"
+#include "TimeSetup.h"
+#include <stdbool.h>
+extern RTC_DateTypeDef sDate;
+extern RTC_HandleTypeDef hrtc;
+extern MasterClock masterClock;
+extern GUI_CONST_STORAGE GUI_FONT GUI_FontArial18;
 /*********************************************************************
 *
 *       Defines
@@ -34,7 +46,7 @@
 
 // USER START (Optionally insert additional defines)
 RTC_DateTypeDef sDateTemp;
-extern GUI_CONST_STORAGE GUI_FONT GUI_FontArial18;
+
 // USER END
 
 /*********************************************************************
@@ -86,7 +98,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 //		{
 //			sDateTemp.Date = 31;
 //			sprintf(outString, "%02d", sDateTemp.Date);
-//			HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, outString);
+//			HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, outString);
 //		}
 //	}
 //	else if (sDateTemp.Month == 4 || sDateTemp.Month == 6 || sDateTemp.Month == 9 || sDateTemp.Month == 11)
@@ -95,7 +107,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 //		{
 //			sDateTemp.Date = 30;
 //			sprintf(outString, "%02d", sDateTemp.Date);
-//			HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, outString);
+//			HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, outString);
 //		}
 //	}
 //	else if (sDateTemp.Month == 2) //Если февраль
@@ -106,7 +118,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 //			{
 //				sDateTemp.Date = 29;
 //				sprintf(outString, "%02d", sDateTemp.Date);
-//				HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, outString);
+//				HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, outString);
 //			}
 //		}
 //		else
@@ -116,7 +128,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 //			{
 //				sDateTemp.Date = 28;
 //				sprintf(outString, "%02d", sDateTemp.Date);
-//				HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, outString);
+//				HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, outString);
 //			}
 //		}
 //	}
@@ -161,14 +173,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		HEADER_AddItem(hItem, 80, "43", 14);
 		HEADER_AddItem(hItem, 80, "54", 14);
 		HEADER_SetTextColor(hItem, GUI_WHITE);
-		handles.hHeaderTimeDateSetupVals = hItem;
+		masterClock.handles->hHeaderTimeDateSetupVals = hItem;
 		sprintf(date, "%02d", sDateTemp.Date);
-		HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 0, date);
+		HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, date);
 		sprintf(date, "%02d", sDateTemp.Month);
-		HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 1, date);
+		HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 1, date);
 		sprintf(date, "%02d", sDateTemp.Year);
-		HEADER_SetItemText(handles.hHeaderTimeDateSetupVals, 2, date);
-		HEADER_SetTextColor(handles.hHeaderTimeDateSetupVals, GUI_WHITE);
+		HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 2, date);
+		HEADER_SetTextColor(masterClock.handles->hHeaderTimeDateSetupVals, GUI_WHITE);
 		//
 		// Initialization of 'Header'
 		//
@@ -192,16 +204,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sDateTemp.Date != getLastDayOfMonth(&sDateTemp))
 				{
 					pollButton(ID_BUTTON_DTS_Dplus, WM_NOTIFICATION_CLICKED, (int8_t*)&sDateTemp.Date);
 				}
 				else
 				{
-					longPressCNT.value = getLastDayOfMonth(&sDateTemp);
+					masterClock.longPressCNT->value = getLastDayOfMonth(&sDateTemp);
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_DTS_ENTER));
 				}
@@ -221,16 +233,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sDateTemp.Date != 12)
 				{
 					pollButton(ID_BUTTON_DTS_Mplus, WM_NOTIFICATION_CLICKED, (int8_t*)&sDateTemp.Month);
 				}
 				else
 				{
-					longPressCNT.value = 12;
+					masterClock.longPressCNT->value = 12;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_DTS_ENTER));
 				}
@@ -240,8 +252,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER START (Optionally insert code for reacting on notification message)
 				pollButton(ID_BUTTON_DTS_Mplus, WM_NOTIFICATION_RELEASED, (int8_t*)&sDateTemp.Month);
 				correctDate(&sDateTemp);
-				//HEADER_SetTextColor(handles.hHeaderTimeDateSetupVals, GUI_BLUE);
-		// USER END
+				sprintf(date, "%02d", sDateTemp.Date);
+				HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, date);
+				HEADER_SetTextColor(masterClock.handles->hHeaderTimeDateSetupVals, GUI_WHITE);
+				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
 				// USER END
@@ -251,16 +265,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sDateTemp.Date != 99)
 				{
 					pollButton(ID_BUTTON_DTS_Yplus, WM_NOTIFICATION_CLICKED, (int8_t*)&sDateTemp.Year);
 				}
 				else
 				{
-					longPressCNT.value = 99;
+					masterClock.longPressCNT->value = 99;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_DTS_ENTER));
 				}
@@ -270,6 +284,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER START (Optionally insert code for reacting on notification message)
 				pollButton(ID_BUTTON_DTS_Yplus, WM_NOTIFICATION_RELEASED, (int8_t*)&sDateTemp.Year);
 				correctDate(&sDateTemp);
+				sprintf(date, "%02d", sDateTemp.Date);
+				HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, date);
+				HEADER_SetTextColor(masterClock.handles->hHeaderTimeDateSetupVals, GUI_WHITE);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -291,9 +308,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					while (1) {};
 				}
-				sendMsg(handles.hTimeDateSetupMenu, WM_DATE_UPDATE);
-				gui_Vars.valsChanged = false;
-				gui_Vars.timeFrozen = false;
+				sendMsg(masterClock.handles->hTimeDateSetupMenu, WM_DATE_UPDATE);
+				masterClock.guiVars->valsChanged = false;
+				masterClock.guiVars->timeFrozen = false;
 				sDateTemp = sDate;
 				saveDateToBKP();
 				// USER END
@@ -306,13 +323,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sDateTemp.Date != 0)
 				{
 					pollButton(ID_BUTTON_DTS_Dminus, WM_NOTIFICATION_CLICKED, (int8_t*)&sDateTemp.Date);
 				}
 
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_DTS_ENTER));
 				}
@@ -331,12 +348,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sDateTemp.Date != 0)
 				{
 					pollButton(ID_BUTTON_DTS_Mminus, WM_NOTIFICATION_CLICKED, (int8_t*)&sDateTemp.Month);
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_DTS_ENTER));
 				}
@@ -346,6 +363,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER START (Optionally insert code for reacting on notification message)
 				pollButton(ID_BUTTON_DTS_Mminus, WM_NOTIFICATION_RELEASED, (int8_t*)&sDateTemp.Month);
 				correctDate(&sDateTemp);
+				sprintf(date, "%02d", sDateTemp.Date);
+				HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, date);
+				HEADER_SetTextColor(masterClock.handles->hHeaderTimeDateSetupVals, GUI_WHITE);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -356,12 +376,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sDateTemp.Date != 0)
 				{
 					pollButton(ID_BUTTON_DTS_Yminus, WM_NOTIFICATION_CLICKED, (int8_t*)&sDateTemp.Year);
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_DTS_ENTER));
 				}
@@ -371,6 +391,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER START (Optionally insert code for reacting on notification message)
 				pollButton(ID_BUTTON_DTS_Yminus, WM_NOTIFICATION_RELEASED, (int8_t*)&sDateTemp.Year);
 				correctDate(&sDateTemp);
+				sprintf(date, "%02d", sDateTemp.Date);
+				HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, date);
+				HEADER_SetTextColor(masterClock.handles->hHeaderTimeDateSetupVals, GUI_WHITE);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -385,8 +408,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_TIMESETUP;
-				gui_Vars.valsChanged = false;
+				masterClock.guiVars->menuState = MENU_STATE_TIMESETUP;
+				masterClock.guiVars->valsChanged = false;
 				CreateTimeSetupWindow();
 				WM_DeleteWindow(pMsg->hWin);
 
@@ -407,7 +430,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		WM_DefaultProc(pMsg);
 		break;
 	}
-	valsChangedOld = gui_Vars.valsChanged;
+	valsChangedOld = masterClock.guiVars->valsChanged;
 }
 
 /*********************************************************************
@@ -424,7 +447,7 @@ WM_HWIN CreateTimeDateWindow(void) {
 	WM_HWIN hWin;
 
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
-	handles.hTimeDateSetupMenu = hWin;
+	masterClock.handles->hTimeDateSetupMenu = hWin;
 	BUTTON_SetDefaultFont(&GUI_FontArial18);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_DTS_Dplus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_DTS_Mplus), _cbArrowUpButton);
@@ -432,8 +455,8 @@ WM_HWIN CreateTimeDateWindow(void) {
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_DTS_Dminus), _cbArrowDownButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_DTS_Mminus), _cbArrowDownButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_DTS_Yminus), _cbArrowDownButton);
-	handles.hButtonDTSenter = WM_GetDialogItem(hWin, ID_BUTTON_DTS_ENTER);
-	WM_SetCallback(handles.hButtonDTSenter, _cbEnterButton);
+	masterClock.handles->hButtonDTSenter = WM_GetDialogItem(hWin, ID_BUTTON_DTS_ENTER);
+	WM_SetCallback(masterClock.handles->hButtonDTSenter, _cbEnterButton);
 	return hWin;
 }
 

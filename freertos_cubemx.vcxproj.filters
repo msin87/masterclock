@@ -480,6 +480,15 @@
     <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_adc_ex.h">
       <Filter>Header files\STM32Cube HAL\ADC</Filter>
     </ClInclude>
+    <ClCompile Include="Src\lines.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\timedate.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\backup.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\arial18.h">
@@ -804,6 +813,9 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WM_Intern.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\lines.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

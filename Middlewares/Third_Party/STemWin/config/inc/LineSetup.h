@@ -16,20 +16,6 @@
 #define ID_HEADER_LINESETUP_STATVALS   (GUI_ID_USER + 0x5D)
 #define ID_HEADER_LINESETUP_TOP   (GUI_ID_USER + 0x5E)
 #include "DIALOG.h"
-#include "guivars.h"
-#include "callbacks.h"
-#include "string.h"
-#include "stdio.h"
-#include "stm32f1xx_hal.h"
-#include "cmsis_os.h"
-#include "sram.h"
-#include "mainMenu.h"
-#include "LineSetupPulse.h"
-
-extern GUI_Vars gui_Vars;
-extern Lines line[4];
-extern RTC_TimeTypeDef sTime;
-extern LongPressCNT longPressCNT;
-extern TIM_HandleTypeDef htim7;
 WM_HWIN CreateLineSetupWindow(void);
+
 #endif

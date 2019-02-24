@@ -12,17 +12,11 @@
 #define	ID_HEADER_SUMWINSETUP_STATVALS (GUI_ID_USER + 0x79)
 #define	ID_HEADER_SUMWINSETUP_TOP (GUI_ID_USER + 0x7A)
 #include "DIALOG.h"
-#include "guivars.h"
-#include "string.h"
-#include "stdio.h"
+
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
-#include "TimeCalibrate.h"
-#include "callbacks.h"
-#include "TimeDateSetup.h"
-extern RTC_TimeTypeDef sTime;
-extern RTC_DateTypeDef sDate;
-extern DaylightSaving daylightSaving;
+
+
 WM_HWIN CreateTimeSumWinSetupWindow(void);
 
 #endif

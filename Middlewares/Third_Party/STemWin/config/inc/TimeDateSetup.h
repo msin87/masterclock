@@ -1,5 +1,5 @@
-#ifndef TIMEDATE_H
-#define TIMEDATE_H	
+#ifndef TIMEDATESETUP_H
+#define TIMEDATESETUP_H	
 #define ID_WINDOW_DATETIMESETUP   (GUI_ID_USER + 0x40)
 #define ID_BUTTON_DTS_Dplus   (GUI_ID_USER + 0x41)
 #define ID_HEADER_DTS_DMY   (GUI_ID_USER + 0x42)
@@ -13,16 +13,8 @@
 #define ID_BUTTON_DTS_BACK    (GUI_ID_USER + 0x4A)
 #define ID_HEADER_DTS   (GUI_ID_USER + 0x4B)
 #include "DIALOG.h"
-#include "callbacks.h"
-#include "guivars.h"
-#include "string.h"
-#include "stdio.h"
-#include "stm32f1xx_hal.h"
-#include "cmsis_os.h"
-#include "TimeSetup.h"
-#include "sram.h"
+
 WM_HWIN CreateTimeDateWindow(void);
-extern GUI_Vars gui_Vars;
-extern Handles handles;
-extern RTC_DateTypeDef sDate;
+
+
 #endif

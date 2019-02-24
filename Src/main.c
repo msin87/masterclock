@@ -58,6 +58,9 @@
 #include "GUI.h"
 #include "mainMenu.h"
 #include "guivars.h"
+#include "lines.h"
+#include "timedate.h"
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -73,16 +76,13 @@ RTC_TimeTypeDef sTime;
 RTC_TimeTypeDef sTimePrev;
 RTC_DateTypeDef sDate;
 RTC_DateTypeDef sDatePrev;
-extern Lines line[4];
-extern Handles handles;
 WM_MESSAGE msg;
 WM_MESSAGE msgButton;
-extern GUI_Vars gui_Vars;
-extern TimeCalibration timeCalibr;
+
+
 uint8_t tickSecond = 0;
 extern uint16_t backgroundBuffer[18];
-extern LongPressCNT longPressCNT;
-extern DaylightSaving daylightSaving;
+extern MasterClock masterClock;
 GUI_ALLOC_INFO pInfo;
 uint8_t doAfterStart = 0;
 
@@ -164,46 +164,46 @@ void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 void longPressControl(void)
 {
 	char text[9];
-	if (longPressCNT.direction == 0)
+	if (masterClock.longPressCNT->direction == 0)
 	{
 		return;
 	}
-	if (longPressCNT.direction < 0)
+	if (masterClock.longPressCNT->direction < 0)
 	{
-		if (longPressCNT.value <= longPressCNT.lowerLimit)
+		if (masterClock.longPressCNT->value <= masterClock.longPressCNT->lowerLimit)
 		{
 			return;
 		}
 
 	}
-	if (longPressCNT.direction > 0)
+	if (masterClock.longPressCNT->direction > 0)
 	{
-		if (longPressCNT.value >= longPressCNT.upperLimit)
+		if (masterClock.longPressCNT->value >= masterClock.longPressCNT->upperLimit)
 		{
 			return;
 		}
 	}
-	if (longPressCNT.it && BUTTON_IsPressed(longPressCNT.button))
+	if (masterClock.longPressCNT->it && BUTTON_IsPressed(masterClock.longPressCNT->button))
 	{
-		longPressCNT.itCNT++;
-		if (longPressCNT.itCNT > 3)
+		masterClock.longPressCNT->itCNT++;
+		if (masterClock.longPressCNT->itCNT > 3)
 		{
-			longPressCNT.value += longPressCNT.direction;
-			if (gui_Vars.menuState >= MENU_STATE_LINE1SETUP_PULSE && gui_Vars.menuState <= MENU_STATE_LINE4SETUP_PULSE)
+			masterClock.longPressCNT->value += masterClock.longPressCNT->direction;
+			if (masterClock.guiVars->menuState >= MENU_STATE_LINE1SETUP_PULSE && masterClock.guiVars->menuState <= MENU_STATE_LINE4SETUP_PULSE)
 			{
-				sprintf(text, "%4d", longPressCNT.value * LINE_WIDTH_MULT);
+				sprintf(text, "%4d", masterClock.longPressCNT->value * LINE_WIDTH_MULT);
 			}
-			else if ((gui_Vars.menuState == MENU_STATE_TIME_SUMWIN || gui_Vars.menuState == MENU_STATE_TIMECALIBRATION || (gui_Vars.menuState >= MENU_STATE_LINE1SETUP && gui_Vars.menuState <= MENU_STATE_LINE4SETUP)) && longPressCNT.lowerLimit < 0)
+			else if ((masterClock.guiVars->menuState == MENU_STATE_TIME_SUMWIN || masterClock.guiVars->menuState == MENU_STATE_TIMECALIBRATION || (masterClock.guiVars->menuState >= MENU_STATE_LINE1SETUP && masterClock.guiVars->menuState <= MENU_STATE_LINE4SETUP)) && masterClock.longPressCNT->lowerLimit < 0)
 			{
-				if (longPressCNT.value > 0)
+				if (masterClock.longPressCNT->value > 0)
 				{
-					sprintf(text, "+%d", longPressCNT.value);
+					sprintf(text, "+%d", masterClock.longPressCNT->value);
 				}
-				else if (longPressCNT.value < 0)
+				else if (masterClock.longPressCNT->value < 0)
 				{
-					sprintf(text, "%d", longPressCNT.value);
+					sprintf(text, "%d", masterClock.longPressCNT->value);
 				}
-				else if (longPressCNT.value == 0)
+				else if (masterClock.longPressCNT->value == 0)
 				{
 					sprintf(text, "%d", 0);
 				}
@@ -212,17 +212,17 @@ void longPressControl(void)
 
 			else
 			{
-				sprintf(text, "%02d", longPressCNT.value);
+				sprintf(text, "%02d", masterClock.longPressCNT->value);
 			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, text);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			longPressCNT.it = 0;
-			longPressCNT.itCNT = 4;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, text);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.longPressCNT->it = 0;
+			masterClock.longPressCNT->itCNT = 4;
 		}
 	}
 	else
 	{
-		longPressCNT.itCNT = 0;
+		masterClock.longPressCNT->itCNT = 0;
 	}
 
 
@@ -244,45 +244,45 @@ void LinesInit(void)
 	//				 (0..7)*375	= 0,375...3000 sec. 			|
 	//					0 sec = line status OFF					|
 	//													1440 minutes (1 day)	
-	line[0].xSemaphore = xSemaphoreCreateCounting(720, 0);
-	line[1].xSemaphore = xSemaphoreCreateCounting(720, 0);
-	line[2].xSemaphore = xSemaphoreCreateCounting(720, 0);
-	line[3].xSemaphore = xSemaphoreCreateCounting(720, 0);
+	masterClock.line[0].xSemaphore = xSemaphoreCreateCounting(720, 0);
+	masterClock.line[1].xSemaphore = xSemaphoreCreateCounting(720, 0);
+	masterClock.line[2].xSemaphore = xSemaphoreCreateCounting(720, 0);
+	masterClock.line[3].xSemaphore = xSemaphoreCreateCounting(720, 0);
 
-	line[0].LineGPIOpos = LINE0_POS_OUTPUT_GPIO_Port;
-	line[0].LineGPIOneg = LINE0_NEG_OUTPUT_GPIO_Port;
-	line[0].LinePinPos = LINE0_POS_OUTPUT_Pin;
-	line[0].LinePinNeg = LINE0_NEG_OUTPUT_Pin;
+	masterClock.line[0].LineGPIOpos = LINE0_POS_OUTPUT_GPIO_Port;
+	masterClock.line[0].LineGPIOneg = LINE0_NEG_OUTPUT_GPIO_Port;
+	masterClock.line[0].LinePinPos = LINE0_POS_OUTPUT_Pin;
+	masterClock.line[0].LinePinNeg = LINE0_NEG_OUTPUT_Pin;
 
-	line[1].LineGPIOpos = LINE1_POS_OUTPUT_GPIO_Port;
-	line[1].LineGPIOneg = LINE1_NEG_OUTPUT_GPIO_Port;
-	line[1].LinePinPos = LINE1_POS_OUTPUT_Pin;
-	line[1].LinePinNeg = LINE1_NEG_OUTPUT_Pin;
+	masterClock.line[1].LineGPIOpos = LINE1_POS_OUTPUT_GPIO_Port;
+	masterClock.line[1].LineGPIOneg = LINE1_NEG_OUTPUT_GPIO_Port;
+	masterClock.line[1].LinePinPos = LINE1_POS_OUTPUT_Pin;
+	masterClock.line[1].LinePinNeg = LINE1_NEG_OUTPUT_Pin;
 
-	line[2].LineGPIOpos = LINE2_POS_OUTPUT_GPIO_Port;
-	line[2].LineGPIOneg = LINE2_NEG_OUTPUT_GPIO_Port;
-	line[2].LinePinPos = LINE2_POS_OUTPUT_Pin;
-	line[2].LinePinNeg = LINE2_NEG_OUTPUT_Pin;
+	masterClock.line[2].LineGPIOpos = LINE2_POS_OUTPUT_GPIO_Port;
+	masterClock.line[2].LineGPIOneg = LINE2_NEG_OUTPUT_GPIO_Port;
+	masterClock.line[2].LinePinPos = LINE2_POS_OUTPUT_Pin;
+	masterClock.line[2].LinePinNeg = LINE2_NEG_OUTPUT_Pin;
 
-	line[3].LineGPIOpos = LINE3_POS_OUTPUT_GPIO_Port;
-	line[3].LineGPIOneg = LINE3_NEG_OUTPUT_GPIO_Port;
-	line[3].LinePinPos = LINE3_POS_OUTPUT_Pin;
-	line[3].LinePinNeg = LINE3_NEG_OUTPUT_Pin;
+	masterClock.line[3].LineGPIOpos = LINE3_POS_OUTPUT_GPIO_Port;
+	masterClock.line[3].LineGPIOneg = LINE3_NEG_OUTPUT_GPIO_Port;
+	masterClock.line[3].LinePinPos = LINE3_POS_OUTPUT_Pin;
+	masterClock.line[3].LinePinNeg = LINE3_NEG_OUTPUT_Pin;
 
 	for (i = 0; i < LINES_AMOUNT; ++i)
 	{
 		dataInBKP = rtc_read_backup_reg(i + BKP_LINE1_OFFSET);
-		line[i].Hours = (dataInBKP & 0b11111111111) / 60;
-		line[i].Minutes = (dataInBKP & 0b11111111111) % 60;
-		line[i].Width = (dataInBKP >> 11) & 0b111;
-		line[i].Status = (dataInBKP >> 14) & 0b11;
+		masterClock.line[i].Hours = (dataInBKP & 0b11111111111) / 60;
+		masterClock.line[i].Minutes = (dataInBKP & 0b11111111111) % 60;
+		masterClock.line[i].Width = (dataInBKP >> 11) & 0b111;
+		masterClock.line[i].Status = (dataInBKP >> 14) & 0b11;
 		//Проверка на ошибки, и если что, то все по нулям, и выкл линию. 
-		if ((line[i].Hours > 23) || (line[i].Minutes > 59) || (line[i].Width > 15) || (line[i].Status > 2))
+		if ((masterClock.line[i].Hours > 23) || (masterClock.line[i].Minutes > 59) || (masterClock.line[i].Width > 15) || (masterClock.line[i].Status > 2))
 		{
-			line[i].Minutes = 0;
-			line[i].Hours = 0;
-			line[i].Width = 0;
-			line[i].Status = LINE_STATUS_OFF;
+			masterClock.line[i].Minutes = 0;
+			masterClock.line[i].Hours = 0;
+			masterClock.line[i].Width = 0;
+			masterClock.line[i].Status = LINE_STATUS_OFF;
 		}
 
 	}
@@ -293,11 +293,11 @@ void LinesInit(void)
 		buff = (dataInBKP >> ((i - 1) * 5));
 		if (buff & 0b10000)
 		{
-			line[i].TimeZone = (char)(~(buff & 0b1111));
+			masterClock.line[i].TimeZone = (char)(~(buff & 0b1111));
 		}
 		else
 		{
-			line[i].TimeZone = (char)(buff & 0b1111);
+			masterClock.line[i].TimeZone = (char)(buff & 0b1111);
 		}
 	}
 
@@ -360,6 +360,7 @@ int main(void)
 	//Init_SSD1289();
 
 	variables.calibrated = 1;
+	initStructures();
 	LinesInit();
 	readLinesPolarityFromBKP();
 
@@ -448,7 +449,7 @@ void SystemClock_Config(void)
 
 	/**Initializes the CPU, AHB and APB busses clocks
 	*/
-	if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
+	/*if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
 	{
 		RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
 		RCC_OscInitStruct.LSEState = RCC_LSE_ON;
@@ -456,11 +457,11 @@ void SystemClock_Config(void)
 	else
 	{
 		RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-	}
-	//RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
+	}*/
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
 	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
 	RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
-	//RCC_OscInitStruct.LSEState = RCC_LSE_ON;
+	RCC_OscInitStruct.LSEState = RCC_LSE_ON;
 	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
@@ -483,7 +484,7 @@ void SystemClock_Config(void)
 	{
 		Error_Handler();
 	}
-	if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
+	/*if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
 	{
 		PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC;
 		PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
@@ -491,9 +492,9 @@ void SystemClock_Config(void)
 	else
 	{
 		PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-	}
-	//PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC;
-	//PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+	}*/
+	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC;
+	PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
 	PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
 	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
 	{
@@ -1059,7 +1060,7 @@ void StartDefaultTask(void const * argument)
 		osDelay(50);
 
 		touch_control(&variables);
-		if (longPressCNT.it)
+		if (masterClock.longPressCNT->it)
 		{
 			longPressControl();
 		}
@@ -1100,7 +1101,7 @@ void vTaskGUI(void const * argument)
 	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 	CreateMainMenu();
 	HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-	line[0].TimeZone = daylightSaving.timeZone;
+	masterClock.line[0].TimeZone = masterClock.daylightSaving->timeZone;
 	pollLinesOutput(10);
 
 
@@ -1123,7 +1124,7 @@ void vTaskGUI(void const * argument)
 			if (sTime.Hours == 0 && sTime.Minutes == 0 && sTime.Seconds == 0)
 			{
 				timeCalibr.isCalibrated = false;
-				daylightSaving.needToShift = true;
+				masterClock.daylightSaving->needToShift = true;
 			}
 			//коррекция происходит в 01:02:00
 			if (doAfterStart || (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30))
@@ -1157,11 +1158,11 @@ void vTaskGUI(void const * argument)
 
 				}
 
-				if (doAfterStart || (daylightSaving.needToShift&& daylightSaving.enableDLS&&isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay)))
+				if (doAfterStart || (masterClock.daylightSaving->needToShift&& masterClock.daylightSaving->enableDLS&&isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay)))
 				{
-					sTime.Hours += daylightSaving.timeShift;
+					sTime.Hours += masterClock.daylightSaving->timeShift;
 					pollLinesOutput(10);
-					daylightSaving.needToShift = false;
+					masterClock.daylightSaving->needToShift = false;
 					if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 					{
 						Error_Handler();
@@ -1174,13 +1175,13 @@ void vTaskGUI(void const * argument)
 			{
 				for (i = 0; i < LINES_AMOUNT; ++i)
 				{
-					if (line[i].Pulses >= 0)
+					if (masterClock.line[i].Pulses >= 0)
 					{
-						xSemaphoreGive(line[i].xSemaphore);
+						xSemaphoreGive(masterClock.line[i].xSemaphore);
 					}
 					else
 					{
-						line[i].Pulses++;
+						masterClock.line[i].Pulses++;
 					}
 				}
 
@@ -1201,12 +1202,12 @@ void vTaskGUI(void const * argument)
 
 				//			}
 				//		}
-				//		if (gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
+				//		if (masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
 				//		saveLineToBKP(i);
 				//	}
 				//}
 				/****************конец перебора структур Lines***************************************/
-				//if(gui_Vars.menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
+				//if(masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
 			}
 			if (sTimePrev.Hours == 23 && sTime.Hours == 0) //сменился день
 			{
@@ -1216,7 +1217,7 @@ void vTaskGUI(void const * argument)
 				//DateToUpdate.Year = (read & 0b1111111000000000) >> 9;
 
 				saveDateToBKP();
-				switch (gui_Vars.menuState) {
+				switch (masterClock.guiVars->menuState) {
 				case MENU_STATE_MAIN:
 					sendMsg(handles.hMainMenu, WM_DATE_UPDATE);
 					break;
@@ -1225,7 +1226,7 @@ void vTaskGUI(void const * argument)
 					break;
 				}
 			}
-			switch (gui_Vars.menuState) {
+			switch (masterClock.guiVars->menuState) {
 			case MENU_STATE_MAIN:
 				sendMsg(handles.hMainMenu, WM_SEC_UPDATE);
 				break;
@@ -1279,8 +1280,9 @@ void vTaskLine0(void const * argument)
 		/* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(line[0].xSemaphore, portMAX_DELAY);
+		xSemaphoreTake(masterClock.line[0].xSemaphore, portMAX_DELAY);
 		lineSendSignal(0);
+		saveLineToBKP(0);
 	}
 	/* USER CODE END vTaskLine0 */
 }
@@ -1298,8 +1300,9 @@ void vTaskLine1(void const * argument)
 		/* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(line[1].xSemaphore, portMAX_DELAY);
+		xSemaphoreTake(masterClock.line[1].xSemaphore, portMAX_DELAY);
 		lineSendSignal(1);
+		saveLineToBKP(1);
 	}
 	/* USER CODE END vTaskLine1 */
 }
@@ -1317,8 +1320,9 @@ void vTaskLine2(void const * argument)
 		/* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(line[2].xSemaphore, portMAX_DELAY);
+		xSemaphoreTake(masterClock.line[2].xSemaphore, portMAX_DELAY);
 		lineSendSignal(2);
+		saveLineToBKP(2);
 	}
 	/* USER CODE END vTaskLine2 */
 }
@@ -1336,8 +1340,9 @@ void vTaskLine3(void const * argument)
 		/* Infinite loop */
 	for (;;)
 	{
-		xSemaphoreTake(line[3].xSemaphore, portMAX_DELAY);
+		xSemaphoreTake(masterClock.line[3].xSemaphore, portMAX_DELAY);
 		lineSendSignal(3);
+		saveLineToBKP(3);
 	}
 	/* USER CODE END vTaskLine3 */
 }

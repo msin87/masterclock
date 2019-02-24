@@ -22,7 +22,17 @@
 // USER END
 
 #include "TimeSumWinSetup.h"
-
+#include "TimeCalibrate.h"
+#include "callbacks.h"
+#include "TimeDateSetup.h"
+#include "guivars.h"
+#include "string.h"
+#include "stdio.h"
+#include "LineSetup.h"
+extern LongPressCNT longPressCNT;
+extern RTC_TimeTypeDef sTime;
+extern RTC_DateTypeDef sDate;
+extern DaylightSaving daylightSaving;
 /*********************************************************************
 *
 *       Defines
@@ -119,11 +129,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		handles.hHeaderSumWinSetupVals = hItem;
 		if ((int8_t)daylightSavingTemp.timeZone > 0)
 		{
-			sprintf(str, "+%d", daylightSaving.timeZone);
+			sprintf(str, "+%d", masterClock.daylightSaving->timeZone);
 		}
 		else if ((int8_t)daylightSavingTemp.timeZone <= 0)
 		{
-			sprintf(str, "%d", (int8_t)daylightSaving.timeZone);
+			sprintf(str, "%d", (int8_t)masterClock.daylightSaving->timeZone);
 		}
 		HEADER_AddItem(hItem, 80, str, 14);
 		if (daylightSavingTemp.enableDLS == 0)
@@ -165,7 +175,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				}
 				else
 				{
-					longPressCNT.value = 12;
+					masterClock.longPressCNT->value = 12;
 				}
 				if (valsChangedOld != gui_Vars.valsChanged)
 				{
@@ -294,7 +304,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuState = MENU_STATE_TIMECALIBRATION;
+				masterClock.guiVars->menuState = MENU_STATE_TIMECALIBRATION;
 				gui_Vars.valsChanged = false;
 				WM_DeleteWindow(handles.hTimeSumWinSetupMenu);
 				WM_ShowWindow(handles.hTimeCalibrateMenu);
