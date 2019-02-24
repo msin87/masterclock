@@ -114,8 +114,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		TFT_LineSetupShowString(173, 17, str, 18, 0xFFFF);
 		break;
 	case WM_INIT_DIALOG:
-		width[masterClock.guiVars->menuState - 8] = line[masterClock.guiVars->menuState - 8].Width;
-		polarity[masterClock.guiVars->menuState - 8] = line[masterClock.guiVars->menuState - 8].Polarity;
+		width[masterClock.guiVars->menuState - 8] = masterClock.line[masterClock.guiVars->menuState - 8].Width;
+		polarity[masterClock.guiVars->menuState - 8] = masterClock.line[masterClock.guiVars->menuState - 8].Polarity;
 		// Initialization of Main Window
 		//
 		hItem = pMsg->hWin;
@@ -132,10 +132,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Initialization of 'Header'
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS);
-		sprintf(str, "%4d", line[masterClock.guiVars->menuState - 8].Width * LINE_WIDTH_MULT);
+		sprintf(str, "%4d", masterClock.line[masterClock.guiVars->menuState - 8].Width * LINE_WIDTH_MULT);
 		HEADER_AddItem(hItem, 80, str, 14);
 
-		if (line[masterClock.guiVars->menuState - 8].Polarity)
+		if (masterClock.line[masterClock.guiVars->menuState - 8].Polarity)
 		{
 			HEADER_AddItem(hItem, 80, "Постоян.", 14);
 		}
@@ -144,7 +144,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			HEADER_AddItem(hItem, 80, "Перемен.", 14);
 		}
 
-		switch (line[masterClock.guiVars->menuState - 8].Status)
+		switch (masterClock.line[masterClock.guiVars->menuState - 8].Status)
 		{
 		case LINE_STATUS_RUN:
 			HEADER_AddItem(hItem, 80, "СТАРТ", 14);
