@@ -22,7 +22,16 @@
 // USER END
 
 #include "TimeCalibrate.h"
-extern LongPressCNT longPressCNT;
+#include "stm32f1xx_hal.h"
+#include "cmsis_os.h"
+#include "guivars.h"
+#include "string.h"
+#include "stdio.h"
+#include "callbacks.h"
+#include "TimeSetup.h"
+#include "TimeSumWinSetup.h"
+#include <stdbool.h>
+#include "backup.h"
 /*********************************************************************
 *
 *       Defines
@@ -116,28 +125,28 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		HEADER_AddItem(hItem, 80, "+", 14);
 		HEADER_AddItem(hItem, 80, "43", 14);
 		HEADER_AddItem(hItem, 80, " ", 14);
-		handles.hHeaderTimeCalibrVals = hItem;
-		if (timeCalibr.seconds < 0)
+		masterClock.handles->hHeaderTimeCalibrVals = hItem;
+		if (masterClock.timeCalibration->seconds < 0)
 		{
 
-			sprintf(val, "%d", timeCalibr.seconds);
+			sprintf(val, "%d", masterClock.timeCalibration->seconds);
 			HEADER_SetItemText(hItem, 0, val);
 		}
 		else
 		{
-			if (timeCalibr.seconds == 0)
+			if (masterClock.timeCalibration->seconds == 0)
 			{
 				HEADER_SetItemText(hItem, 0, "0");
 			}
 			else
 			{
-				sprintf(val, "+%d", timeCalibr.seconds);
+				sprintf(val, "+%d", masterClock.timeCalibration->seconds);
 				HEADER_SetItemText(hItem, 0, val);
 			}
 
 		}
 
-		sprintf(val, "%d", timeCalibr.days);
+		sprintf(val, "%d", masterClock.timeCalibration->days);
 		HEADER_SetItemText(hItem, 1, val);
 		HEADER_SetTextColor(hItem, GUI_WHITE);
 		//
@@ -157,16 +166,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
-				if (timeCalibr.seconds != 29)
+				masterClock.guiVars->timeFrozen = 1;
+				if (masterClock.timeCalibration->seconds != 29)
 				{
-					pollButton(ID_BUTTON_TIMECALIBRATE_SECplus, WM_NOTIFICATION_CLICKED, (int8_t*)&timeCalibr.seconds);
+					pollButton(ID_BUTTON_TIMECALIBRATE_SECplus, WM_NOTIFICATION_CLICKED, (int8_t*)&masterClock.timeCalibration->seconds);
 				}
 				else
 				{
 					masterClock.longPressCNT->value = 29;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_TIMECALIBRATE_ENTER));
 				}
@@ -174,7 +183,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				pollButton(ID_BUTTON_TIMECALIBRATE_SECplus, WM_NOTIFICATION_RELEASED, (int8_t*)&timeCalibr.seconds);
+				pollButton(ID_BUTTON_TIMECALIBRATE_SECplus, WM_NOTIFICATION_RELEASED, (int8_t*)&masterClock.timeCalibration->seconds);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -186,16 +195,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
-				if (timeCalibr.days != 255)
+				masterClock.guiVars->timeFrozen = 1;
+				if (masterClock.timeCalibration->days != 255)
 				{
-					pollButton(ID_BUTTON_TIMECALIBRATE_DAYplus, WM_NOTIFICATION_CLICKED, (int8_t*)&timeCalibr.days);
+					pollButton(ID_BUTTON_TIMECALIBRATE_DAYplus, WM_NOTIFICATION_CLICKED, (int8_t*)&masterClock.timeCalibration->days);
 				}
 				else
 				{
 					masterClock.longPressCNT->value = 0xFF;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_TIMECALIBRATE_ENTER));
 				}
@@ -204,7 +213,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 
-				pollButton(ID_BUTTON_TIMECALIBRATE_DAYplus, WM_NOTIFICATION_RELEASED, (int8_t*)&timeCalibr.days);
+				pollButton(ID_BUTTON_TIMECALIBRATE_DAYplus, WM_NOTIFICATION_RELEASED, (int8_t*)&masterClock.timeCalibration->days);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -220,7 +229,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.valsChanged = false;
+				masterClock.guiVars->valsChanged = false;
 				saveTimeCalibrToBKP();
 
 
@@ -235,16 +244,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
-				if (timeCalibr.seconds != -30)
+				masterClock.guiVars->timeFrozen = 1;
+				if (masterClock.timeCalibration->seconds != -30)
 				{
-					pollButton(ID_BUTTON_TIMECALIBRATE_SECminus, WM_NOTIFICATION_CLICKED, (int8_t*)&timeCalibr.seconds);
+					pollButton(ID_BUTTON_TIMECALIBRATE_SECminus, WM_NOTIFICATION_CLICKED, (int8_t*)&masterClock.timeCalibration->seconds);
 				}
 				else
 				{
 					masterClock.longPressCNT->value = -30;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_TIMECALIBRATE_ENTER));
 				}
@@ -252,7 +261,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				pollButton(ID_BUTTON_TIMECALIBRATE_SECminus, WM_NOTIFICATION_RELEASED, (int8_t*)&timeCalibr.seconds);
+				pollButton(ID_BUTTON_TIMECALIBRATE_SECminus, WM_NOTIFICATION_RELEASED, (int8_t*)&masterClock.timeCalibration->seconds);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -264,16 +273,16 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
-				if (timeCalibr.days != 0)
+				masterClock.guiVars->timeFrozen = 1;
+				if (masterClock.timeCalibration->days != 0)
 				{
-					pollButton(ID_BUTTON_TIMECALIBRATE_DAYminus, WM_NOTIFICATION_CLICKED, (int8_t*)&timeCalibr.days);
+					pollButton(ID_BUTTON_TIMECALIBRATE_DAYminus, WM_NOTIFICATION_CLICKED, (int8_t*)&masterClock.timeCalibration->days);
 				}
 				else
 				{
 					masterClock.longPressCNT->value = 0;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_TIMECALIBRATE_ENTER));
 				}
@@ -281,7 +290,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				pollButton(ID_BUTTON_TIMECALIBRATE_DAYminus, WM_NOTIFICATION_RELEASED, (int8_t*)&timeCalibr.days);
+				pollButton(ID_BUTTON_TIMECALIBRATE_DAYminus, WM_NOTIFICATION_RELEASED, (int8_t*)&masterClock.timeCalibration->days);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -297,7 +306,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState = MENU_STATE_TIMESETUP;
-				gui_Vars.valsChanged = false;
+				masterClock.guiVars->valsChanged = false;
 				CreateTimeSetupWindow();
 				WM_DeleteWindow(pMsg->hWin);
 
@@ -317,7 +326,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState = MENU_STATE_TIME_SUMWIN;
-				gui_Vars.valsChanged = false;
+				masterClock.guiVars->valsChanged = false;
 				CreateTimeSumWinSetupWindow();
 				WM_HideWindow(pMsg->hWin);
 
@@ -338,7 +347,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		WM_DefaultProc(pMsg);
 		break;
 	}
-	valsChangedOld = gui_Vars.valsChanged;
+	valsChangedOld = masterClock.guiVars->valsChanged;
 }
 
 /*********************************************************************
@@ -355,7 +364,7 @@ WM_HWIN CreateTimeCalibrateWindow(void) {
 	WM_HWIN hWin;
 
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
-	handles.hTimeCalibrateMenu = hWin;
+	masterClock.handles->hTimeCalibrateMenu = hWin;
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_TIMECALIBRATE_DAYplus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_TIMECALIBRATE_SECplus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_TIMECALIBRATE_DAYminus), _cbArrowDownButton);

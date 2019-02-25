@@ -7,20 +7,20 @@
 #include "TimeSetup.h"
 #include "TimeDateSetup.h"
 #include "TimeCalibrate.h"
+#include "TimeSumWinSetup.h"
 #include "LineSetupPulse.h"
 #include "LineSetup.h"
 #include "timedate.h"
 
 extern RTC_TimeTypeDef sTime;
-extern GUI_Vars gui_Vars;
-extern DaylightSaving daylightSaving;
+
 extern osMessageQId queueLCDLinesTimeHandle;
 extern GUI_CONST_STORAGE GUI_CHARINFO GUI_FontArial18_CharInfo[192];
 extern GUI_CONST_STORAGE GUI_FONT_PROP GUI_FontArial18_Prop2;
 extern GUI_CONST_STORAGE GUI_FONT_PROP GUI_FontArial18_Prop1;
-extern Lines line[4];
+
 extern TIM_HandleTypeDef htim7;
-extern LongPressCNT longPressCNT;
+
 
 //void saveDateToBKP(void)
 //{
@@ -136,14 +136,14 @@ void _cbEnterButton(WM_MESSAGE * pMsg)
 
 	case WM_PAINT:
 		BUTTON_Callback(pMsg);
-		if (gui_Vars.valsChanged)
+		if (masterClock.guiVars->valsChanged)
 		{
 			GUI_SetColor(0x282171);
 			GUI_FillRect(5, 60, 65, 65);
 		}
 	default:
 		BUTTON_Callback(pMsg);
-		if (gui_Vars.valsChanged)
+		if (masterClock.guiVars->valsChanged)
 		{
 			GUI_SetColor(0x282171);
 			GUI_FillRect(5, 60, 65, 65);
@@ -382,197 +382,197 @@ void TFT_LineSetupShowString(uint16_t x, uint16_t y, char *p, uint8_t fontsize, 
 //	RtcHandle.Instance = RTC;
 //	return HAL_RTCEx_BKUPRead(&RtcHandle, BackupRegister);
 //}
-uint32_t calcCRCofBKP(void)
-{
-	uint32_t dataInBKP[4] = { 0, 0, 0, 0 };
-	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);                  //date
-	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);                 //line 1
-	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);                  //line 2 
-	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);                 //line 3
-	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);                  //line 4
-	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);        //daylightsaving 8 бит из 16.
-	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);                 //
-	dataInBKP[3] |= rtc_read_backup_reg(BKP_LINES_TIMEZONE_OFFSET);
-	CRC->CR |= CRC_CR_RESET;
-	CRC->DR = dataInBKP[0];
-	CRC->DR = dataInBKP[1];
-	CRC->DR = dataInBKP[2];
-	CRC->DR = dataInBKP[3];
-	return CRC->DR;
-}
-uint32_t calkCRCofFlash(void)
-{
-	uint32_t dataInFLASH[6] = { 0, 0, 0, 0, 0, 0 };
-	dataInFLASH[0] = flash_read(FLASH_CALIA_OFFSET);
-	dataInFLASH[1] = flash_read(FLASH_CALIB_OFFSET);
-	dataInFLASH[2] = flash_read(FLASH_CALIC_OFFSET);
-	dataInFLASH[3] = flash_read(FLASH_CALID_OFFSET);
-	dataInFLASH[4] = flash_read(FLASH_CALIE_OFFSET);
-	dataInFLASH[5] = flash_read(FLASH_CALIF_OFFSET);
-	CRC->CR |= CRC_CR_RESET;
-	CRC->DR = dataInFLASH[0];
-	CRC->DR = dataInFLASH[1];
-	CRC->DR = dataInFLASH[2];
-	CRC->DR = dataInFLASH[3];
-	CRC->DR = dataInFLASH[4];
-	CRC->DR = dataInFLASH[5];
-	return CRC->DR;
+//uint32_t calcCRCofBKP(void)
+//{
+//	uint32_t dataInBKP[4] = { 0, 0, 0, 0 };
+//	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);                  //date
+//	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);                 //line 1
+//	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);                  //line 2 
+//	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);                 //line 3
+//	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);                  //line 4
+//	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);        //daylightsaving 8 бит из 16.
+//	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);                 //
+//	dataInBKP[3] |= rtc_read_backup_reg(BKP_LINES_TIMEZONE_OFFSET);
+//	CRC->CR |= CRC_CR_RESET;
+//	CRC->DR = dataInBKP[0];
+//	CRC->DR = dataInBKP[1];
+//	CRC->DR = dataInBKP[2];
+//	CRC->DR = dataInBKP[3];
+//	return CRC->DR;
+//}
+//uint32_t calkCRCofFlash(void)
+//{
+//	uint32_t dataInFLASH[6] = { 0, 0, 0, 0, 0, 0 };
+//	dataInFLASH[0] = flash_read(FLASH_CALIA_OFFSET);
+//	dataInFLASH[1] = flash_read(FLASH_CALIB_OFFSET);
+//	dataInFLASH[2] = flash_read(FLASH_CALIC_OFFSET);
+//	dataInFLASH[3] = flash_read(FLASH_CALID_OFFSET);
+//	dataInFLASH[4] = flash_read(FLASH_CALIE_OFFSET);
+//	dataInFLASH[5] = flash_read(FLASH_CALIF_OFFSET);
+//	CRC->CR |= CRC_CR_RESET;
+//	CRC->DR = dataInFLASH[0];
+//	CRC->DR = dataInFLASH[1];
+//	CRC->DR = dataInFLASH[2];
+//	CRC->DR = dataInFLASH[3];
+//	CRC->DR = dataInFLASH[4];
+//	CRC->DR = dataInFLASH[5];
+//	return CRC->DR;
+//
+//
+//}
+//uint8_t isCRC_OK_Flash(void)
+//{
+//	uint32_t CRCinFLASH = 0;
+//	CRCinFLASH = flash_read(FLASH_CRC_OFFSET);
+//	if (CRCinFLASH == calkCRCofFlash())
+//	{
+//		return 1;
+//	}
+//	else
+//	{
+//		return 0;
+//	}
+//	return 0;
+//}
+//uint8_t isCRC_OK_BKP(void)
+//{
+//	uint32_t CRCinBKP = 0;
+//	CRCinBKP = rtc_read_backup_reg(BKP_CRC_OFFSET_LOW);
+//	CRCinBKP |= (rtc_read_backup_reg(BKP_CRC_OFFSET_HIGH) << 16);
+//	if (CRCinBKP == calcCRCofBKP())
+//	{
+//		return 1;
+//	}
+//	else
+//	{
+//		return 0;
+//	}
+//	return 0;
+//}
+//void saveTimeCalibrToBKP(void)
+//{
+//	uint16_t writeBuff = 0;
+//	writeBuff = masterClock.timeCalibration->days;
+//	writeBuff |= (masterClock.timeCalibration->seconds << 8);
+//	//	15	14	13	12	11	10	9	8	7	6	5	4	3	2	1	0
+//	//  \----------seconds----------/    \---------days-------------/
+//	rtc_write_backup_reg(BKP_TIMECALIBR_OFFSET, writeBuff);
+//}
+//void saveLinesPolarityToBKP(void)
+//{
+//	uint16_t writeBuff = 0;
+//	writeBuff = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
+//	writeBuff &= 0x00FF;
+//	writeBuff |= (masterClock.guiVars->linesPolarity << 8);
+//	rtc_write_backup_reg(BKP_LINESPOLARITY_OFFSET, writeBuff);
+//
+//}
+//void readLinesPolarityFromBKP(void)
+//{
+//	uint16_t readBuff = 0;
+//	readBuff = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
+//	masterClock.guiVars->linesPolarity = readBuff >> 8;
+//}
+//void readTimeCalibrFromBKP(void)
+//{
+//	uint16_t readBuff = 0;
+//	readBuff = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);
+//	masterClock.timeCalibration->days = readBuff & 0xFF;
+//	masterClock.timeCalibration->seconds = (int8_t)(readBuff >> 8);
+//}
+//void saveLineToBKP(uint8_t lineNumber)
+//{
+//	uint16_t dataToBKP = 0;
+//	uint8_t shift = 0, i;
+//	uint16_t buff = 0;
+//	//line timeZone:
+//	//	4	3	2	1	0
+//	//	\----timezone---/
+//	//		01111 = +16
+//	//		10000 = -16
+//	rtc_write_backup_reg(lineNumber + BKP_LINE1_OFFSET, ((masterClock.line[lineNumber].Hours * 60) + masterClock.line[lineNumber].Minutes) | (masterClock.line[lineNumber].Width << 11) | masterClock.line[lineNumber].Status << 14);
+//	if (lineNumber == 0) return;
+//
+//	for (i = 1; i < LINES_AMOUNT; ++i)
+//	{
+//
+//		if ((int8_t)masterClock.line[i].TimeZone >= 0)
+//		{
+//			dataToBKP = masterClock.line[i].TimeZone;
+//		}
+//		else
+//		{
+//			dataToBKP = (~(masterClock.line[i].TimeZone)) & 0xFF;                 //если отрицательное, то инверсия и флаг отрицательного.
+//			dataToBKP |= 0b10000;
+//		}
+//		buff |= (dataToBKP << ((i - 1) * 5));
+//	}
+//
+//	rtc_write_backup_reg(BKP_LINES_TIMEZONE_OFFSET, buff);
+//
+//}
 
-
-}
-uint8_t isCRC_OK_Flash(void)
-{
-	uint32_t CRCinFLASH = 0;
-	CRCinFLASH = flash_read(FLASH_CRC_OFFSET);
-	if (CRCinFLASH == calkCRCofFlash())
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-	return 0;
-}
-uint8_t isCRC_OK_BKP(void)
-{
-	uint32_t CRCinBKP = 0;
-	CRCinBKP = rtc_read_backup_reg(BKP_CRC_OFFSET_LOW);
-	CRCinBKP |= (rtc_read_backup_reg(BKP_CRC_OFFSET_HIGH) << 16);
-	if (CRCinBKP == calcCRCofBKP())
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-	return 0;
-}
-void saveTimeCalibrToBKP(void)
-{
-	uint16_t writeBuff = 0;
-	writeBuff = timeCalibr.days;
-	writeBuff |= (timeCalibr.seconds << 8);
-	//	15	14	13	12	11	10	9	8	7	6	5	4	3	2	1	0
-	//  \----------seconds----------/    \---------days-------------/
-	rtc_write_backup_reg(BKP_TIMECALIBR_OFFSET, writeBuff);
-}
-void saveLinesPolarityToBKP(void)
-{
-	uint16_t writeBuff = 0;
-	writeBuff = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
-	writeBuff &= 0x00FF;
-	writeBuff |= (masterClock.guiVars->linesPolarity << 8);
-	rtc_write_backup_reg(BKP_LINESPOLARITY_OFFSET, writeBuff);
-
-}
-void readLinesPolarityFromBKP(void)
-{
-	uint16_t readBuff = 0;
-	readBuff = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
-	masterClock.guiVars->linesPolarity = readBuff >> 8;
-}
-void readTimeCalibrFromBKP(void)
-{
-	uint16_t readBuff = 0;
-	readBuff = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);
-	timeCalibr.days = readBuff & 0xFF;
-	timeCalibr.seconds = (int8_t)(readBuff >> 8);
-}
-void saveLineToBKP(uint8_t lineNumber)
-{
-	uint16_t dataToBKP = 0;
-	uint8_t shift = 0, i;
-	uint16_t buff = 0;
-	//line timeZone:
-	//	4	3	2	1	0
-	//	\----timezone---/
-	//		01111 = +16
-	//		10000 = -16
-	rtc_write_backup_reg(lineNumber + BKP_LINE1_OFFSET, ((line[lineNumber].Hours * 60) + line[lineNumber].Minutes) | (line[lineNumber].Width << 11) | line[lineNumber].Status << 14);
-	if (lineNumber == 0) return;
-
-	for (i = 1; i < LINES_AMOUNT; ++i)
-	{
-
-		if ((int8_t)line[i].TimeZone >= 0)
-		{
-			dataToBKP = line[i].TimeZone;
-		}
-		else
-		{
-			dataToBKP = (~(line[i].TimeZone)) & 0xFF;                 //если отрицательное, то инверсия и флаг отрицательного.
-			dataToBKP |= 0b10000;
-		}
-		buff |= (dataToBKP << ((i - 1) * 5));
-	}
-
-	rtc_write_backup_reg(BKP_LINES_TIMEZONE_OFFSET, buff);
-
-}
-
-void saveDaylightSavingToBKP(void)
-{
-	//daylight
-	// 		7	6	5	4	3	2	1	0
-	//		|	\---/	\----timezone---/
-	//		|	  |			01111 = +16
-	//		|	  |			10000 = -16
-	//		|	  |
-	//		|	TimeShift 
-	//		|	 00 disable
-	//		|	 01 +1
-	//		|	 10	-1	
-	//		|
-	//		EnableDLS
-	uint16_t dataToBKP = 0;
-
-	if ((int8_t)masterClock.daylightSaving->timeZone >= 0)
-	{
-		dataToBKP = masterClock.daylightSaving->timeZone;
-	}
-	else
-	{
-		dataToBKP = (~(masterClock.daylightSaving->timeZone)) & 0xFF;                 //если отрицательное, то инверсия и флаг отрицательного.
-		dataToBKP |= 0b10000;
-	}
-	if (daylightSaving.timeShift < 0)
-	{
-		dataToBKP |= (0b10 << 5);                 //отрицательный флаг для timeShift
-	}
-	else
-	{
-		dataToBKP |= 1 << 5;
-	}
-	if (daylightSaving.enableDLS == true)
-	{
-		dataToBKP |= 1 << 7;
-	}
-	rtc_write_backup_reg(BKP_DAYLIGHTSAVING_OFFSET, dataToBKP);
-}
-void readDaylightSavingFromBKP(void)
-{
-	uint16_t dataInBKP = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
-	if (dataInBKP & 0b10000) //если флаг отрицательного числа
-	{
-		masterClock.daylightSaving->timeZone = (char)(~(dataInBKP & 0b1111));
-	}
-	else
-	{
-		masterClock.daylightSaving->timeZone = (char)(dataInBKP & 0b1111);
-	}
-	if (dataInBKP & 0b1000000) //если отрицательный флаг
-	{
-		daylightSaving.timeShift = -1;
-
-	}
-	else
-	{
-		daylightSaving.timeShift = (dataInBKP >> 5) & 0b11;
-	}
-	daylightSaving.enableDLS = (dataInBKP >> 7);
-}
+//void saveDaylightSavingToBKP(void)
+//{
+//	//daylight
+//	// 		7	6	5	4	3	2	1	0
+//	//		|	\---/	\----timezone---/
+//	//		|	  |			01111 = +16
+//	//		|	  |			10000 = -16
+//	//		|	  |
+//	//		|	TimeShift 
+//	//		|	 00 disable
+//	//		|	 01 +1
+//	//		|	 10	-1	
+//	//		|
+//	//		EnableDLS
+//	uint16_t dataToBKP = 0;
+//
+//	if ((int8_t)masterClock.daylightSaving->timeZone >= 0)
+//	{
+//		dataToBKP = masterClock.daylightSaving->timeZone;
+//	}
+//	else
+//	{
+//		dataToBKP = (~(masterClock.daylightSaving->timeZone)) & 0xFF;                 //если отрицательное, то инверсия и флаг отрицательного.
+//		dataToBKP |= 0b10000;
+//	}
+//	if (masterClock.daylightSaving->timeShift < 0)
+//	{
+//		dataToBKP |= (0b10 << 5);                 //отрицательный флаг для timeShift
+//	}
+//	else
+//	{
+//		dataToBKP |= 1 << 5;
+//	}
+//	if (masterClock.daylightSaving->enableDLS == true)
+//	{
+//		dataToBKP |= 1 << 7;
+//	}
+//	rtc_write_backup_reg(BKP_DAYLIGHTSAVING_OFFSET, dataToBKP);
+//}
+//void readDaylightSavingFromBKP(void)
+//{
+//	uint16_t dataInBKP = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
+//	if (dataInBKP & 0b10000) //если флаг отрицательного числа
+//	{
+//		masterClock.daylightSaving->timeZone = (char)(~(dataInBKP & 0b1111));
+//	}
+//	else
+//	{
+//		masterClock.daylightSaving->timeZone = (char)(dataInBKP & 0b1111);
+//	}
+//	if (dataInBKP & 0b1000000) //если отрицательный флаг
+//	{
+//		masterClock.daylightSaving->timeShift = -1;
+//
+//	}
+//	else
+//	{
+//		masterClock.daylightSaving->timeShift = (dataInBKP >> 5) & 0b11;
+//	}
+//	masterClock.daylightSaving->enableDLS = (dataInBKP >> 7);
+//}
 //uint8_t increaseDay(RTC_DateTypeDef* Date)
 //{
 //	if (Date->Month == 1 || Date->Month == 3 || Date->Month == 5 || Date->Month == 7 || Date->Month == 8 || Date->Month == 10 || Date->Month == 12)
@@ -670,40 +670,40 @@ void readDaylightSavingFromBKP(void)
 //		}
 //	}
 //}
-void flash_unlock(void) {
-	FLASH->KEYR = FLASH_KEY1;
-	FLASH->KEYR = FLASH_KEY2;
-}
-void flash_lock() {
-	FLASH->CR |= FLASH_CR_LOCK;
-}
-uint8_t flash_ready(void) {
-	return !(FLASH->SR & FLASH_SR_BSY);
-}
-
-void flash_write(uint32_t address, uint32_t data) {
-	FLASH->CR |= FLASH_CR_PG;                 //Разрешаем программирование флеша
-	while (!flash_ready());                 //Ожидаем готовности флеша к записи
-	*(__IO uint16_t*)address = (uint16_t)data;                 //Пишем младшие 2 бата
-	while (!flash_ready());
-	address += 2;
-	data >>= 16;
-	*(__IO uint16_t*)address = (uint16_t)data;                 //Пишем старшие 2 байта
-	while (!flash_ready());
-	FLASH->CR &= ~(FLASH_CR_PG);                 //Запрещаем программирование флеша
-}
-
-void flash_erase_page(uint32_t address) {
-	FLASH->CR |= FLASH_CR_PER;                 //Устанавливаем бит стирания одной страницы
-	FLASH->AR = address;                 // Задаем её адрес
-	FLASH->CR |= FLASH_CR_STRT;                 // Запускаем стирание 
-	while (!flash_ready())
-		;                  //Ждем пока страница сотрется. 
-	FLASH->CR &= ~FLASH_CR_PER;                 //Сбрасываем бит обратно
-}
-uint32_t flash_read(uint32_t address) {
-	return (*(__IO uint32_t*) address);
-}
+//void flash_unlock(void) {
+//	FLASH->KEYR = FLASH_KEY1;
+//	FLASH->KEYR = FLASH_KEY2;
+//}
+//void flash_lock() {
+//	FLASH->CR |= FLASH_CR_LOCK;
+//}
+//uint8_t flash_ready(void) {
+//	return !(FLASH->SR & FLASH_SR_BSY);
+//}
+//
+//void flash_write(uint32_t address, uint32_t data) {
+//	FLASH->CR |= FLASH_CR_PG;                 //Разрешаем программирование флеша
+//	while (!flash_ready());                 //Ожидаем готовности флеша к записи
+//	*(__IO uint16_t*)address = (uint16_t)data;                 //Пишем младшие 2 бата
+//	while (!flash_ready());
+//	address += 2;
+//	data >>= 16;
+//	*(__IO uint16_t*)address = (uint16_t)data;                 //Пишем старшие 2 байта
+//	while (!flash_ready());
+//	FLASH->CR &= ~(FLASH_CR_PG);                 //Запрещаем программирование флеша
+//}
+//
+//void flash_erase_page(uint32_t address) {
+//	FLASH->CR |= FLASH_CR_PER;                 //Устанавливаем бит стирания одной страницы
+//	FLASH->AR = address;                 // Задаем её адрес
+//	FLASH->CR |= FLASH_CR_STRT;                 // Запускаем стирание 
+//	while (!flash_ready())
+//		;                  //Ждем пока страница сотрется. 
+//	FLASH->CR &= ~FLASH_CR_PER;                 //Сбрасываем бит обратно
+//}
+//uint32_t flash_read(uint32_t address) {
+//	return (*(__IO uint32_t*) address);
+//}
 //uint8_t hoursToUTC(int8_t hours, int8_t timeZone)
 //{
 //	hours %= 24;
@@ -852,194 +852,194 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 	char str[5];
 	if (action == WM_NOTIFICATION_CLICKED)
 	{
-		longPressCNT.lowerLimit = 0;
+		masterClock.longPressCNT->lowerLimit = 0;
 		switch (id)
 		{
 		case ID_BUTTON_LINESETUP_Hminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Hminus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_BUTTON_LINESETUP_Hminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_LINESETUP_Mminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Mminus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
+			masterClock.longPressCNT->headerItem = 1;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_BUTTON_LINESETUP_Mminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_LINESETUP_Hplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 23;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 23;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Hplus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_BUTTON_LINESETUP_Hplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_LINESETUP_Mplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 59;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 59;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Mplus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_HEADER_LINESETUP_VALS);
+			masterClock.longPressCNT->headerItem = 1;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_BUTTON_LINESETUP_Mplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 			//vv TIMESETUP vv
 		case ID_BUTTON_HOURplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 23;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 23;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_HOURplus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_BUTTON_HOURplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 			break;
 		case ID_BUTTON_MINplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 59;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 59;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_MINplus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+			masterClock.longPressCNT->headerItem = 1;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_BUTTON_MINplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_SECplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 59;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 59;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_SECplus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+			masterClock.longPressCNT->headerItem = 2;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_BUTTON_SECplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_HOURminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_HOURminus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_BUTTON_HOURminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_MINminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_MINminus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+			masterClock.longPressCNT->headerItem = 1;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_BUTTON_MINminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_SECminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSetupMenu, ID_HEADER_HMS_VALUE);
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSetupMenu, ID_BUTTON_SECminus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_HEADER_HMS_VALUE);
+			masterClock.longPressCNT->headerItem = 2;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeSetupMenu, ID_BUTTON_SECminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_LINESETUP_PULSE_MSECplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 15;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 15;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_HEADER_LINESETUP_PULSE_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECplus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hLineSetupPulseMenu, ID_HEADER_LINESETUP_PULSE_VALS);
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%4d", masterClock.longPressCNT->value * LINE_WIDTH_MULT);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_LINESETUP_PULSE_MSECminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_HEADER_LINESETUP_PULSE_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECminus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hLineSetupPulseMenu, ID_HEADER_LINESETUP_PULSE_VALS);
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_MSECminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%4d", masterClock.longPressCNT->value * LINE_WIDTH_MULT);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_SUMWINSETUP_Zplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 12;
-			longPressCNT.lowerLimit = -12;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 12;
+			masterClock.longPressCNT->lowerLimit = -12;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_HEADER_SUMWINSETUP_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_Zplus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hTimeSumWinSetupMenu, ID_HEADER_SUMWINSETUP_VALS);
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_Zplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			if (masterClock.longPressCNT->value > 0)
@@ -1050,18 +1050,18 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			{
 				sprintf(str, "%d", masterClock.longPressCNT->value);
 			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_SUMWINSETUP_Zminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = -12;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->lowerLimit = -12;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_HEADER_SUMWINSETUP_VALS);
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_Zminus);
+			masterClock.longPressCNT->header = WM_GetDialogItem(masterClock.handles->hTimeSumWinSetupMenu, ID_HEADER_SUMWINSETUP_VALS);
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_Zminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			if (masterClock.longPressCNT->value > 0)
@@ -1072,108 +1072,108 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			{
 				sprintf(str, "%d", masterClock.longPressCNT->value);
 			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_DTS_Dplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = getLastDayOfMonth((RTC_DateTypeDef*)(val - 2));
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = getLastDayOfMonth((RTC_DateTypeDef*)(val - 2));
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Dplus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeDateSetupVals;
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeDateSetupMenu, ID_BUTTON_DTS_Dplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_DTS_Dminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Dminus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeDateSetupVals;
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeDateSetupMenu, ID_BUTTON_DTS_Dminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_DTS_Mplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 12;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 12;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Mplus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeDateSetupVals;
+			masterClock.longPressCNT->headerItem = 1;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeDateSetupMenu, ID_BUTTON_DTS_Mplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 
 		case ID_BUTTON_DTS_Mminus:
-			longPressCNT.direction = -1;
-			longPressCNT.upperLimit = 0;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->upperLimit = 0;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Mminus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeDateSetupVals;
+			masterClock.longPressCNT->headerItem = 1;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeDateSetupMenu, ID_BUTTON_DTS_Mminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_DTS_Yplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 99;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 99;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Yplus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeDateSetupVals;
+			masterClock.longPressCNT->headerItem = 2;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeDateSetupMenu, ID_BUTTON_DTS_Yplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_DTS_Yminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeDateSetupVals;
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeDateSetupMenu, ID_BUTTON_DTS_Yminus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeDateSetupVals;
+			masterClock.longPressCNT->headerItem = 2;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeDateSetupMenu, ID_BUTTON_DTS_Yminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_TIMECALIBRATE_SECplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 29;
-			longPressCNT.lowerLimit = -30;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 29;
+			masterClock.longPressCNT->lowerLimit = -30;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeCalibrVals;
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_SECplus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeCalibrVals;
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_SECplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			if (masterClock.longPressCNT->value > 0)
@@ -1184,18 +1184,18 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			{
 				sprintf(str, "%d", masterClock.longPressCNT->value);
 			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_TIMECALIBRATE_SECminus:
-			longPressCNT.direction = -1;
-			longPressCNT.lowerLimit = -30;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->lowerLimit = -30;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeCalibrVals;
-			longPressCNT.headerItem = 0;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_SECminus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeCalibrVals;
+			masterClock.longPressCNT->headerItem = 0;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_SECminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			if (masterClock.longPressCNT->value > 0)
@@ -1206,48 +1206,48 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			{
 				sprintf(str, "%d", masterClock.longPressCNT->value);
 			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_TIMECALIBRATE_DAYplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 0xFF;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 0xFF;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = handles.hHeaderTimeCalibrVals;
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_DAYplus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeCalibrVals;
+			masterClock.longPressCNT->headerItem = 1;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_DAYplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_TIMECALIBRATE_DAYminus:
-			longPressCNT.direction = -1;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = handles.hHeaderTimeCalibrVals;
-			longPressCNT.headerItem = 1;
-			longPressCNT.button = WM_GetDialogItem(handles.hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_DAYminus);
+			masterClock.longPressCNT->header = masterClock.handles->hHeaderTimeCalibrVals;
+			masterClock.longPressCNT->headerItem = 1;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hTimeCalibrateMenu, ID_BUTTON_TIMECALIBRATE_DAYminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			sprintf(str, "%02d", masterClock.longPressCNT->value);
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_LINESETUP_Zplus:
-			longPressCNT.direction = 1;
-			longPressCNT.upperLimit = 12;
-			longPressCNT.lowerLimit = -12;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = 1;
+			masterClock.longPressCNT->upperLimit = 12;
+			masterClock.longPressCNT->lowerLimit = -12;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val + 1;
-			longPressCNT.header = masterClock.handles->hLineSetupVals;
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Zplus);
+			masterClock.longPressCNT->header = masterClock.handles->hLineSetupVals;
+			masterClock.longPressCNT->headerItem = 2;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_BUTTON_LINESETUP_Zplus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			if (masterClock.longPressCNT->value > 0)
@@ -1258,19 +1258,19 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			{
 				sprintf(str, "%d", masterClock.longPressCNT->value);
 			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 		case ID_BUTTON_LINESETUP_Zminus:
-			longPressCNT.direction = -1;
-			longPressCNT.upperLimit = 12;
-			longPressCNT.lowerLimit = -12;
-			longPressCNT.itCNT = 0;
+			masterClock.longPressCNT->direction = -1;
+			masterClock.longPressCNT->upperLimit = 12;
+			masterClock.longPressCNT->lowerLimit = -12;
+			masterClock.longPressCNT->itCNT = 0;
 			masterClock.longPressCNT->value = *val - 1;
-			longPressCNT.header = masterClock.handles->hLineSetupVals;
-			longPressCNT.headerItem = 2;
-			longPressCNT.button = WM_GetDialogItem(handles.hLineSetupMenu, ID_BUTTON_LINESETUP_Zminus);
+			masterClock.longPressCNT->header = masterClock.handles->hLineSetupVals;
+			masterClock.longPressCNT->headerItem = 2;
+			masterClock.longPressCNT->button = WM_GetDialogItem(masterClock.handles->hLineSetupMenu, ID_BUTTON_LINESETUP_Zminus);
 			TIM7->CNT = 0;
 			HAL_TIM_Base_Start_IT(&htim7);
 			if (masterClock.longPressCNT->value > 0)
@@ -1281,9 +1281,9 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 			{
 				sprintf(str, "%d", masterClock.longPressCNT->value);
 			}
-			HEADER_SetItemText(longPressCNT.header, longPressCNT.headerItem, str);
-			HEADER_SetTextColor(longPressCNT.header, GUI_WHITE);
-			gui_Vars.valsChanged = true;
+			HEADER_SetItemText(masterClock.longPressCNT->header, masterClock.longPressCNT->headerItem, str);
+			HEADER_SetTextColor(masterClock.longPressCNT->header, GUI_WHITE);
+			masterClock.guiVars->valsChanged = true;
 			break;
 
 
@@ -1294,8 +1294,8 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 	if (action == WM_NOTIFICATION_RELEASED)
 	{
 
-		longPressCNT.direction = 0;
-		longPressCNT.itCNT = 0;
+		masterClock.longPressCNT->direction = 0;
+		masterClock.longPressCNT->itCNT = 0;
 		*val = masterClock.longPressCNT->value;
 		TIM7->CNT = 0;
 		HAL_TIM_Base_Stop_IT(&htim7);

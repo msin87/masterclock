@@ -32,8 +32,8 @@
 #include "cmsis_os.h"
 #include "sram.h"
 #include "LineSetup.h"
+#include "backup.h"
 
-extern MasterClock masterClock;
 extern RTC_TimeTypeDef sTime;
 
 /*********************************************************************
@@ -208,9 +208,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					masterClock.longPressCNT->value = 15;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
-					WM_Invalidate(WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_ENTER));
+					WM_Invalidate(WM_GetDialogItem(masterClock.handles->hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_ENTER));
 				}
 				// USER END
 				break;
@@ -233,7 +233,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				polarity[masterClock.guiVars->menuState - 8] = 1;  //Переменная полярность
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_PULSE_ENTER));
 				}
@@ -254,9 +254,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				line[masterClock.guiVars->menuState - 8].Width = width[masterClock.guiVars->menuState - 8];
-				line[masterClock.guiVars->menuState - 8].Polarity = polarity[masterClock.guiVars->menuState - 8];
-				gui_Vars.valsChanged = false;
+				masterClock.line[masterClock.guiVars->menuState - 8].Width = width[masterClock.guiVars->menuState - 8];
+				masterClock.line[masterClock.guiVars->menuState - 8].Polarity = polarity[masterClock.guiVars->menuState - 8];
+				masterClock.guiVars->valsChanged = false;
 				saveLineToBKP(masterClock.guiVars->menuState - 8);
 
 				// USER END
@@ -273,10 +273,10 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if (line[masterClock.guiVars->menuState - 8].Status == LINE_STATUS_OFF)
+				if (masterClock.line[masterClock.guiVars->menuState - 8].Status == LINE_STATUS_OFF)
 				{
 					BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_PULSE_ONOFF), "ВКЛ");
-					line[masterClock.guiVars->menuState - 8].Status = LINE_STATUS_STOP;
+					masterClock.line[masterClock.guiVars->menuState - 8].Status = LINE_STATUS_STOP;
 					HEADER_SetItemText(WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS), 2, "СТОП");
 					HEADER_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS), GUI_WHITE);
 
@@ -284,7 +284,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				else
 				{
 					BUTTON_SetText(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_PULSE_ONOFF), "ВЫКЛ");
-					line[masterClock.guiVars->menuState - 8].Status = LINE_STATUS_OFF;
+					masterClock.line[masterClock.guiVars->menuState - 8].Status = LINE_STATUS_OFF;
 					HEADER_SetItemText(WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS), 2, "ВЫКЛ");
 					HEADER_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_HEADER_LINESETUP_PULSE_VALS), GUI_WHITE);
 				}
@@ -303,9 +303,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					pollButton(ID_BUTTON_LINESETUP_PULSE_MSECminus, WM_NOTIFICATION_CLICKED, (int8_t*)&width[masterClock.guiVars->menuState - 8]);
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
-					WM_Invalidate(WM_GetDialogItem(handles.hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_ENTER));
+					WM_Invalidate(WM_GetDialogItem(masterClock.handles->hLineSetupPulseMenu, ID_BUTTON_LINESETUP_PULSE_ENTER));
 				}
 				// USER END
 				break;
@@ -327,7 +327,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				polarity[masterClock.guiVars->menuState - 8] = 0;  //постоянная полярность.
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_PULSE_ENTER));
 				}
@@ -349,7 +349,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState -= 4;
-				gui_Vars.valsChanged = false;
+				masterClock.guiVars->valsChanged = false;
 				CreateLineSetupWindow();
 				WM_DeleteWindow(pMsg->hWin);
 				// USER END
@@ -368,7 +368,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		WM_DefaultProc(pMsg);
 		break;
 	}
-	valsChangedOld = gui_Vars.valsChanged;
+	valsChangedOld = masterClock.guiVars->valsChanged;
 }
 
 /*********************************************************************
@@ -391,7 +391,7 @@ WM_HWIN CreateLineSetupPulseWindow(void) {
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_PULSE_MSECminus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_PULSE_POLminus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_LINESETUP_PULSE_ENTER), _cbEnterButton);
-	handles.hLineSetupPulseMenu = hWin;
+	masterClock.handles->hLineSetupPulseMenu = hWin;
 	return hWin;
 }
 

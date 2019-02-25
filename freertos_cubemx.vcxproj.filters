@@ -489,6 +489,12 @@
     <ClCompile Include="Src\backup.c">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="Src\crc.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\flash.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\arial18.h">

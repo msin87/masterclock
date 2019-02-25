@@ -97,8 +97,10 @@
     <ClCompile Include="Src\backup.c" />
     <ClCompile Include="Src\button76x76Skin.c" />
     <ClCompile Include="Src\callbacks.c" />
+    <ClCompile Include="Src\crc.c" />
     <ClCompile Include="Src\Digital-7 Mono70.c" />
     <ClCompile Include="Src\Digital-747.c" />
+    <ClCompile Include="Src\flash.c" />
     <ClCompile Include="Src\freertos.c" />
     <ClCompile Include="Src\guivars.c" />
     <ClCompile Include="Src\lcdcmd.c" />

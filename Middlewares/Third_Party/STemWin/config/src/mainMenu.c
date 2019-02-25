@@ -64,15 +64,15 @@
 
 
 // USER START (Optionally insert additional defines)
-extern GUI_Vars gui_Vars;
-extern Handles handles;
+
 char timeString[9];
-extern Lines line[4];
+
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontArial18;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontDigital7Mono70;
 extern GUI_CONST_STORAGE GUI_CHARINFO GUI_FontArial18_CharInfo[192];
 extern GUI_CONST_STORAGE GUI_FONT_PROP GUI_FontDigital7Mono70_Prop2;
 extern GUI_CONST_STORAGE GUI_FONT_PROP GUI_FontDigital7Mono70_Prop1;
+
 uint16_t backgroundBuffer[18];
 GUI_RECT rect;
 
@@ -9089,13 +9089,13 @@ static void _cbButton(WM_MESSAGE * pMsg)
 			GUI_DispStringInRect("Линия 1", &Rect, TextAlign);
 			Rect.y0 = 50;
 			Rect.y1 = 60;
-			switch (line[0].Status) {
+			switch (masterClock.line[0].Status) {
 			case LINE_STATUS_OFF:
 				GUI_SetColor(GUI_GRAY);
 				strcpy(timeString, "ВЫКЛ");
 				break;
 			case LINE_STATUS_RUN:
-				sprintf(timeString, "%02d:%02d", line[0].Hours, line[0].Minutes);
+				sprintf(timeString, "%02d:%02d", masterClock.line[0].Hours, masterClock.line[0].Minutes);
 				GUI_SetColor(GUI_WHITE);
 				break;
 			case LINE_STATUS_STOP:
@@ -9111,13 +9111,13 @@ static void _cbButton(WM_MESSAGE * pMsg)
 			GUI_DispStringInRect("Линия 2", &Rect, TextAlign);
 			Rect.y0 = 50;
 			Rect.y1 = 60;
-			switch (line[1].Status) {
+			switch (masterClock.line[1].Status) {
 			case LINE_STATUS_OFF:
 				GUI_SetColor(GUI_GRAY);
 				strcpy(timeString, "ВЫКЛ");
 				break;
 			case LINE_STATUS_RUN:
-				sprintf(timeString, "%02d:%02d", line[1].Hours, line[1].Minutes);
+				sprintf(timeString, "%02d:%02d", masterClock.line[1].Hours, masterClock.line[1].Minutes);
 				GUI_SetColor(GUI_WHITE);
 				break;
 			case LINE_STATUS_STOP:
@@ -9132,13 +9132,13 @@ static void _cbButton(WM_MESSAGE * pMsg)
 			GUI_DispStringInRect("Линия 3", &Rect, TextAlign);
 			Rect.y0 = 50;
 			Rect.y1 = 60;
-			switch (line[2].Status) {
+			switch (masterClock.line[2].Status) {
 			case LINE_STATUS_OFF:
 				GUI_SetColor(GUI_GRAY);
 				strcpy(timeString, "ВЫКЛ");
 				break;
 			case LINE_STATUS_RUN:
-				sprintf(timeString, "%02d:%02d", line[2].Hours, line[2].Minutes);
+				sprintf(timeString, "%02d:%02d", masterClock.line[2].Hours, masterClock.line[2].Minutes);
 				GUI_SetColor(GUI_WHITE);
 				break;
 			case LINE_STATUS_STOP:
@@ -9152,13 +9152,13 @@ static void _cbButton(WM_MESSAGE * pMsg)
 			GUI_DispStringInRect("Линия 4", &Rect, TextAlign);
 			Rect.y0 = 50;
 			Rect.y1 = 60;
-			switch (line[3].Status) {
+			switch (masterClock.line[3].Status) {
 			case LINE_STATUS_OFF:
 				GUI_SetColor(GUI_GRAY);
 				strcpy(timeString, "ВЫКЛ");
 				break;
 			case LINE_STATUS_RUN:
-				sprintf(timeString, "%02d:%02d", line[3].Hours, line[3].Minutes);
+				sprintf(timeString, "%02d:%02d", masterClock.line[3].Hours, masterClock.line[3].Minutes);
 				GUI_SetColor(GUI_WHITE);
 				break;
 			case LINE_STATUS_STOP:
@@ -9185,7 +9185,7 @@ static void _cbButton(WM_MESSAGE * pMsg)
 void sendMsgToMainLineButtons(uint16_t message)
 {
 	WM_MESSAGE msgButton;
-	if (handles.hMainMenu != 0)
+	if (masterClock.handles->hMainMenu != 0)
 	{
 		msgButton.MsgId = message;
 		WM_SendMessage(masterClock.handles->hButtonLine[0], &msgButton);
@@ -9197,12 +9197,12 @@ void sendMsgToMainLineButtons(uint16_t message)
 void forceUpdateStrings(void)
 {
 	sprintf(timeString, "%d", sTime.Seconds % 10);
-	TEXT_SetText(handles.hSecondsString_L, timeString);
-	WM_ShowWindow(handles.hMainMenu);
+	TEXT_SetText(masterClock.handles->hSecondsString_L, timeString);
+	WM_ShowWindow(masterClock.handles->hMainMenu);
 	sprintf(timeString, ":%d", sTime.Seconds / 10);
-	TEXT_SetText(handles.hSecondsString_H, timeString);
+	TEXT_SetText(masterClock.handles->hSecondsString_H, timeString);
 	sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
-	TEXT_SetText(handles.hHourMinString, timeString);
+	TEXT_SetText(masterClock.handles->hHourMinString, timeString);
 	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 	TFT_MainMenu_ShowDate();
 }
@@ -9271,7 +9271,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_HOUR_MIN);
 
-		handles.hHourMinString = hItem;
+		masterClock.handles->hHourMinString = hItem;
 		HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
 		sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
 		TEXT_SetText(hItem, timeString);
@@ -9284,7 +9284,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_SECONDS_H);
 		sprintf(timeString, ":%d", sTime.Seconds / 10);
 		TEXT_SetText(hItem, timeString);
-		handles.hSecondsString_H = hItem;
+		masterClock.handles->hSecondsString_H = hItem;
 		TEXT_SetFont(hItem, &GUI_FontDigital7Mono70);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
@@ -9294,7 +9294,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_SECONDS_L);
 		sprintf(timeString, "%d", sTime.Seconds % 10);
 		TEXT_SetText(hItem, timeString);
-		handles.hSecondsString_L = hItem;
+		masterClock.handles->hSecondsString_L = hItem;
 		TEXT_SetFont(hItem, &GUI_FontDigital7Mono70);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
@@ -9390,21 +9390,21 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_SEC_UPDATE:
 		sprintf(timeString, "%d", sTime.Seconds % 10);
 		//HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-		TEXT_SetText(handles.hSecondsString_L, timeString);
-		if (gui_Vars.prevSecond_L == 9)
+		TEXT_SetText(masterClock.handles->hSecondsString_L, timeString);
+		if (masterClock.guiVars->prevSecond_L == 9)
 		{
 			sprintf(timeString, ":%d", sTime.Seconds / 10);
-			TEXT_SetText(handles.hSecondsString_H, timeString);
-			if (gui_Vars.prevSecond_H == 5) //прошла минута
+			TEXT_SetText(masterClock.handles->hSecondsString_H, timeString);
+			if (masterClock.guiVars->prevSecond_H == 5) //прошла минута
 			{
 				sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
-				TEXT_SetText(handles.hHourMinString, timeString);      //обновление строки с часами и минутами
+				TEXT_SetText(masterClock.handles->hHourMinString, timeString);      //обновление строки с часами и минутами
 
 			}
 		}
 		pMsg->MsgId = 0;
-		gui_Vars.prevSecond_L = sTime.Seconds % 10;
-		gui_Vars.prevSecond_H = sTime.Seconds / 10;
+		masterClock.guiVars->prevSecond_L = sTime.Seconds % 10;
+		masterClock.guiVars->prevSecond_H = sTime.Seconds / 10;
 		break;
 
 
@@ -9424,7 +9424,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState = MENU_STATE_LINE1SETUP;
-				WM_HideWindow(handles.hMainMenu);
+				WM_HideWindow(masterClock.handles->hMainMenu);
 				CreateLineSetupWindow();
 
 				// USER END
@@ -9443,7 +9443,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState = MENU_STATE_LINE2SETUP;
-				WM_HideWindow(handles.hMainMenu);
+				WM_HideWindow(masterClock.handles->hMainMenu);
 				CreateLineSetupWindow();
 				// USER END
 				break;
@@ -9460,7 +9460,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState = MENU_STATE_LINE3SETUP;
-				WM_HideWindow(handles.hMainMenu);
+				WM_HideWindow(masterClock.handles->hMainMenu);
 				CreateLineSetupWindow();
 				// USER END
 				break;
@@ -9477,7 +9477,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState = MENU_STATE_LINE4SETUP;
-				WM_HideWindow(handles.hMainMenu);
+				WM_HideWindow(masterClock.handles->hMainMenu);
 				CreateLineSetupWindow();
 				// USER END
 				break;
@@ -9495,7 +9495,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuLocked = 0;
+				masterClock.guiVars->menuLocked = 0;
 
 				WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
 				WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
@@ -9515,7 +9515,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.menuLocked = 1;
+				masterClock.guiVars->menuLocked = 1;
 				WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
 				WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
 				// USER END
@@ -9533,7 +9533,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState = MENU_STATE_TIMESETUP;
-				WM_HideWindow(handles.hMainMenu);
+				WM_HideWindow(masterClock.handles->hMainMenu);
 				CreateTimeSetupWindow();
 
 
@@ -9682,7 +9682,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 }
 WM_HWIN CreateMainMenu(void) {
 	WM_HWIN hWin;
-	gui_Vars.menuLocked = 1;
+	masterClock.guiVars->menuLocked = 1;
 	BUTTON_SKINFLEX_PROPS Props;
 	HEADER_SKINFLEX_PROPS Header_Props;
 	Props.aColorFrame[0] = GUI_ORANGE;
@@ -9729,7 +9729,7 @@ WM_HWIN CreateMainMenu(void) {
 	WM_SetCallback(masterClock.handles->hButtonLine[2], _cbButton);
 	WM_SetCallback(masterClock.handles->hButtonLine[3], _cbButton);
 
-	handles.hMainMenu = hWin;
+	masterClock.handles->hMainMenu = hWin;
 
 
 
@@ -9828,8 +9828,8 @@ void TFT_MainMenu_ShowDate(void)
 		strcat(str, "вс ");
 		break;
 	}
-	TEXT_SetText(WM_GetDialogItem(handles.hMainMenu, ID_TEXT_DATE), str);
-	TEXT_SetTextColor(WM_GetDialogItem(handles.hMainMenu, ID_TEXT_DATE), GUI_WHITE);
+	TEXT_SetText(WM_GetDialogItem(masterClock.handles->hMainMenu, ID_TEXT_DATE), str);
+	TEXT_SetTextColor(WM_GetDialogItem(masterClock.handles->hMainMenu, ID_TEXT_DATE), GUI_WHITE);
 
 }
 void TFT_ShowString(uint16_t x, uint16_t y, char *p, uint8_t fontsize, uint16_t color)

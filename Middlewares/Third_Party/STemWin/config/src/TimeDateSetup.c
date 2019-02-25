@@ -31,9 +31,9 @@
 #include "cmsis_os.h"
 #include "TimeSetup.h"
 #include <stdbool.h>
+#include "backup.h"
 extern RTC_DateTypeDef sDate;
 extern RTC_HandleTypeDef hrtc;
-extern MasterClock masterClock;
 extern GUI_CONST_STORAGE GUI_FONT GUI_FontArial18;
 /*********************************************************************
 *

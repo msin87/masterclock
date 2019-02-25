@@ -12,17 +12,7 @@
 #define ID_HEADER_TIMECALIBRATE   (GUI_ID_USER + 0x3B)
 #define ID_BUTTON_TIMECALIBRATE_SUMWIN (GUI_ID_USER + 0x3C)
 #include "DIALOG.h"
-#include "guivars.h"
-#include "string.h"
-#include "stdio.h"
-#include "stm32f1xx_hal.h"
-#include "cmsis_os.h"
-#include "callbacks.h"
-#include "TimeSetup.h"
-#include "sram.h"
-#include "TimeSumWinSetup.h"
+
 WM_HWIN CreateTimeCalibrateWindow(void);
-extern GUI_Vars gui_Vars;
-extern Handles handles;
-extern TimeCalibration timeCalibr;
+
 #endif

@@ -29,10 +29,12 @@
 #include "string.h"
 #include "stdio.h"
 #include "LineSetup.h"
-extern LongPressCNT longPressCNT;
+#include <stdbool.h>
+#include "backup.h"
+
 extern RTC_TimeTypeDef sTime;
 extern RTC_DateTypeDef sDate;
-extern DaylightSaving daylightSaving;
+
 /*********************************************************************
 *
 *       Defines
@@ -110,7 +112,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	switch (pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 
-		daylightSavingTemp = daylightSaving;
+		daylightSavingTemp = *masterClock.daylightSaving;
 		// Initialization of Main Window
 		//
 		hItem = pMsg->hWin;
@@ -126,7 +128,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// Названия значений
 		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_SUMWINSETUP_VALS);
-		handles.hHeaderSumWinSetupVals = hItem;
+		masterClock.handles->hHeaderSumWinSetupVals = hItem;
 		if ((int8_t)daylightSavingTemp.timeZone > 0)
 		{
 			sprintf(str, "+%d", masterClock.daylightSaving->timeZone);
@@ -177,9 +179,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					masterClock.longPressCNT->value = 12;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
-					WM_Invalidate(WM_GetDialogItem(handles.hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_ENTER));
+					WM_Invalidate(WM_GetDialogItem(masterClock.handles->hTimeSumWinSetupMenu, ID_BUTTON_SUMWINSETUP_ENTER));
 				}
 				// USER END
 				break;
@@ -208,7 +210,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					daylightSavingTemp.enableDLS = true;
 
-					gui_Vars.valsChanged = true;
+					masterClock.guiVars->valsChanged = true;
 					HEADER_SetItemText(WM_GetDialogItem(pMsg->hWin, ID_HEADER_SUMWINSETUP_VALS), 1, "ВКЛ");
 					HEADER_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_HEADER_SUMWINSETUP_VALS), GUI_WHITE);
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_SUMWINSETUP_ENTER));
@@ -231,8 +233,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				daylightSaving = daylightSavingTemp;
-				gui_Vars.valsChanged = false;
+				masterClock.daylightSaving = &daylightSavingTemp;
+				masterClock.guiVars->valsChanged = false;
 				saveDaylightSavingToBKP();
 				// USER END
 				break;
@@ -250,7 +252,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					pollButton(ID_BUTTON_SUMWINSETUP_Zminus, WM_NOTIFICATION_CLICKED, (int8_t*)&daylightSavingTemp.timeZone);
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_SUMWINSETUP_ENTER));
 				}
@@ -280,7 +282,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				if (daylightSavingTemp.enableDLS == true)
 				{
 					daylightSavingTemp.enableDLS = false;
-					gui_Vars.valsChanged = true;
+					masterClock.guiVars->valsChanged = true;
 					HEADER_SetItemText(WM_GetDialogItem(pMsg->hWin, ID_HEADER_SUMWINSETUP_VALS), 1, "ВЫКЛ");
 					HEADER_SetTextColor(WM_GetDialogItem(pMsg->hWin, ID_HEADER_SUMWINSETUP_VALS), GUI_WHITE);
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINESETUP_ENTER));
@@ -305,9 +307,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->menuState = MENU_STATE_TIMECALIBRATION;
-				gui_Vars.valsChanged = false;
-				WM_DeleteWindow(handles.hTimeSumWinSetupMenu);
-				WM_ShowWindow(handles.hTimeCalibrateMenu);
+				masterClock.guiVars->valsChanged = false;
+				WM_DeleteWindow(masterClock.handles->hTimeSumWinSetupMenu);
+				WM_ShowWindow(masterClock.handles->hTimeCalibrateMenu);
 
 				// USER END
 				break;
@@ -323,7 +325,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		WM_DefaultProc(pMsg);
 		break;
 	}
-	valsChangedOld = gui_Vars.valsChanged;
+	valsChangedOld = masterClock.guiVars->valsChanged;
 }
 
 /*********************************************************************
@@ -341,7 +343,7 @@ WM_HWIN CreateTimeSumWinSetupWindow(void) {
 	WM_HWIN hWin;
 
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
-	handles.hTimeSumWinSetupMenu = hWin;
+	masterClock.handles->hTimeSumWinSetupMenu = hWin;
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_SUMWINSETUP_Zplus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_SUMWINSETUP_SUMWIN_ON), _cbArrowUpButton);
 	//WM_SetCallback(WM_GetDialogItem(hWin,ID_BUTTON_LINESETUP_Splus),_cbArrowUpButton);

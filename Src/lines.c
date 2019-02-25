@@ -1,6 +1,8 @@
 #include "lines.h"
+#include "backup.h"
+#include "timedate.h"
 extern RTC_TimeTypeDef sTime;
-extern MasterClock masterClock;
+
 void lineSetupMenuUpdateVals(void)
 {
 	char str[3];

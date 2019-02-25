@@ -1,4 +1,7 @@
 #include "touch.h"
+#include "flash.h"
+#include "crc.h"
+#include "backup.h"
 #define TOLERANCE 20
 
 //unsigned int Xs_1=0,Xs_2=0,Xs_3=0,Xs_4=0,Ys_1=0,Ys_2=0,Ys_3=0,Ys_4=0; //јЗВјґҐЧш±кЦµ

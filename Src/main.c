@@ -60,6 +60,8 @@
 #include "guivars.h"
 #include "lines.h"
 #include "timedate.h"
+#include "backup.h"
+#include "crc.h"
 #include <stdbool.h>
 /* USER CODE END Includes */
 
@@ -82,7 +84,7 @@ WM_MESSAGE msgButton;
 
 uint8_t tickSecond = 0;
 extern uint16_t backgroundBuffer[18];
-extern MasterClock masterClock;
+
 GUI_ALLOC_INFO pInfo;
 uint8_t doAfterStart = 0;
 
@@ -1079,11 +1081,11 @@ void StartDefaultTask(void const * argument)
 */
 void sendMsgToMainMenu(uint16_t message)
 {
-	if (handles.hMainMenu != 0)
+	if (masterClock.handles->hMainMenu != 0)
 	{
 		msg.MsgId = message;
 		msg.Data.v = 0xFF;
-		WM_SendMessage(handles.hMainMenu, &msg);
+		WM_SendMessage(masterClock.handles->hMainMenu, &msg);
 	}
 }
 
@@ -1130,28 +1132,28 @@ void vTaskGUI(void const * argument)
 			if (doAfterStart || (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30))
 			{
 
-				if (timeCalibr.seconds != 0 && timeCalibr.days != 0 && timeCalibr.isCalibrated == false) //если калибровка включена
+				if (masterClock.timeCalibration->seconds != 0 && masterClock.timeCalibration->days != 0 && timeCalibr.isCalibrated == false) //если калибровка включена
 				{
-					timeCalibr.daysPassed++;
-					if (timeCalibr.daysPassed == timeCalibr.days) //если настал день калибровки
+					masterClock.timeCalibration->daysPassed++;
+					if (masterClock.timeCalibration->daysPassed == masterClock.timeCalibration->days) //если настал день калибровки
 					{
-						if (timeCalibr.seconds > 0) //если добавить секунды
+						if (masterClock.timeCalibration->seconds > 0) //если добавить секунды
 						{
-							sTime.Seconds += timeCalibr.seconds;                  //прибавили секунды
+							sTime.Seconds += masterClock.timeCalibration->seconds;                  //прибавили секунды
 							if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 							{
 								Error_Handler();
 							}
 						}
-						if (timeCalibr.seconds < 0) //если убавить секунды
+						if (masterClock.timeCalibration->seconds < 0) //если убавить секунды
 						{
-							sTime.Seconds += timeCalibr.seconds;                   //прибавили секунды
+							sTime.Seconds += masterClock.timeCalibration->seconds;                   //прибавили секунды
 							if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 							{
 								Error_Handler();
 							}
 						}
-						timeCalibr.daysPassed = 0;                  // 1 => 0
+						masterClock.timeCalibration->daysPassed = 0;                  // 1 => 0
 						timeCalibr.isCalibrated = true;
 
 					}
@@ -1219,43 +1221,43 @@ void vTaskGUI(void const * argument)
 				saveDateToBKP();
 				switch (masterClock.guiVars->menuState) {
 				case MENU_STATE_MAIN:
-					sendMsg(handles.hMainMenu, WM_DATE_UPDATE);
+					sendMsg(masterClock.handles->hMainMenu, WM_DATE_UPDATE);
 					break;
 				case MENU_STATE_TIMEDATESETUP:
-					sendMsg(handles.hTimeDateSetupMenu, WM_DATE_UPDATE);
+					sendMsg(masterClock.handles->hTimeDateSetupMenu, WM_DATE_UPDATE);
 					break;
 				}
 			}
 			switch (masterClock.guiVars->menuState) {
 			case MENU_STATE_MAIN:
-				sendMsg(handles.hMainMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hMainMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_TIMESETUP:
-				sendMsg(handles.hTimeSetupMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hTimeSetupMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_LINE1SETUP:
-				sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_LINE2SETUP:
-				sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_LINE3SETUP:
-				sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_LINE4SETUP:
-				sendMsg(handles.hLineSetupMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_LINE1SETUP_PULSE:
-				sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_LINE2SETUP_PULSE:
-				sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_LINE3SETUP_PULSE:
-				sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
 				break;
 			case MENU_STATE_LINE4SETUP_PULSE:
-				sendMsg(handles.hLineSetupPulseMenu, WM_SEC_UPDATE);
+				sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
 				break;
 
 			}

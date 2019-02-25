@@ -18,7 +18,7 @@ void initStructures(void)
 void sendMsg(WM_HWIN handle, uint16_t message)
 {
 	WM_MESSAGE msgStruct;
-	if (handles.hMainMenu != 0)
+	if (masterClock.handles->hMainMenu != 0)
 	{
 		msgStruct.MsgId = message;
 		msgStruct.Data.v = 0xFF;

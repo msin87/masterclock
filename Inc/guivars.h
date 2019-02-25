@@ -111,7 +111,7 @@ typedef struct
 
 	BUTTON_Handle hButtonLine[4];
 	BUTTON_Handle hButtonDTSenter;
-	BUTTON_Handle hButtonLSenter;
+
 
 	TEXT_Handle hLineSetupVals;
 
@@ -165,7 +165,7 @@ typedef struct
 	Lines line[4];
 	DaylightSaving* daylightSaving;
 } MasterClock;
-
+MasterClock masterClock;
 void sendMsg(WM_HWIN handle, uint16_t message);
 void initStructures(void);
 #endif

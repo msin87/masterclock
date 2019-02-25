@@ -36,7 +36,7 @@ extern RTC_HandleTypeDef hrtc;
 
 extern RTC_TimeTypeDef sTime;
 extern RTC_DateTypeDef sDate;
-extern MasterClock masterClock;
+
 /*********************************************************************
 *
 *       Defines
@@ -130,14 +130,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		HEADER_AddItem(hItem, 80, "18", 14);
 		HEADER_AddItem(hItem, 80, "43", 14);
 		HEADER_AddItem(hItem, 80, "54", 14);
-		handles.hHeaderTimeSetupVals = hItem;
+		masterClock.handles->hHeaderTimeSetupVals = hItem;
 		sprintf(time, "%02d", sTime.Hours);
-		HEADER_SetItemText(handles.hHeaderTimeSetupVals, 0, time);
+		HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 0, time);
 		sprintf(time, "%02d", sTime.Minutes);
-		HEADER_SetItemText(handles.hHeaderTimeSetupVals, 1, time);
+		HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 1, time);
 		sprintf(time, "%02d", sTime.Seconds);
-		HEADER_SetItemText(handles.hHeaderTimeSetupVals, 2, time);
-		HEADER_SetTextColor(handles.hHeaderTimeSetupVals, GUI_WHITE);
+		HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 2, time);
+		HEADER_SetTextColor(masterClock.handles->hHeaderTimeSetupVals, GUI_WHITE);
 		//
 		// Initialization of 'Header'
 		//
@@ -148,22 +148,22 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// USER END
 		break;
 	case WM_SEC_UPDATE:
-		if (gui_Vars.timeFrozen == 0)
+		if (masterClock.guiVars->timeFrozen == 0)
 		{
 			sprintf(time, "%02d", sTime.Seconds);
-			HEADER_SetItemText(handles.hHeaderTimeSetupVals, 2, time);
-			if (gui_Vars.prevSecond_H == 5 && gui_Vars.prevSecond_L == 9) //прошла минута
+			HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 2, time);
+			if (masterClock.guiVars->prevSecond_H == 5 && masterClock.guiVars->prevSecond_L == 9) //прошла минута
 			{
 				sprintf(time, "%02d", sTime.Hours);
-				HEADER_SetItemText(handles.hHeaderTimeSetupVals, 0, time);
+				HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 0, time);
 				sprintf(time, "%02d", sTime.Minutes);
-				HEADER_SetItemText(handles.hHeaderTimeSetupVals, 1, time);
+				HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 1, time);
 
 			}
-			HEADER_SetTextColor(handles.hHeaderTimeSetupVals, GUI_WHITE);
+			HEADER_SetTextColor(masterClock.handles->hHeaderTimeSetupVals, GUI_WHITE);
 			pMsg->MsgId = 0;
-			gui_Vars.prevSecond_L = sTime.Seconds % 10;
-			gui_Vars.prevSecond_H = sTime.Seconds / 10;
+			masterClock.guiVars->prevSecond_L = sTime.Seconds % 10;
+			masterClock.guiVars->prevSecond_H = sTime.Seconds / 10;
 			sTime_tmp = sTime;
 		}
 		break;
@@ -175,7 +175,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sTime_tmp.Hours != 23)
 				{
 					pollButton(ID_BUTTON_HOURplus, WM_NOTIFICATION_CLICKED, (int8_t*)&sTime_tmp.Hours);
@@ -184,7 +184,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					masterClock.longPressCNT->value = 23;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_ENTER));
 				}
@@ -207,7 +207,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sTime_tmp.Minutes != 59)
 				{
 					pollButton(ID_BUTTON_MINplus, WM_NOTIFICATION_CLICKED, (int8_t*)&sTime_tmp.Minutes);
@@ -216,7 +216,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					masterClock.longPressCNT->value = 59;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_ENTER));
 				}
@@ -235,7 +235,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sTime_tmp.Seconds != 59)
 				{
 					pollButton(ID_BUTTON_SECplus, WM_NOTIFICATION_CLICKED, (int8_t*)&sTime_tmp.Seconds);
@@ -244,7 +244,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				{
 					masterClock.longPressCNT->value = 59;
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_ENTER));
 				}
@@ -268,14 +268,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 0;
-				gui_Vars.valsChanged = false;
+				masterClock.guiVars->timeFrozen = 0;
+				masterClock.guiVars->valsChanged = false;
 				sTime = sTime_tmp;
 				if (HAL_RTC_SetTime(&hrtc, &sTime_tmp, RTC_FORMAT_BIN) != HAL_OK)
 				{
 					while (1)
 					{
-						gui_Vars.timeFrozen = 0;
+						masterClock.guiVars->timeFrozen = 0;
 					}
 				}
 				pollLinesOutput(10);
@@ -293,9 +293,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 0;
+				masterClock.guiVars->timeFrozen = 0;
 				masterClock.guiVars->menuState = MENU_STATE_TIMECALIBRATION;
-				gui_Vars.valsChanged = false;
+				masterClock.guiVars->valsChanged = false;
 				CreateTimeCalibrateWindow();
 				WM_DeleteWindow(pMsg->hWin);
 				// USER END
@@ -312,9 +312,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 0;
+				masterClock.guiVars->timeFrozen = 0;
 				masterClock.guiVars->menuState = MENU_STATE_TIMEDATESETUP;
-				gui_Vars.valsChanged = false;
+				masterClock.guiVars->valsChanged = false;
 				CreateTimeDateWindow();
 				WM_DeleteWindow(pMsg->hWin);
 				// USER END
@@ -327,12 +327,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sTime_tmp.Hours != 0)
 				{
 					pollButton(ID_BUTTON_HOURminus, WM_NOTIFICATION_CLICKED, (int8_t*)&sTime_tmp.Hours);
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_ENTER));
 				}
@@ -351,12 +351,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sTime_tmp.Minutes != 0)
 				{
 					pollButton(ID_BUTTON_MINminus, WM_NOTIFICATION_CLICKED, (int8_t*)&sTime_tmp.Minutes);
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_ENTER));
 				}
@@ -376,12 +376,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			switch (NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 1;
+				masterClock.guiVars->timeFrozen = 1;
 				if (sTime_tmp.Seconds != 0)
 				{
 					pollButton(ID_BUTTON_SECminus, WM_NOTIFICATION_CLICKED, (int8_t*)&sTime_tmp.Seconds);
 				}
-				if (valsChangedOld != gui_Vars.valsChanged)
+				if (valsChangedOld != masterClock.guiVars->valsChanged)
 				{
 					WM_Invalidate(WM_GetDialogItem(pMsg->hWin, ID_BUTTON_ENTER));
 				}
@@ -404,11 +404,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				gui_Vars.timeFrozen = 0;
+				masterClock.guiVars->timeFrozen = 0;
 				message.MsgId = WM_BACKTOMAINMENU;
 				message.Data.v = 0xFF;
-				gui_Vars.valsChanged = false;
-				WM_SendMessage(handles.hMainMenu, &message);
+				masterClock.guiVars->valsChanged = false;
+				WM_SendMessage(masterClock.handles->hMainMenu, &message);
 
 				WM_DeleteWindow(pMsg->hWin);
 				// USER END
@@ -445,7 +445,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		WM_DefaultProc(pMsg);
 		break;
 	}
-	valsChangedOld = gui_Vars.valsChanged;
+	valsChangedOld = masterClock.guiVars->valsChanged;
 }
 
 /*********************************************************************
@@ -463,7 +463,7 @@ WM_HWIN CreateTimeSetupWindow(void) {
 	WM_HWIN hWin;
 
 	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
-	handles.hTimeSetupMenu = hWin;
+	masterClock.handles->hTimeSetupMenu = hWin;
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_HOURplus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_MINplus), _cbArrowUpButton);
 	WM_SetCallback(WM_GetDialogItem(hWin, ID_BUTTON_SECplus), _cbArrowUpButton);
