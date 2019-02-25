@@ -348,6 +348,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
 				diff = get_sTimeLinesDiff(&lineTemp[masterClock.guiVars->menuState - 4], 10);
+				xQueueReset(masterClock.line[masterClock.guiVars->menuState - 4].xSemaphore);
 				masterClock.line[masterClock.guiVars->menuState - 4] = lineTemp[masterClock.guiVars->menuState - 4];
 				masterClock.guiVars->valsChanged = false;
 				saveLineToBKP(masterClock.guiVars->menuState - 4);
@@ -386,6 +387,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					masterClock.line[2].pTemp = (uint32_t*)&lineTemp[2];
 					masterClock.line[3].pTemp = (uint32_t*)&lineTemp[3];
 					masterClock.line[masterClock.guiVars->menuState - 4].Pulses = 0;
+					xQueueReset(masterClock.line[masterClock.guiVars->menuState - 4].xSemaphore);
 					while (diff > 0)
 					{
 						for (i = 0; i < LINES_AMOUNT; ++i)
@@ -554,8 +556,6 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				masterClock.guiVars->valsChanged = false;
 				WM_SendMessage(masterClock.handles->hMainMenu, &message);
 				WM_DeleteWindow(masterClock.handles->hLineSetupMenu);
-
-
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)

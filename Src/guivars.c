@@ -1,7 +1,6 @@
 #include "guivars.h"
 GUI_Vars gui_Vars;
 Handles handles;
-Lines line[4];
 TimeCalibration timeCalibr;
 LongPressCNT longPressCNT;
 DaylightSaving daylightSaving;
