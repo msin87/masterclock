@@ -91,6 +91,7 @@
     <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\TimeSumWinSetup.c" />
     <ClCompile Include="Middlewares\Third_Party\STemWin\config\src\WindowDLG.c" />
     <ClCompile Include="Middlewares\Third_Party\STemWin\lib\src\GUI_X_OS.c" />
+    <ClCompile Include="Src\adc.c" />
     <ClCompile Include="Src\Arial16.c" />
     <ClCompile Include="Src\Arial18.c" />
     <ClCompile Include="Src\arrow.c" />

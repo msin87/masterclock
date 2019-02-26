@@ -507,6 +507,9 @@
     <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_uart.h">
       <Filter>Header files\STM32Cube HAL\UART</Filter>
     </ClInclude>
+    <ClCompile Include="Src\adc.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\arial18.h">

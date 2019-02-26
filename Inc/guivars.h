@@ -155,16 +155,24 @@ typedef struct
 	char needToShift;
 
 } DaylightSaving;
-
+typedef struct
+{
+	uint16_t ADCdata[20];
+	void(*startCurrentSense)(void);
+	void(*stopCurrentSense)(void);
+}
+CurrentSense;
 typedef struct
 {
 	GUI_Vars* guiVars;
 	LongPressCNT* longPressCNT;
 	TimeCalibration* timeCalibration;
 	Handles* handles;
+	CurrentSense* currentSense;
 	Lines line[4];
 	DaylightSaving* daylightSaving;
 } MasterClock;
+
 MasterClock masterClock;
 void sendMsg(WM_HWIN handle, uint16_t message);
 void initStructures(void);

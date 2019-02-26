@@ -1,10 +1,12 @@
 #include "guivars.h"
+#include "adc.h"
 GUI_Vars gui_Vars;
 Handles handles;
 TimeCalibration timeCalibr;
 LongPressCNT longPressCNT;
 DaylightSaving daylightSaving;
 MasterClock masterClock;
+CurrentSense currentSense;
 void initStructures(void)
 {
 	masterClock.daylightSaving = &daylightSaving;
@@ -12,7 +14,9 @@ void initStructures(void)
 	masterClock.handles = &handles;
 	masterClock.longPressCNT = &longPressCNT;
 	masterClock.timeCalibration = &timeCalibr;
-
+	masterClock.currentSense = &currentSense;
+	masterClock.currentSense->startCurrentSense = _startCurrentSense;
+	masterClock.currentSense->stopCurrentSense = _stopCurrentSense;
 }
 void sendMsg(WM_HWIN handle, uint16_t message)
 {

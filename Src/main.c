@@ -417,7 +417,7 @@ static void MX_ADC1_Init(void)
 	hadc1.Init.ContinuousConvMode = ENABLE;
 	hadc1.Init.DiscontinuousConvMode = DISABLE;
 	hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-	hadc1.Init.DataAlign = ADC_DATAALIGN_LEFT;
+	hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	hadc1.Init.NbrOfConversion = 1;
 	if (HAL_ADC_Init(&hadc1) != HAL_OK)
 	{
@@ -1045,7 +1045,7 @@ void vTaskGUI(void const * argument)
 								{
 									if (masterClock.timeCalibration->seconds > 0) //если добавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                   //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                    //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
@@ -1053,13 +1053,13 @@ void vTaskGUI(void const * argument)
 										}
 									if (masterClock.timeCalibration->seconds < 0) //если убавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                    //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                     //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
 											}
 										}
-									masterClock.timeCalibration->daysPassed = 0;                   // 1 => 0
+									masterClock.timeCalibration->daysPassed = 0;                    // 1 => 0
 									timeCalibr.isCalibrated = true;
 
 								}

@@ -2,6 +2,8 @@
 #include "backup.h"
 #include "timedate.h"
 #include "main.h"
+#define POLARITY_POSITIVE 1
+#define POLARITY_NEGATIVE 0
 extern RTC_TimeTypeDef sTime;
 extern RTC_DateTypeDef sDate;
 void lineSetupMenuUpdateVals(void)
@@ -30,6 +32,30 @@ void pollLinesOutput(uint8_t waitMinutes)
 		}
 	}
 }
+void pollGPIO(uint8_t lineNumber, uint8_t polarity)
+{
+	
+	if (polarity == POLARITY_POSITIVE)
+	{
+		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos;       		//set
+		masterClock.currentSense->startCurrentSense();
+		osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
+		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos << 16;      //reset
+		masterClock.currentSense->stopCurrentSense();
+		osDelay(LINES_DEAD_TIME);
+		return;
+	}
+	if (polarity == POLARITY_NEGATIVE)
+	{
+		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg;    		//set
+		masterClock.currentSense->startCurrentSense();
+		osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
+		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg << 16;      //reset
+		masterClock.currentSense->stopCurrentSense();
+		osDelay(LINES_DEAD_TIME);
+	}
+	
+}
 void lineSendSignal(uint8_t lineNumber)
 {
 
@@ -53,17 +79,11 @@ void lineSendSignal(uint8_t lineNumber)
 		WM_Invalidate(masterClock.handles->hButtonLine[lineNumber]);
 		if (masterClock.guiVars->linesPolarity & outputMask)
 		{
-			masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos; 		//set
-			osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
-			masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos << 16;  //reset
-			osDelay(LINES_DEAD_TIME);
+			pollGPIO(lineNumber, POLARITY_POSITIVE);
 		}
 		else
 		{
-			masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg; 		//set
-			osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
-			masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg << 16;  //reset
-			osDelay(LINES_DEAD_TIME);
+			pollGPIO(lineNumber, POLARITY_NEGATIVE);
 		}
 		saveLinesPolarityToBKP();
 
@@ -211,7 +231,7 @@ void LinesInit(void)
 
 	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
-		doTimeCorrection = true;        //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
+		doTimeCorrection = true;          //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
 	}
 	else
 	{
