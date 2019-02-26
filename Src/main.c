@@ -98,8 +98,8 @@ uint8_t doAfterStart = 0;
 
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc1;
-ADC_HandleTypeDef hadc2;
 ADC_HandleTypeDef hadc3;
+DMA_HandleTypeDef hdma_adc1;
 
 CRC_HandleTypeDef hcrc;
 
@@ -109,6 +109,9 @@ SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim7;
 
+UART_HandleTypeDef huart1;
+DMA_HandleTypeDef hdma_usart1_rx;
+
 SRAM_HandleTypeDef hsram1;
 
 osThreadId defaultTaskHandle;
@@ -117,8 +120,6 @@ osThreadId TaskLine0Handle;
 osThreadId TaskLine1Handle;
 osThreadId TaskLine2Handle;
 osThreadId TaskLine3Handle;
-osThreadId LCD_LinesTimeHandle;
-osMessageQId queueLCDLinesTimeHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -126,21 +127,21 @@ osMessageQId queueLCDLinesTimeHandle;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_FSMC_Init(void);
 static void MX_CRC_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_RTC_Init(void);
 static void MX_TIM7_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_ADC2_Init(void);
 static void MX_ADC3_Init(void);
+static void MX_USART1_UART_Init(void);
 void StartDefaultTask(void const * argument);
 void vTaskGUI(void const * argument);
 void vTaskLine0(void const * argument);
 void vTaskLine1(void const * argument);
 void vTaskLine2(void const * argument);
 void vTaskLine3(void const * argument);
-
 
 /* USER CODE BEGIN PFP */
 void delay(uint32_t delayTime);
@@ -348,16 +349,17 @@ int main(void)
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
+	MX_DMA_Init();
 	MX_FSMC_Init();
 	MX_CRC_Init();
 	MX_SPI1_Init();
 	MX_RTC_Init();
 	MX_TIM7_Init();
 	MX_ADC1_Init();
-	MX_ADC2_Init();
 	MX_ADC3_Init();
+	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
-	//GUI_Init();
+	  //GUI_Init();
 	HAL_RTCEx_SetSecond_IT(&hrtc);
 	//Init_SSD1289();
 
@@ -369,15 +371,15 @@ int main(void)
 	/* USER CODE END 2 */
 
 	/* USER CODE BEGIN RTOS_MUTEX */
-				/* add mutexes, ... */
+				  /* add mutexes, ... */
 	/* USER CODE END RTOS_MUTEX */
 
 	/* USER CODE BEGIN RTOS_SEMAPHORES */
-				/* add semaphores, ... */
+				  /* add semaphores, ... */
 	/* USER CODE END RTOS_SEMAPHORES */
 
 	/* USER CODE BEGIN RTOS_TIMERS */
-				/* start timers, add new ones, ... */
+				  /* start timers, add new ones, ... */
 	/* USER CODE END RTOS_TIMERS */
 
 	/* Create the thread(s) */
@@ -405,21 +407,12 @@ int main(void)
 	osThreadDef(TaskLine3, vTaskLine3, osPriorityNormal, 0, 128);
 	TaskLine3Handle = osThreadCreate(osThread(TaskLine3), NULL);
 
-	/* definition and creation of LCD_LinesTime */
-	//osThreadDef(LCD_LinesTime, vTaskLCDLinesTime, osPriorityNormal, 0, 128);
-	//LCD_LinesTimeHandle = osThreadCreate(osThread(LCD_LinesTime), NULL);
-
 	/* USER CODE BEGIN RTOS_THREADS */
-				/* add threads, ... */
+				  /* add threads, ... */
 	/* USER CODE END RTOS_THREADS */
 
-	/* Create the queue(s) */
-	/* definition and creation of queueLCDLinesTime */
-	//osMessageQDef(queueLCDLinesTime, 4, int16_t);
-	//queueLCDLinesTimeHandle = osMessageCreate(osMessageQ(queueLCDLinesTime), NULL);
-
 	/* USER CODE BEGIN RTOS_QUEUES */
-				/* add queues, ... */
+				  /* add queues, ... */
 	/* USER CODE END RTOS_QUEUES */
 
 
@@ -451,15 +444,6 @@ void SystemClock_Config(void)
 
 	/**Initializes the CPU, AHB and APB busses clocks
 	*/
-	/*if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
-	{
-		RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
-		RCC_OscInitStruct.LSEState = RCC_LSE_ON;
-	}
-	else
-	{
-		RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-	}*/
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_LSE;
 	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
 	RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
@@ -468,7 +452,6 @@ void SystemClock_Config(void)
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
 	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
 	RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-
 	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
 	{
 		Error_Handler();
@@ -486,15 +469,6 @@ void SystemClock_Config(void)
 	{
 		Error_Handler();
 	}
-	/*if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
-	{
-		PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC;
-		PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
-	}
-	else
-	{
-		PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-	}*/
 	PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC | RCC_PERIPHCLK_ADC;
 	PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
 	PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV6;
@@ -525,10 +499,10 @@ static void MX_ADC1_Init(void)
 	*/
 	hadc1.Instance = ADC1;
 	hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
-	hadc1.Init.ContinuousConvMode = DISABLE;
+	hadc1.Init.ContinuousConvMode = ENABLE;
 	hadc1.Init.DiscontinuousConvMode = DISABLE;
 	hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-	hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+	hadc1.Init.DataAlign = ADC_DATAALIGN_LEFT;
 	hadc1.Init.NbrOfConversion = 1;
 	if (HAL_ADC_Init(&hadc1) != HAL_OK)
 	{
@@ -538,7 +512,7 @@ static void MX_ADC1_Init(void)
 	*/
 	sConfig.Channel = ADC_CHANNEL_0;
 	sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+	sConfig.SamplingTime = ADC_SAMPLETIME_41CYCLES_5;
 	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
 	{
 		Error_Handler();
@@ -546,51 +520,6 @@ static void MX_ADC1_Init(void)
 	/* USER CODE BEGIN ADC1_Init 2 */
 
 	/* USER CODE END ADC1_Init 2 */
-
-}
-
-/**
-  * @brief ADC2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_ADC2_Init(void)
-{
-
-	/* USER CODE BEGIN ADC2_Init 0 */
-
-	/* USER CODE END ADC2_Init 0 */
-
-	ADC_ChannelConfTypeDef sConfig = { 0 };
-
-	/* USER CODE BEGIN ADC2_Init 1 */
-
-	/* USER CODE END ADC2_Init 1 */
-	/**Common config
-	*/
-	hadc2.Instance = ADC2;
-	hadc2.Init.ScanConvMode = ADC_SCAN_DISABLE;
-	hadc2.Init.ContinuousConvMode = DISABLE;
-	hadc2.Init.DiscontinuousConvMode = DISABLE;
-	hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-	hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-	hadc2.Init.NbrOfConversion = 1;
-	if (HAL_ADC_Init(&hadc2) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	/**Configure Regular Channel
-	*/
-	sConfig.Channel = ADC_CHANNEL_1;
-	sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
-	if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	/* USER CODE BEGIN ADC2_Init 2 */
-
-	/* USER CODE END ADC2_Init 2 */
 
 }
 
@@ -606,6 +535,7 @@ static void MX_ADC3_Init(void)
 
 	/* USER CODE END ADC3_Init 0 */
 
+	ADC_AnalogWDGConfTypeDef AnalogWDGConfig = { 0 };
 	ADC_ChannelConfTypeDef sConfig = { 0 };
 
 	/* USER CODE BEGIN ADC3_Init 1 */
@@ -624,11 +554,22 @@ static void MX_ADC3_Init(void)
 	{
 		Error_Handler();
 	}
+	/**Configure Analog WatchDog 1
+	*/
+	AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
+	AnalogWDGConfig.HighThreshold = 3500;
+	AnalogWDGConfig.LowThreshold = 2000;
+	AnalogWDGConfig.Channel = ADC_CHANNEL_1;
+	AnalogWDGConfig.ITMode = ENABLE;
+	if (HAL_ADC_AnalogWDGConfig(&hadc3, &AnalogWDGConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
 	/**Configure Regular Channel
 	*/
-	sConfig.Channel = ADC_CHANNEL_2;
+	sConfig.Channel = ADC_CHANNEL_1;
 	sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+	sConfig.SamplingTime = ADC_SAMPLETIME_41CYCLES_5;
 	if (HAL_ADC_ConfigChannel(&hadc3, &sConfig) != HAL_OK)
 	{
 		Error_Handler();
@@ -683,20 +624,16 @@ static void MX_RTC_Init(void)
 	RTC_DateTypeDef DateToUpdate = { 0 };
 
 	/* USER CODE BEGIN RTC_Init 1 */
-
-	/* USER CODE END RTC_Init 1 */
-	/**Initialize RTC Only
-	*/
 	hrtc.Instance = RTC;
 	hrtc.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 	hrtc.Init.OutPut = RTC_OUTPUTSOURCE_ALARM;
-
 	if ((RCC->BDCR & RCC_BDCR_RTCEN) == 0)
 	{
 		if (HAL_RTC_Init(&hrtc) != HAL_OK)
 		{
 			Error_Handler();
 		}
+
 	}
 	else
 	{
@@ -708,6 +645,11 @@ static void MX_RTC_Init(void)
 		HAL_NVIC_SetPriority(RTC_IRQn, 15, 0);
 		HAL_NVIC_EnableIRQ(RTC_IRQn);
 	}
+	/* USER CODE END RTC_Init 1 */
+	/**Initialize RTC Only
+	*/
+
+
 	/* USER CODE BEGIN Check_RTC_BKUP */
 	read = rtc_read_backup_reg(BKP_DATE_OFFSET);
 	if (!isCRC_OK_BKP())
@@ -760,26 +702,29 @@ static void MX_RTC_Init(void)
 
 	/**Initialize RTC and set the Time and Date
 	*/
-	//sTime.Hours = 0x23;
-	//sTime.Minutes = 0x51;
-	//sTime.Seconds = 0x0;
+	/* sTime.Hours = 0x23;
+	 sTime.Minutes = 0x51;
+	 sTime.Seconds = 0x0;
 
-	//if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
-	//{
-	//	Error_Handler();
-	//}
-	//DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
-	//DateToUpdate.Month = RTC_MONTH_DECEMBER;
-	//DateToUpdate.Date = 0x17;
-	//DateToUpdate.Year = 0x18;
+	 if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BCD) != HAL_OK)
+	 {
+	   Error_Handler();
+	 }
+	 DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
+	 DateToUpdate.Month = RTC_MONTH_DECEMBER;
+	 DateToUpdate.Date = 0x17;
+	 DateToUpdate.Year = 0x18;*/
 
+	 /* if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BCD) != HAL_OK)
+	  {
+		Error_Handler();
+	  }*/
+	  /* USER CODE BEGIN RTC_Init 2 */
 	if (HAL_RTC_SetDate(&hrtc, &DateToUpdate, RTC_FORMAT_BIN) != HAL_OK)
 	{
 		Error_Handler();
 	}
 	HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-	/* USER CODE BEGIN RTC_Init 2 */
-
 	/* USER CODE END RTC_Init 2 */
 
 }
@@ -861,6 +806,57 @@ static void MX_TIM7_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+	/* USER CODE BEGIN USART1_Init 0 */
+
+	/* USER CODE END USART1_Init 0 */
+
+	/* USER CODE BEGIN USART1_Init 1 */
+
+	/* USER CODE END USART1_Init 1 */
+	huart1.Instance = USART1;
+	huart1.Init.BaudRate = 115200;
+	huart1.Init.WordLength = UART_WORDLENGTH_8B;
+	huart1.Init.StopBits = UART_STOPBITS_1;
+	huart1.Init.Parity = UART_PARITY_NONE;
+	huart1.Init.Mode = UART_MODE_TX_RX;
+	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_UART_Init(&huart1) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	/* USER CODE BEGIN USART1_Init 2 */
+
+	/* USER CODE END USART1_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+	/* DMA controller clock enable */
+	__HAL_RCC_DMA1_CLK_ENABLE();
+
+	/* DMA interrupt init */
+	/* DMA1_Channel1_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 5, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+	/* DMA1_Channel5_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 5, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -877,22 +873,17 @@ static void MX_GPIO_Init(void)
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOE,
-		LINE0_NEG_OUTPUT_Pin | LINE1_NEG_OUTPUT_Pin | LINE2_NEG_OUTPUT_Pin | LINE3_NEG_OUTPUT_Pin
-		| LCD_RESET_Pin,
-		GPIO_PIN_RESET);
-
-	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOC,
-		OUTPUT_LINE1_Pin | OUTPUT_LINE2_Pin | OUTPUT_LINE3_Pin | OUTPUT_LINE4_Pin
-		| LINE0_POS_OUTPUT_Pin | LINE1_POS_OUTPUT_Pin,
-		GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE, LINE0_NEG_OUTPUT_Pin | LINE1_NEG_OUTPUT_Pin | LINE2_NEG_OUTPUT_Pin | LINE3_NEG_OUTPUT_Pin
+		| LCD_RESET_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(SRAM_CS_GPIO_Port, SRAM_CS_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOD, LINE3_POS_OUTPUT_Pin | LINE2_POS_OUTPUT_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOC, LINE0_POS_OUTPUT_Pin | LINE1_POS_OUTPUT_Pin, GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(TOUCH_CS_GPIO_Port, TOUCH_CS_Pin, GPIO_PIN_RESET);
@@ -905,15 +896,6 @@ static void MX_GPIO_Init(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-	/*Configure GPIO pins : OUTPUT_LINE1_Pin OUTPUT_LINE2_Pin OUTPUT_LINE3_Pin OUTPUT_LINE4_Pin
-							 LINE0_POS_OUTPUT_Pin LINE1_POS_OUTPUT_Pin */
-	GPIO_InitStruct.Pin = OUTPUT_LINE1_Pin | OUTPUT_LINE2_Pin | OUTPUT_LINE3_Pin | OUTPUT_LINE4_Pin
-		| LINE0_POS_OUTPUT_Pin | LINE1_POS_OUTPUT_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : SRAM_CS_Pin */
 	GPIO_InitStruct.Pin = SRAM_CS_Pin;
@@ -928,6 +910,13 @@ static void MX_GPIO_Init(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : LINE0_POS_OUTPUT_Pin LINE1_POS_OUTPUT_Pin */
+	GPIO_InitStruct.Pin = LINE0_POS_OUTPUT_Pin | LINE1_POS_OUTPUT_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 	/*Configure GPIO pin : NOT_PEN_Pin */
 	GPIO_InitStruct.Pin = NOT_PEN_Pin;
@@ -1094,7 +1083,7 @@ void sendMsgToMainMenu(uint16_t message)
 void vTaskGUI(void const * argument)
 {
 	/* USER CODE BEGIN vTaskGUI */
-	//int xPos, yPos;
+	  //int xPos, yPos;
 
 	uint16_t i = 0;
 
@@ -1279,7 +1268,7 @@ void vTaskGUI(void const * argument)
 void vTaskLine0(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine0 */
-		/* Infinite loop */
+		  /* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(masterClock.line[0].xSemaphore, portMAX_DELAY);
@@ -1299,7 +1288,7 @@ void vTaskLine0(void const * argument)
 void vTaskLine1(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine1 */
-		/* Infinite loop */
+		  /* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(masterClock.line[1].xSemaphore, portMAX_DELAY);
@@ -1319,7 +1308,7 @@ void vTaskLine1(void const * argument)
 void vTaskLine2(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine2 */
-		/* Infinite loop */
+		  /* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(masterClock.line[2].xSemaphore, portMAX_DELAY);
@@ -1339,7 +1328,7 @@ void vTaskLine2(void const * argument)
 void vTaskLine3(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine3 */
-		/* Infinite loop */
+		  /* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(masterClock.line[3].xSemaphore, portMAX_DELAY);
@@ -1348,15 +1337,6 @@ void vTaskLine3(void const * argument)
 	}
 	/* USER CODE END vTaskLine3 */
 }
-
-/* USER CODE BEGIN Header_vTaskLCDLinesTime */
-/**
-* @brief Function implementing the LCD_LinesTime thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_vTaskLCDLinesTime */
-
 
 /**
   * @brief  Period elapsed callback in non blocking mode
@@ -1386,10 +1366,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
 	/* USER CODE BEGIN Error_Handler_Debug */
-				/* User can add his own implementation to report the HAL error return state */
+				  /* User can add his own implementation to report the HAL error return state */
 
 	/* USER CODE END Error_Handler_Debug */
-}
+	}
 
 #ifdef  USE_FULL_ASSERT
 /**
@@ -1402,9 +1382,9 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
 	/* USER CODE BEGIN 6 */
-				/* User can add his own implementation to report the file name and line number,
-				   tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-				   /* USER CODE END 6 */
+				  /* User can add his own implementation to report the file name and line number,
+					 tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+					 /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 

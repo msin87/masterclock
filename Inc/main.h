@@ -47,9 +47,9 @@
   *
   ******************************************************************************
   */
-  /* USER CODE END Header */
+/* USER CODE END Header */
 
-  /* Define to prevent recursive inclusion -------------------------------------*/
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
 #define __MAIN_H
 
@@ -57,7 +57,7 @@
 extern "C" {
 #endif
 
-	/* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -72,26 +72,26 @@ extern "C" {
 	//SemaphoreHandle_t xSemaphoreLine[4];
 
 
-	/* USER CODE END ET */
+/* USER CODE END ET */
 
-	/* Exported constants --------------------------------------------------------*/
-	/* USER CODE BEGIN EC */
+/* Exported constants --------------------------------------------------------*/
+/* USER CODE BEGIN EC */
 
-	/* USER CODE END EC */
+/* USER CODE END EC */
 
-	/* Exported macro ------------------------------------------------------------*/
-	/* USER CODE BEGIN EM */
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
 
-	/* USER CODE END EM */
+/* USER CODE END EM */
 
-	/* Exported functions prototypes ---------------------------------------------*/
-	void Error_Handler(void);
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
 
-	/* USER CODE BEGIN EFP */
+/* USER CODE BEGIN EFP */
 
-	/* USER CODE END EFP */
+/* USER CODE END EFP */
 
-	/* Private defines -----------------------------------------------------------*/
+/* Private defines -----------------------------------------------------------*/
 #define LINE0_NEG_OUTPUT_Pin GPIO_PIN_2
 #define LINE0_NEG_OUTPUT_GPIO_Port GPIOE
 #define LINE1_NEG_OUTPUT_Pin GPIO_PIN_3
@@ -100,20 +100,10 @@ extern "C" {
 #define LINE2_NEG_OUTPUT_GPIO_Port GPIOE
 #define LINE3_NEG_OUTPUT_Pin GPIO_PIN_5
 #define LINE3_NEG_OUTPUT_GPIO_Port GPIOE
-#define OUTPUT_LINE1_Pin GPIO_PIN_0
-#define OUTPUT_LINE1_GPIO_Port GPIOC
-#define OUTPUT_LINE2_Pin GPIO_PIN_1
-#define OUTPUT_LINE2_GPIO_Port GPIOC
-#define OUTPUT_LINE3_Pin GPIO_PIN_2
-#define OUTPUT_LINE3_GPIO_Port GPIOC
-#define OUTPUT_LINE4_Pin GPIO_PIN_3
-#define OUTPUT_LINE4_GPIO_Port GPIOC
-#define Isense_Pin GPIO_PIN_0
-#define Isense_GPIO_Port GPIOA
-#define DTMF_SIGNAL_IN_Pin GPIO_PIN_1
-#define DTMF_SIGNAL_IN_GPIO_Port GPIOA
-#define PS_Monitor_Pin GPIO_PIN_2
-#define PS_Monitor_GPIO_Port GPIOA
+#define Isense_LOAD_Pin GPIO_PIN_0
+#define Isense_LOAD_GPIO_Port GPIOA
+#define Vsense_PSU_Pin GPIO_PIN_1
+#define Vsense_PSU_GPIO_Port GPIOA
 #define SRAM_CS_Pin GPIO_PIN_4
 #define SRAM_CS_GPIO_Port GPIOA
 #define LINE3_POS_OUTPUT_Pin GPIO_PIN_13

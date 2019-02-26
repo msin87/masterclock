@@ -241,6 +241,7 @@
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WM.h" />
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WM_GUI.h" />
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\WM_Intern.h" />
+    <None Include="README.md" />
     <None Include="stm32.props" />
     <ClCompile Include="$(BSP_ROOT)\STM32F1xxxx\StartupFiles\startup_stm32f103xe.c" />
     <ClInclude Include="Inc\arial18.h" />
@@ -303,5 +304,7 @@
     <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_adc_ex.c" />
     <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_adc.h" />
     <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_adc_ex.h" />
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_uart.c" />
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_uart.h" />
   </ItemGroup>
 </Project>

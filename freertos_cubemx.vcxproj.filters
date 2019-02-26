@@ -142,6 +142,12 @@
     <Filter Include="Header files\STM32Cube HAL\ADC">
       <UniqueIdentifier>{0d620771-62d2-4559-8f1c-2c1fca3654d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source files\STM32Cube HAL\UART">
+      <UniqueIdentifier>{aa4bdfb6-64f2-4b49-8f96-2252cec01738}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\STM32Cube HAL\UART">
+      <UniqueIdentifier>{336c3eed-a5f4-4f7e-947c-e5952cc10ed5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\freertos.c">
@@ -495,6 +501,12 @@
     <ClCompile Include="Src\flash.c">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_uart.c">
+      <Filter>Source files\STM32Cube HAL\UART</Filter>
+    </ClCompile>
+    <ClInclude Include="Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_uart.h">
+      <Filter>Header files\STM32Cube HAL\UART</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\arial18.h">
@@ -829,5 +841,8 @@
     <Library Include="Middlewares\Third_Party\STemWin\lib\STemWin532_CM3_OS_GCC.a">
       <Filter>Source files</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

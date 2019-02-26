@@ -44,7 +44,7 @@
     <AllDependencies>
       <ProjectDependency>
         <RelativePath>freertos_cubemx.gpdsc</RelativePath>
-        <Timestamp>131949539733236077</Timestamp>
+        <Timestamp>131956746768127263</Timestamp>
       </ProjectDependency>
     </AllDependencies>
     <RootDirectory>
@@ -131,6 +131,17 @@
                 </VirtualFileSnapshot>
                 <VirtualFileSnapshot>
                   <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
+                </VirtualFileSnapshot>
+              </Files>
+            </VirtualDirectorySnapshot>
+            <VirtualDirectorySnapshot>
+              <Name>UART</Name>
+              <Files>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_hal_uart.h</RelativePath>
+                </VirtualFileSnapshot>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_uart.c</RelativePath>
                 </VirtualFileSnapshot>
               </Files>
             </VirtualDirectorySnapshot>
@@ -222,28 +233,6 @@
               </Files>
             </VirtualDirectorySnapshot>
             <VirtualDirectorySnapshot>
-              <Name>PCCARD</Name>
-              <Files>
-                <VirtualFileSnapshot>
-                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h</RelativePath>
-                </VirtualFileSnapshot>
-                <VirtualFileSnapshot>
-                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
-                </VirtualFileSnapshot>
-              </Files>
-            </VirtualDirectorySnapshot>
-            <VirtualDirectorySnapshot>
-              <Name>NOR</Name>
-              <Files>
-                <VirtualFileSnapshot>
-                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h</RelativePath>
-                </VirtualFileSnapshot>
-                <VirtualFileSnapshot>
-                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
-                </VirtualFileSnapshot>
-              </Files>
-            </VirtualDirectorySnapshot>
-            <VirtualDirectorySnapshot>
               <Name>FREERTOS</Name>
               <Files>
                 <VirtualFileSnapshot>
@@ -320,6 +309,28 @@
                 </VirtualFileSnapshot>
                 <VirtualFileSnapshot>
                   <RelativePath>Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3\portmacro.h</RelativePath>
+                </VirtualFileSnapshot>
+              </Files>
+            </VirtualDirectorySnapshot>
+            <VirtualDirectorySnapshot>
+              <Name>NOR</Name>
+              <Files>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h</RelativePath>
+                </VirtualFileSnapshot>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
+                </VirtualFileSnapshot>
+              </Files>
+            </VirtualDirectorySnapshot>
+            <VirtualDirectorySnapshot>
+              <Name>PCCARD</Name>
+              <Files>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h</RelativePath>
+                </VirtualFileSnapshot>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
                 </VirtualFileSnapshot>
               </Files>
             </VirtualDirectorySnapshot>
@@ -431,14 +442,14 @@
       <ImportedConfiguration>
         <Settings>
           <IncludeDirectories>
-            <string>C:\stm32\Inc</string>
-            <string>C:\stm32\Drivers\CMSIS\Device\ST\STM32F1xx\Include</string>
-            <string>C:\stm32\Drivers\STM32F1xx_HAL_Driver\Inc</string>
-            <string>C:\stm32\Drivers\STM32F1xx_HAL_Driver\Src</string>
-            <string>C:\stm32\Middlewares\Third_Party\FreeRTOS\Source\include</string>
-            <string>C:\stm32\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</string>
-            <string>C:\stm32\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3</string>
-            <string>C:\stm32\Drivers\STM32F1xx_HAL_Driver\Inc\Legacy</string>
+            <string>C:\stm32\masterclock\Inc</string>
+            <string>C:\stm32\masterclock\Drivers\CMSIS\Device\ST\STM32F1xx\Include</string>
+            <string>C:\stm32\masterclock\Drivers\STM32F1xx_HAL_Driver\Inc</string>
+            <string>C:\stm32\masterclock\Drivers\STM32F1xx_HAL_Driver\Src</string>
+            <string>C:\stm32\masterclock\Middlewares\Third_Party\FreeRTOS\Source\include</string>
+            <string>C:\stm32\masterclock\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS</string>
+            <string>C:\stm32\masterclock\Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3</string>
+            <string>C:\stm32\masterclock\Drivers\STM32F1xx_HAL_Driver\Inc\Legacy</string>
           </IncludeDirectories>
           <PreprocessorMacros>
             <string>$$com.sysprogs.bspoptions.primary_memory$$_layout</string>
