@@ -86,7 +86,7 @@ uint8_t tickSecond = 0;
 extern uint16_t backgroundBuffer[18];
 
 GUI_ALLOC_INFO pInfo;
-uint8_t doAfterStart = 0;
+uint8_t doTimeCorrection = 0;
 
 
 /* USER CODE END PD */
@@ -153,7 +153,7 @@ void delay(uint32_t delayTime);
 void delay(uint32_t delayTime)
 {
 	uint32_t i;
-	for (i = 0; i < delayTime; i++);
+	for (i = 0; i < delayTime; i++) ;
 }
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {
@@ -233,92 +233,7 @@ void longPressControl(void)
 
 }
 
-void LinesInit(void)
-{
-	uint8_t i = 0;
-	uint16_t dataInBKP;
-	uint16_t buff;
-	//2 байта * 4 = 8 байт
-	// 15    14    13    12   11   10    9    8    7    6    5    4    3    2    1    0
-	// \status/		\---width--/	\--------------------hours*minutes-----------------/	
-	//    |				  |										|
-	//	  0 = STOP		  |										|
-	//	  1 = RUN		  |										|
-	//				 (0..7)*375	= 0,375...3000 sec. 			|
-	//					0 sec = line status OFF					|
-	//													1440 minutes (1 day)	
-	masterClock.line[0].xSemaphore = xSemaphoreCreateCounting(720, 0);
-	masterClock.line[1].xSemaphore = xSemaphoreCreateCounting(720, 0);
-	masterClock.line[2].xSemaphore = xSemaphoreCreateCounting(720, 0);
-	masterClock.line[3].xSemaphore = xSemaphoreCreateCounting(720, 0);
 
-	masterClock.line[0].LineGPIOpos = LINE0_POS_OUTPUT_GPIO_Port;
-	masterClock.line[0].LineGPIOneg = LINE0_NEG_OUTPUT_GPIO_Port;
-	masterClock.line[0].LinePinPos = LINE0_POS_OUTPUT_Pin;
-	masterClock.line[0].LinePinNeg = LINE0_NEG_OUTPUT_Pin;
-
-	masterClock.line[1].LineGPIOpos = LINE1_POS_OUTPUT_GPIO_Port;
-	masterClock.line[1].LineGPIOneg = LINE1_NEG_OUTPUT_GPIO_Port;
-	masterClock.line[1].LinePinPos = LINE1_POS_OUTPUT_Pin;
-	masterClock.line[1].LinePinNeg = LINE1_NEG_OUTPUT_Pin;
-
-	masterClock.line[2].LineGPIOpos = LINE2_POS_OUTPUT_GPIO_Port;
-	masterClock.line[2].LineGPIOneg = LINE2_NEG_OUTPUT_GPIO_Port;
-	masterClock.line[2].LinePinPos = LINE2_POS_OUTPUT_Pin;
-	masterClock.line[2].LinePinNeg = LINE2_NEG_OUTPUT_Pin;
-
-	masterClock.line[3].LineGPIOpos = LINE3_POS_OUTPUT_GPIO_Port;
-	masterClock.line[3].LineGPIOneg = LINE3_NEG_OUTPUT_GPIO_Port;
-	masterClock.line[3].LinePinPos = LINE3_POS_OUTPUT_Pin;
-	masterClock.line[3].LinePinNeg = LINE3_NEG_OUTPUT_Pin;
-
-	for (i = 0; i < LINES_AMOUNT; ++i)
-	{
-		dataInBKP = rtc_read_backup_reg(i + BKP_LINE1_OFFSET);
-		masterClock.line[i].Hours = (dataInBKP & 0b11111111111) / 60;
-		masterClock.line[i].Minutes = (dataInBKP & 0b11111111111) % 60;
-		masterClock.line[i].Width = (dataInBKP >> 11) & 0b111;
-		masterClock.line[i].Status = (dataInBKP >> 14) & 0b11;
-		//Проверка на ошибки, и если что, то все по нулям, и выкл линию. 
-		if ((masterClock.line[i].Hours > 23) || (masterClock.line[i].Minutes > 59) || (masterClock.line[i].Width > 15) || (masterClock.line[i].Status > 2))
-		{
-			masterClock.line[i].Minutes = 0;
-			masterClock.line[i].Hours = 0;
-			masterClock.line[i].Width = 0;
-			masterClock.line[i].Status = LINE_STATUS_OFF;
-		}
-
-	}
-
-	dataInBKP = rtc_read_backup_reg(BKP_LINES_TIMEZONE_OFFSET);
-	for (i = 1; i < LINES_AMOUNT; ++i)
-	{
-		buff = (dataInBKP >> ((i - 1) * 5));
-		if (buff & 0b10000)
-		{
-			masterClock.line[i].TimeZone = (char)(~(buff & 0b1111));
-		}
-		else
-		{
-			masterClock.line[i].TimeZone = (char)(buff & 0b1111);
-		}
-	}
-
-	readDaylightSavingFromBKP();
-
-
-	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
-	{
-		doAfterStart = true;       //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
-	}
-	else
-	{
-		doAfterStart = false;
-	}
-	//Проверка отставания времени на Линии1 по отношению к системному времени, взятому из BKP
-
-
-}
 /* USER CODE END 0 */
 
 /**
@@ -359,8 +274,8 @@ int main(void)
 	MX_ADC3_Init();
 	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
-	  //GUI_Init();
-	HAL_RTCEx_SetSecond_IT(&hrtc);
+	//GUI_Init();
+  HAL_RTCEx_SetSecond_IT(&hrtc);
 	//Init_SSD1289();
 
 	variables.calibrated = 1;
@@ -873,8 +788,10 @@ static void MX_GPIO_Init(void)
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOE, LINE0_NEG_OUTPUT_Pin | LINE1_NEG_OUTPUT_Pin | LINE2_NEG_OUTPUT_Pin | LINE3_NEG_OUTPUT_Pin
-		| LCD_RESET_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOE,
+		LINE0_NEG_OUTPUT_Pin | LINE1_NEG_OUTPUT_Pin | LINE2_NEG_OUTPUT_Pin | LINE3_NEG_OUTPUT_Pin
+		| LCD_RESET_Pin,
+		GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(SRAM_CS_GPIO_Port, SRAM_CS_Pin, GPIO_PIN_RESET);
@@ -1083,9 +1000,9 @@ void sendMsgToMainMenu(uint16_t message)
 void vTaskGUI(void const * argument)
 {
 	/* USER CODE BEGIN vTaskGUI */
-	  //int xPos, yPos;
+	//int xPos, yPos;
 
-	uint16_t i = 0;
+  uint16_t i = 0;
 
 	GUI_Init();
 	//Calibrate(&variables);
@@ -1104,155 +1021,155 @@ void vTaskGUI(void const * argument)
 		GUI_ALLOC_GetMemInfo(&pInfo);
 
 		if (tickSecond) //см. callback  HAL_RTCEx_RTCEventCallback
-		{
-
-			HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-			//здесь надо реализовать запись секунд в BKP регистр
-
-
-
-			//калибровка
-			if (sTime.Hours == 0 && sTime.Minutes == 0 && sTime.Seconds == 0)
-			{
-				timeCalibr.isCalibrated = false;
-				masterClock.daylightSaving->needToShift = true;
-			}
-			//коррекция происходит в 01:02:00
-			if (doAfterStart || (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30))
 			{
 
-				if (masterClock.timeCalibration->seconds != 0 && masterClock.timeCalibration->days != 0 && timeCalibr.isCalibrated == false) //если калибровка включена
+				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+				//здесь надо реализовать запись секунд в BKP регистр
+
+
+
+				//калибровка
+				if(sTime.Hours == 0 && sTime.Minutes == 0 && sTime.Seconds == 0)
 				{
-					masterClock.timeCalibration->daysPassed++;
-					if (masterClock.timeCalibration->daysPassed == masterClock.timeCalibration->days) //если настал день калибровки
-					{
-						if (masterClock.timeCalibration->seconds > 0) //если добавить секунды
+					timeCalibr.isCalibrated = false;
+					masterClock.daylightSaving->needToShift = true;
+				}
+				//коррекция происходит в 01:02:00
+				if(doTimeCorrection || (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30))
+				{
+
+					if (masterClock.timeCalibration->seconds != 0 && masterClock.timeCalibration->days != 0 && timeCalibr.isCalibrated == false) //если калибровка включена
 						{
-							sTime.Seconds += masterClock.timeCalibration->seconds;                  //прибавили секунды
-							if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+							masterClock.timeCalibration->daysPassed++;
+							if (masterClock.timeCalibration->daysPassed == masterClock.timeCalibration->days) //если настал день калибровки
+								{
+									if (masterClock.timeCalibration->seconds > 0) //если добавить секунды
+										{
+											sTime.Seconds += masterClock.timeCalibration->seconds;                   //прибавили секунды
+											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+											{
+												Error_Handler();
+											}
+										}
+									if (masterClock.timeCalibration->seconds < 0) //если убавить секунды
+										{
+											sTime.Seconds += masterClock.timeCalibration->seconds;                    //прибавили секунды
+											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+											{
+												Error_Handler();
+											}
+										}
+									masterClock.timeCalibration->daysPassed = 0;                   // 1 => 0
+									timeCalibr.isCalibrated = true;
+
+								}
+
+						}
+
+					if (doTimeCorrection || (masterClock.daylightSaving->needToShift&& masterClock.daylightSaving->enableDLS&&isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay)))
+					{
+						sTime.Hours += masterClock.daylightSaving->timeShift;
+						pollLinesOutput(10);
+						masterClock.daylightSaving->needToShift = false;
+						if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
+						{
+							Error_Handler();
+						}
+					}
+					doTimeCorrection = false;
+
+				}
+				if (sTimePrev.Seconds == 59) //каждую минуту
+					{
+						for (i = 0; i < LINES_AMOUNT; ++i)
+						{
+							if (masterClock.line[i].Pulses >= 0)
 							{
-								Error_Handler();
+								xSemaphoreGive(masterClock.line[i].xSemaphore);
+							}
+							else
+							{
+								masterClock.line[i].Pulses++;
 							}
 						}
-						if (masterClock.timeCalibration->seconds < 0) //если убавить секунды
-						{
-							sTime.Seconds += masterClock.timeCalibration->seconds;                   //прибавили секунды
-							if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
-							{
-								Error_Handler();
-							}
+
+						//for (i = 0; i < sizeof(line) / 3; i++)
+						//{
+						//	if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
+						//	{
+
+						//		line[i].Minutes++;
+						//		//здесь нужно реализовать вывод импульса на GPIO
+						//		if (line[i].Minutes == 60)
+						//		{
+						//			line[i].Minutes = 0;
+						//			line[i].Hours++;
+						//			if (line[i].Hours == 24)
+						//			{
+						//				line[i].Hours = 0;
+
+						//			}
+						//		}
+						//		if (masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
+						//		saveLineToBKP(i);
+						//	}
+						//}
+						/****************конец перебора структур Lines***************************************/
+						//if(masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
+					}
+				if (sTimePrev.Hours == 23 && sTime.Hours == 0) //сменился день
+					{
+
+						//DateToUpdate.Date = read & 0b11111;
+						//DateToUpdate.Month = (read & 0b111100000) >> 5;
+						//DateToUpdate.Year = (read & 0b1111111000000000) >> 9;
+
+						saveDateToBKP();
+						switch (masterClock.guiVars->menuState) {
+						case MENU_STATE_MAIN:
+							sendMsg(masterClock.handles->hMainMenu, WM_DATE_UPDATE);
+							break;
+						case MENU_STATE_TIMEDATESETUP:
+							sendMsg(masterClock.handles->hTimeDateSetupMenu, WM_DATE_UPDATE);
+							break;
 						}
-						masterClock.timeCalibration->daysPassed = 0;                  // 1 => 0
-						timeCalibr.isCalibrated = true;
-
 					}
-
-				}
-
-				if (doAfterStart || (masterClock.daylightSaving->needToShift&& masterClock.daylightSaving->enableDLS&&isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay)))
-				{
-					sTime.Hours += masterClock.daylightSaving->timeShift;
-					pollLinesOutput(10);
-					masterClock.daylightSaving->needToShift = false;
-					if (HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
-					{
-						Error_Handler();
-					}
-				}
-				doAfterStart = false;
-
-			}
-			if (sTimePrev.Seconds == 59) //каждую минуту
-			{
-				for (i = 0; i < LINES_AMOUNT; ++i)
-				{
-					if (masterClock.line[i].Pulses >= 0)
-					{
-						xSemaphoreGive(masterClock.line[i].xSemaphore);
-					}
-					else
-					{
-						masterClock.line[i].Pulses++;
-					}
-				}
-
-				//for (i = 0; i < sizeof(line) / 3; i++)
-				//{
-				//	if (line[i].Status == LINE_STATUS_RUN)	//если линия запущена, то делаем необходимые инкременты с проверками
-				//	{
-
-				//		line[i].Minutes++;
-				//		//здесь нужно реализовать вывод импульса на GPIO
-				//		if (line[i].Minutes == 60)
-				//		{
-				//			line[i].Minutes = 0;
-				//			line[i].Hours++;
-				//			if (line[i].Hours == 24)
-				//			{
-				//				line[i].Hours = 0;
-
-				//			}
-				//		}
-				//		if (masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
-				//		saveLineToBKP(i);
-				//	}
-				//}
-				/****************конец перебора структур Lines***************************************/
-				//if(masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowLineTime();
-			}
-			if (sTimePrev.Hours == 23 && sTime.Hours == 0) //сменился день
-			{
-
-				//DateToUpdate.Date = read & 0b11111;
-				//DateToUpdate.Month = (read & 0b111100000) >> 5;
-				//DateToUpdate.Year = (read & 0b1111111000000000) >> 9;
-
-				saveDateToBKP();
 				switch (masterClock.guiVars->menuState) {
 				case MENU_STATE_MAIN:
-					sendMsg(masterClock.handles->hMainMenu, WM_DATE_UPDATE);
+					sendMsg(masterClock.handles->hMainMenu, WM_SEC_UPDATE);
 					break;
-				case MENU_STATE_TIMEDATESETUP:
-					sendMsg(masterClock.handles->hTimeDateSetupMenu, WM_DATE_UPDATE);
+				case MENU_STATE_TIMESETUP:
+					sendMsg(masterClock.handles->hTimeSetupMenu, WM_SEC_UPDATE);
 					break;
-				}
-			}
-			switch (masterClock.guiVars->menuState) {
-			case MENU_STATE_MAIN:
-				sendMsg(masterClock.handles->hMainMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_TIMESETUP:
-				sendMsg(masterClock.handles->hTimeSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE1SETUP:
-				sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE2SETUP:
-				sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE3SETUP:
-				sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE4SETUP:
-				sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE1SETUP_PULSE:
-				sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE2SETUP_PULSE:
-				sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE3SETUP_PULSE:
-				sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
-				break;
-			case MENU_STATE_LINE4SETUP_PULSE:
-				sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
-				break;
+				case MENU_STATE_LINE1SETUP:
+					sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE2SETUP:
+					sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE3SETUP:
+					sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE4SETUP:
+					sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE1SETUP_PULSE:
+					sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE2SETUP_PULSE:
+					sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE3SETUP_PULSE:
+					sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_LINE4SETUP_PULSE:
+					sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
+					break;
 
+				}
+				tickSecond = 0;
+				sTimePrev = sTime;
 			}
-			tickSecond = 0;
-			sTimePrev = sTime;
-		}
 
 	}
 	/* USER CODE END vTaskGUI */
@@ -1369,7 +1286,7 @@ void Error_Handler(void)
 				  /* User can add his own implementation to report the HAL error return state */
 
 	/* USER CODE END Error_Handler_Debug */
-	}
+}
 
 #ifdef  USE_FULL_ASSERT
 /**
