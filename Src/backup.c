@@ -12,9 +12,10 @@ void rtc_write_backup_reg(uint16_t BackupRegister, uint16_t data)
 	RtcHandle.Instance = RTC;
 	HAL_PWR_EnableBkUpAccess();
 	HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
-	bkpCRC = calcCRCofBKP();                 //рассчет новой CRC для регистров BKP
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);                 //запись старших 16 бит CRC (Маска 0xFFFF0000)
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);                 //запись младших 16 бит CRC
+	
+	bkpCRC = calcCRCofBKP();                  //рассчет новой CRC для регистров BKP
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);                  //запись старших 16 бит CRC (Маска 0xFFFF0000)
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);                  //запись младших 16 бит CRC
 }
 uint16_t rtc_read_backup_reg(uint16_t BackupRegister)
 {
@@ -55,7 +56,7 @@ void saveLineToBKP(uint8_t lineNumber)
 		}
 		else
 		{
-			dataToBKP = (~(masterClock.line[i].TimeZone)) & 0xFF;                 //если отрицательное, то инверсия и флаг отрицательного.
+			dataToBKP = (~(masterClock.line[i].TimeZone)) & 0xFF;                  //если отрицательное, то инверсия и флаг отрицательного.
 			dataToBKP |= 0b10000;
 		}
 		buff |= (dataToBKP << ((i - 1) * 5));
@@ -86,12 +87,12 @@ void saveDaylightSavingToBKP(void)
 	}
 	else
 	{
-		dataToBKP = (~(masterClock.daylightSaving->timeZone)) & 0xFF;                 //если отрицательное, то инверсия и флаг отрицательного.
+		dataToBKP = (~(masterClock.daylightSaving->timeZone)) & 0xFF;                  //если отрицательное, то инверсия и флаг отрицательного.
 		dataToBKP |= 0b10000;
 	}
 	if (masterClock.daylightSaving->timeShift < 0)
 	{
-		dataToBKP |= (0b10 << 5);                 //отрицательный флаг для timeShift
+		dataToBKP |= (0b10 << 5);                  //отрицательный флаг для timeShift
 	}
 	else
 	{
@@ -107,18 +108,18 @@ void readDaylightSavingFromBKP(void)
 {
 	uint16_t dataInBKP = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
 	if (dataInBKP & 0b10000) //если флаг отрицательного числа
-	{
-		masterClock.daylightSaving->timeZone = (char)(~(dataInBKP & 0b1111));
-	}
+		{
+			masterClock.daylightSaving->timeZone = (char)(~(dataInBKP & 0b1111));
+		}
 	else
 	{
 		masterClock.daylightSaving->timeZone = (char)(dataInBKP & 0b1111);
 	}
 	if (dataInBKP & 0b1000000) //если отрицательный флаг
-	{
-		masterClock.daylightSaving->timeShift = -1;
+		{
+			masterClock.daylightSaving->timeShift = -1;
 
-	}
+		}
 	else
 	{
 		masterClock.daylightSaving->timeShift = (dataInBKP >> 5) & 0b11;

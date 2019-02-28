@@ -39,6 +39,88 @@ extern TIM_HandleTypeDef htim7;
 //	write |= (Date.Year << 9);
 //	rtc_write_backup_reg(BKP_DATE_OFFSET, write);
 //}
+int _ProgbarSkin(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
+	GUI_RECT            	Rect;
+	GUI_RECT            	UserRect;
+	PROGBAR_SKINFLEX_INFO * pInfo;
+	uint32_t loadLevel;
+	switch (pDrawItemInfo->Cmd) {
+	case WIDGET_ITEM_CREATE:
+		return PROGBAR_DrawSkinFlex(pDrawItemInfo);
+	case WIDGET_ITEM_DRAW_BACKGROUND:
+		//
+		// Receive the area of the PROGBAR widget
+		//
+		WM_GetClientRectEx(pDrawItemInfo->hWin, &Rect);
+		loadLevel = PROGBAR_GetValue(pDrawItemInfo->hWin);
+		if (loadLevel < (4096 * 0.65))
+		{
+			GUI_SetColor(GUI_GREEN);
+			GUI_FillRect(Rect.x0, Rect.y0, Rect.x1, Rect.y1);
+		}
+		else if (loadLevel < (4096 * 0.8))
+		{
+			
+			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1 * 0.65, Rect.y1, GUI_GREEN, GUI_ORANGE);
+			GUI_SetColor(GUI_ORANGE);
+			GUI_FillRect(Rect.x1 * 0.65, Rect.y0, Rect.x1, Rect.y1);
+		}
+		else
+		{
+			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1 * 0.65, Rect.y1, GUI_GREEN, GUI_ORANGE);
+			GUI_DrawGradientH(Rect.x1 * 0.65, Rect.y0, Rect.x1 * 0.85, Rect.y1, GUI_ORANGE, GUI_RED);
+			GUI_SetColor(GUI_RED);
+			GUI_FillRect(Rect.x1 * 0.85, Rect.y0, Rect.x1, Rect.y1);
+		}
+		//
+		// Draw a green rounded rect over the complete area, this gets (partially) overwritten by a white one
+		//
+		
+		//
+		// Set a user cliprect
+		//
+		UserRect.x0 = pDrawItemInfo->x0;
+		UserRect.y0 = pDrawItemInfo->y0;
+		UserRect.x1 = pDrawItemInfo->x1;
+		UserRect.y1 = pDrawItemInfo->y1;
+		WM_SetUserClipRect(&UserRect);
+		//
+		// Draw a white rounded rect over the whole PROGBAR area, but the drawing will be visible only in
+		// the area of the cliprect. The size of the cliprect will decrease over time and the white rect
+		// will get smaller.
+		//
+		GUI_SetColor(GUI_WHITE);
+		GUI_FillRect(Rect.x0, Rect.y0, Rect.x1, Rect.y1);
+		//
+		// Very important, restore the the clipping area
+		//
+		WM_SetUserClipRect(NULL);
+
+		//
+		// Almost done, just a draw a red frame over the whole area
+		//
+		GUI_SetColor(0x191615);
+		GUI_DrawRect(Rect.x0, Rect.y0, Rect.x1, Rect.y1);
+		return 0;
+	case WIDGET_ITEM_DRAW_FRAME:
+		//
+		// We handle the frame on our own, so we return 0
+		//
+		return 0;
+	case WIDGET_ITEM_DRAW_TEXT:
+		//
+		// Handle the drawing of the text by the default skinning routine.
+		// This case could be commented. Just left it here to show this command
+		// is available.
+		//
+		return PROGBAR_DrawSkinFlex(pDrawItemInfo);
+	default:
+		//
+		// Anything not handled here will be handled by the default skinning routine.
+		//
+		return PROGBAR_DrawSkinFlex(pDrawItemInfo);
+	}
+}
 void _cbArrowUpButton(WM_MESSAGE * pMsg)
 {
 	GUI_RECT Rect;
@@ -205,10 +287,10 @@ int _DrawSkin_BUTTON_WORDWRAP(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		// Set font 
 		GUI_SetFont(pFont);
 		// If the button is enabled 
-		if (WM_IsEnabled(pDrawItemInfo->hWin))
+		if(WM_IsEnabled(pDrawItemInfo->hWin))
 		{
 			// Set color for pressed / unpressed state
-			if (BUTTON_IsPressed(pDrawItemInfo->hWin))
+			if(BUTTON_IsPressed(pDrawItemInfo->hWin))
 				GUI_SetColor(TextColor_Pressed);
 			else
 				GUI_SetColor(TextColor_Unpressed);
@@ -271,7 +353,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 
 
 	   //;//µ?µ??«????µ??µ
-	for (pos = 0; pos < fontsize*charinfo.BytesPerLine; pos++)
+	for(pos = 0 ; pos < fontsize*charinfo.BytesPerLine ; pos++)
 	{
 		mask = 0x80;
 		for (t = 0; t < xlimit; t++)
@@ -288,7 +370,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7);                 //°??«  
+				Lcd_Write_Data(0x49E7);                            //°??«  
 
 			}
 			mask >>= 1;
@@ -340,7 +422,7 @@ void TFT_LineSetupShowString(uint16_t x, uint16_t y, char *p, uint8_t fontsize, 
 }
 void prepareLPCNT(int8_t direction, int16_t lowerLimit, int16_t upperLimit, int16_t value, uint16_t valueMult, HEADER_Handle valuesHeaderHandle, uint8_t valuesHeaderItem, BUTTON_Handle actionButtonHandle)
 {
-	char str[5] = { 0,0,0,0,0 };
+	char str[5] = { 0, 0, 0, 0, 0 };
 
 	masterClock.longPressCNT->itCNT = 0;
 	masterClock.guiVars->valsChanged = true;

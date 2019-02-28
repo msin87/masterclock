@@ -28,3 +28,10 @@ void sendMsg(WM_HWIN handle, uint16_t message)
 		WM_SendMessage(handle, &msgStruct);
 	}
 }
+void sendMsg_struct(WM_HWIN handle, WM_MESSAGE* msgStruct)
+{
+	if (masterClock.handles->hMainMenu != 0)
+	{
+		WM_SendMessage(handle, msgStruct);
+	}
+}

@@ -157,9 +157,12 @@ typedef struct
 } DaylightSaving;
 typedef struct
 {
+	uint8_t DMAtransferComplete;
 	uint16_t ADCdata[20];
+	uint32_t currentLevel;
 	void(*startCurrentSense)(void);
 	void(*stopCurrentSense)(void);
+	
 }
 CurrentSense;
 typedef struct
@@ -175,6 +178,8 @@ typedef struct
 
 MasterClock masterClock;
 void sendMsg(WM_HWIN handle, uint16_t message);
+void sendMsg_struct(WM_HWIN handle, WM_MESSAGE* msgStruct);
+
 void initStructures(void);
 #endif
 

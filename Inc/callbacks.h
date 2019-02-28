@@ -11,7 +11,7 @@ void _cbArrowDownButton(WM_MESSAGE * pMsg);
 void _cbEnterButton(WM_MESSAGE * pMsg);
 void _cbLineSetupSystemTime(WM_MESSAGE * pMsg);
 void _cbPulseSetupButton(WM_MESSAGE * pMsg);
-
+int _ProgbarSkin(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo);
 int _DrawSkin_BUTTON_WORDWRAP(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo);
 
 //Отказаться от этих двух функций

@@ -44,7 +44,7 @@
     <AllDependencies>
       <ProjectDependency>
         <RelativePath>freertos_cubemx.gpdsc</RelativePath>
-        <Timestamp>131956746768127263</Timestamp>
+        <Timestamp>131958548701105827</Timestamp>
       </ProjectDependency>
     </AllDependencies>
     <RootDirectory>

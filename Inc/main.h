@@ -57,18 +57,18 @@
 extern "C" {
 #endif
 
-	/* Includes ------------------------------------------------------------------*/
+/* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
-	/* Private includes ----------------------------------------------------------*/
-	/* USER CODE BEGIN Includes */
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 #include "touch.h"
 #include "sram.h"
 
-	/* USER CODE END Includes */
+/* USER CODE END Includes */
 
-	/* Exported types ------------------------------------------------------------*/
-	/* USER CODE BEGIN ET */
+/* Exported types ------------------------------------------------------------*/
+/* USER CODE BEGIN ET */
 	//SemaphoreHandle_t xSemaphoreLine[4];
 
 
@@ -77,21 +77,21 @@ extern "C" {
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 uint8_t doTimeCorrection;
-	/* USER CODE END EC */
+/* USER CODE END EC */
 
-	/* Exported macro ------------------------------------------------------------*/
-	/* USER CODE BEGIN EM */
+/* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
 
-	/* USER CODE END EM */
+/* USER CODE END EM */
 
-	/* Exported functions prototypes ---------------------------------------------*/
-	void Error_Handler(void);
+/* Exported functions prototypes ---------------------------------------------*/
+void Error_Handler(void);
 
-	/* USER CODE BEGIN EFP */
+/* USER CODE BEGIN EFP */
 
-	/* USER CODE END EFP */
+/* USER CODE END EFP */
 
-	/* Private defines -----------------------------------------------------------*/
+/* Private defines -----------------------------------------------------------*/
 #define LINE0_NEG_OUTPUT_Pin GPIO_PIN_2
 #define LINE0_NEG_OUTPUT_GPIO_Port GPIOE
 #define LINE1_NEG_OUTPUT_Pin GPIO_PIN_3
@@ -100,10 +100,8 @@ uint8_t doTimeCorrection;
 #define LINE2_NEG_OUTPUT_GPIO_Port GPIOE
 #define LINE3_NEG_OUTPUT_Pin GPIO_PIN_5
 #define LINE3_NEG_OUTPUT_GPIO_Port GPIOE
-#define Isense_LOAD_Pin GPIO_PIN_0
-#define Isense_LOAD_GPIO_Port GPIOA
-#define Vsense_PSU_Pin GPIO_PIN_1
-#define Vsense_PSU_GPIO_Port GPIOA
+#define SENSE_Iout_Pin GPIO_PIN_1
+#define SENSE_Iout_GPIO_Port GPIOC
 #define SRAM_CS_Pin GPIO_PIN_4
 #define SRAM_CS_GPIO_Port GPIOA
 #define LINE3_POS_OUTPUT_Pin GPIO_PIN_13
@@ -120,10 +118,10 @@ uint8_t doTimeCorrection;
 #define TOUCH_CS_GPIO_Port GPIOB
 #define LCD_RESET_Pin GPIO_PIN_1
 #define LCD_RESET_GPIO_Port GPIOE
-	/* USER CODE BEGIN Private defines */
+/* USER CODE BEGIN Private defines */
 
 
-	/* USER CODE END Private defines */
+/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

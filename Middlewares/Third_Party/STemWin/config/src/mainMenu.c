@@ -49,7 +49,8 @@
 #define ID_TEXT_LINE2   (GUI_ID_USER + 0x14)
 #define ID_TEXT_LINE3   (GUI_ID_USER + 0x15)
 #define ID_TEXT_LINE4   (GUI_ID_USER + 0x16)
-
+#define ID_MAINMENU_PROGBAR (GUI_ID_USER + 0x05)
+#define ID_MAINMENU_TEXT_LOAD  (GUI_ID_USER + 0x06)
 #define ID_IMAGE_0_IMAGE_0   0x00
 #define ID_IMAGE_1_IMAGE_0   0x01
 #define ID_IMAGE_2_IMAGE_0   0x02
@@ -9024,11 +9025,14 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ TEXT_CreateIndirect, ":-", ID_TEXT_SECONDS_H, 193, 60, 60, 53, 0, 0x0, 0 },
 	{ TEXT_CreateIndirect, "-", ID_TEXT_SECONDS_L, 256, 60, 30, 53, 0, 0x0, 0 },
 	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE1, 			15, 209, 50, 20, 0, 0x0, 0 },
-	{ TEXT_CreateIndirect, "17.12.2018 mon",ID_TEXT_DATE,110, 116, 100, 20, 0, 0x0, 0 },
+	{ TEXT_CreateIndirect, "17.12.2018 mon", ID_TEXT_DATE, 110, 116, 100, 20, 0, 0x0, 0 },
 	//{TEXT_CreateIndirect, "", ID_TEXT_LINE2, 			95, 209, 50, 20, 0, 0x0, 0 },
 	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE3, 			175, 209, 50, 20, 0, 0x0, 0 },
 	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE4, 			255, 209, 50, 20, 0, 0x0, 0 },
-
+	
+	{ PROGBAR_CreateIndirect, "Нагрузка", ID_MAINMENU_PROGBAR, 245, 150, 70, 10, 0x0, 0 },
+	{ TEXT_CreateIndirect, "Нагрузка", ID_MAINMENU_TEXT_LOAD, 245, 130, 70, 20, 0, 0x0, 0 }
+	
 	// USER START (Optionally insert additional widgets)
 	// USER END
 };
@@ -9231,7 +9235,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	// USER START (Optionally insert additional variables)
 	// USER END
 
-	switch (pMsg->MsgId) {
+	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 
 		//
@@ -9239,15 +9243,14 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//
 		hItem = pMsg->hWin;
 		WINDOW_SetBkColor(hItem, 0x191615);
+	
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_MAINMENU_TEXT_LOAD);
+		TEXT_SetFont(hItem, &GUI_FontArial18);
+		TEXT_SetTextColor(hItem, GUI_WHITE);
+		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		//
-	   // Initialization of 'Line 1'
-	   //
-	// hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_0);
-	// TEXT_SetFont(hItem, &GUI_FontArial18);
-	// TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	 //
-	 // Initialization of 'Line 2'
-	 //
+		// Initialization of 'Line 2'
+		//
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
@@ -9384,8 +9387,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_DATE_UPDATE:
 		HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 		if (masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowDate();
-
-
+		break;
+	case WM_CURRENTMETER_UPDATE:
+		
+		//WM_Invalidate(WM_GetDialogItem(masterClock.handles->hMainMenu, ID_MAINMENU_PROGBAR)); 
+		PROGBAR_SetValue(WM_GetDialogItem(masterClock.handles->hMainMenu, ID_MAINMENU_PROGBAR), masterClock.currentSense->currentLevel);
 		break;
 	case WM_SEC_UPDATE:
 		sprintf(timeString, "%d", sTime.Seconds % 10);
@@ -9396,11 +9402,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			sprintf(timeString, ":%d", sTime.Seconds / 10);
 			TEXT_SetText(masterClock.handles->hSecondsString_H, timeString);
 			if (masterClock.guiVars->prevSecond_H == 5) //прошла минута
-			{
-				sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
-				TEXT_SetText(masterClock.handles->hHourMinString, timeString);      //обновление строки с часами и минутами
+				{
+					sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
+					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                    //обновление строки с часами и минутами
 
-			}
+				}
 		}
 		pMsg->MsgId = 0;
 		masterClock.guiVars->prevSecond_L = sTime.Seconds % 10;
@@ -9414,7 +9420,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		NCode = pMsg->Data.v;
 		switch (Id) {
 		case ID_BUTTON_LINE1: // Notifications sent by ''
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 						//TFT_ReadBackground(15,209, 18, backgroundBuffer);
@@ -9435,7 +9441,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_LINE2: // Notifications sent by ''
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -9452,7 +9458,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_LINE3: // Notifications sent by ''
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -9469,7 +9475,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_LINE4: // Notifications sent by ''
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -9486,8 +9492,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 			// USER START (Optionally insert additional code for further Ids)
-		case ID_IMAGE_1:      // Notifications sent by Lock
-			switch (NCode) {
+		case ID_IMAGE_1 :                    // Notifications sent by Lock
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 
@@ -9508,7 +9514,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_IMAGE_2: // Notifications sent by Unlock
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -9525,7 +9531,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_TEXT_HOUR_MIN: // Notifications sent by Unlock
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -9550,7 +9556,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		// USER START (Optionally insert additional message handling)
 
 		// USER END
-	default:
+	default :
 		WM_DefaultProc(pMsg);
 		if (masterClock.guiVars->menuState == MENU_STATE_MAIN) TFT_MainMenu_ShowDate();
 		break;
@@ -9645,7 +9651,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 
 
 	   //;//µ?µ??«????µ??µ
-	for (pos = 0; pos < fontsize*charinfo.BytesPerLine; pos++)
+	for(pos = 0 ; pos < fontsize*charinfo.BytesPerLine ; pos++)
 	{
 		mask = 0x80;
 		for (t = 0; t < xlimit; t++)
@@ -9662,7 +9668,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(backgroundBuffer[backgrline]);     //°??«  
+				Lcd_Write_Data(backgroundBuffer[backgrline]);                   //°??«  
 
 			}
 			mask >>= 1;
@@ -9728,9 +9734,11 @@ WM_HWIN CreateMainMenu(void) {
 	WM_SetCallback(masterClock.handles->hButtonLine[1], _cbButton);
 	WM_SetCallback(masterClock.handles->hButtonLine[2], _cbButton);
 	WM_SetCallback(masterClock.handles->hButtonLine[3], _cbButton);
-
+	
+	
 	masterClock.handles->hMainMenu = hWin;
-
+	PROGBAR_SetMinMax(WM_GetDialogItem(hWin, ID_MAINMENU_PROGBAR), 0, 0xFFF);
+	PROGBAR_SetSkin(WM_GetDialogItem(hWin, ID_MAINMENU_PROGBAR), _ProgbarSkin);
 
 
 
