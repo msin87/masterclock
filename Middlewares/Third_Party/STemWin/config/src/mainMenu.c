@@ -9060,9 +9060,6 @@ static void _cbButton(WM_MESSAGE * pMsg)
 {
 	GUI_RECT Rect;
 	char lineText[sizeof("BUTTON_LINE_TEXT") + 2] = BUTTON_LINE_TEXT;
-	
-	//	static BUTTON_SKINFLEX_PROPS PropsUnpressed;
-		//char str[5];
 	unsigned char lineNum = 0xFF;
 	int      TextAlign;
 	int id;
@@ -9172,7 +9169,7 @@ static void _cbButton(WM_MESSAGE * pMsg)
 			GUI_DispStringInRect(timeString, &Rect, TextAlign);
 			break;
 		}
-		//GUI_DispStringInRect(str, &Rect, TextAlign);		
+		
 		break;
 	default:
 		BUTTON_Callback(pMsg);
@@ -9210,42 +9207,7 @@ void forceUpdateStrings(void)
 	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 	TFT_MainMenu_ShowDate();
 }
-//void drawCurrentMeter(CurrentSense *currentSense)
-//{
-//	GUI_RECT Rect;
-//	uint32_t level = (currentSense->currentLevel / 4095.0);
-//	uint16_t greenLevel, orangeLevel;
-//	
-//	Rect.x0 = 245;
-//	Rect.x1 = Rect.x0 + 70;
-//	Rect.y0 = 150;
-//	Rect.y1 = Rect.y0 + 7;
-//	
-//	level = Rect.x1*level;
-//	greenLevel = Rect.x1*(CURRENT_GREEN_LEVEL / 100);
-//	orangeLevel = Rect.x1*(CURRENT_ORANGE_LEVEL / 100);
-//	if (level <= greenLevel)
-//	{
-//		GUI_SetColor(GUI_DARKGREEN);
-//		GUI_FillRect(Rect.x0, Rect.y0, Rect.x1, Rect.y1);
-//	}
-//	else if (level <= orangeLevel)
-//	{
-//		
-//		GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1, Rect.y1, GUI_DARKGREEN, GUI_ORANGE);
-//	}
-//}
-/*static void _cbLocalTimeSetupWindows(WM_MESSAGE * pMsg)
-{
-	FRAMEWIN_Handle hItem;
 
-	switch (pMsg->MsgId) {
-  case WM_CREATE:
-
-
-		break;
-	}
-}*/
 /*********************************************************************
 *
 *       _cbDialog
@@ -9263,9 +9225,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 
-		//
-		// Initialization of 'Window'
-		//
+
 		hItem = pMsg->hWin;
 		WINDOW_SetBkColor(hItem, 0x191615);
 	
@@ -9273,30 +9233,22 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		TEXT_SetFont(hItem, &GUI_FontArial18);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-		//
-		// Initialization of 'Line 2'
-		//
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_1);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetFont(hItem, &GUI_FontArial18);
-		//
-		// Initialization of 'Line 3'
-		//
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_2);
 		TEXT_SetFont(hItem, &GUI_FontArial18);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-		//
-		// Initialization of 'Line 4'
-		//
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_3);
 		TEXT_SetFont(hItem, &GUI_FontArial18);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-		//
-		// Initialization of ID_TEXT_HOUR_MIN
-		//
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_HOUR_MIN);
 
 		masterClock.handles->hHourMinString = hItem;
@@ -9306,9 +9258,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		TEXT_SetFont(hItem, &GUI_FontDigital7Mono70);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-		//
-   // Initialization of ID_TEXT_SECONDS_H
-   //
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_SECONDS_H);
 		sprintf(timeString, ":%d", sTime.Seconds / 10);
 		TEXT_SetText(hItem, timeString);
@@ -9316,9 +9266,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		TEXT_SetFont(hItem, &GUI_FontDigital7Mono70);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-		//
-   // Initialization of ID_TEXT_SECONDS_L
-   //
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_SECONDS_L);
 		sprintf(timeString, "%d", sTime.Seconds % 10);
 		TEXT_SetText(hItem, timeString);
@@ -9326,83 +9274,33 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		TEXT_SetFont(hItem, &GUI_FontDigital7Mono70);
 		TEXT_SetTextColor(hItem, GUI_WHITE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-		//
-		// Initialization of '12:00'
-		//
-		//hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE1);
-			//handles.hTimeLine1=hItem;
-		//TEXT_SetFont(hItem, &GUI_FontArial18);
-	   // TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-		//
-		// Initialization of '17.12.2018 mon'
-		//
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_DATE);
 		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
 		TEXT_SetFont(hItem, &GUI_FontArial18);
-		//
-		// Initialization of '_______'
-		//
-		//hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE2);
-		//	handles.hTimeLine2=hItem;
-		//	TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	  //  TEXT_SetFont(hItem, &GUI_FontArial18);
-		//
-		// Initialization of '_______'
-		//
-		//hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE3);
-			//handles.hTimeLine3=hItem;
-	   // TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-		//TEXT_SetFont(hItem, &GUI_FontArial18);
-		//
-		// Initialization of '_______'
-		//
-	  //  hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_LINE4);
-		//	handles.hTimeLine4=hItem;
-	  //  TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
-	  //  TEXT_SetFont(hItem, &GUI_FontArial18);
-		//
-		// Initialization of 'Image'
-		//
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_IMAGE_0);
 		pData = _GetImageById(ID_IMAGE_0_IMAGE_0, &FileSize);
 		IMAGE_SetDTA(hItem, pData, FileSize);
-		//
-		// Initialization of 'Image'
-		//
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1);
 		pData = _GetImageById(ID_IMAGE_1_IMAGE_0, &FileSize);
 		IMAGE_SetDTA(hItem, pData, FileSize);
-		//
-		// Initialization of 'Image'
-		//
+
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2);
 		pData = _GetImageById(ID_IMAGE_2_IMAGE_0, &FileSize);
 		IMAGE_SetDTA(hItem, pData, FileSize);
 		WM_HideWin(hItem);
-		// USER START (Optionally insert additional code for further widget initialization)
-			//
-		// Initialization of 'ID_BUTTON_LINE1 '
-		//
+
 		masterClock.handles->hButtonLine[0] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE1);
-		//BUTTON_SetText(masterClock.handles->hButtonLine1,"1");
-		//BUTTON_SetSkin(masterClock.handles->hButtonLine1, _DrawSkin_BUTTON);
-		// Initialization of 'ID_BUTTON_LINE2 '
-	//
+	
 		masterClock.handles->hButtonLine[1] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE2);
-		//BUTTON_SetText(masterClock.handles->hButtonLine2,"2");
-		//BUTTON_SetSkin(masterClock.handles->hButtonLine2, _DrawSkin_BUTTON);
-		// Initialization of 'ID_BUTTON_LINE3 '
-	//
+
 		masterClock.handles->hButtonLine[2] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE3);
-		//BUTTON_SetText(masterClock.handles->hButtonLine3,"3");
-		//BUTTON_SetSkin(masterClock.handles->hButtonLine3, _DrawSkin_BUTTON);
-		// Initialization of 'ID_BUTTON_LINE4 '
-	//
+
 		masterClock.handles->hButtonLine[3] = WM_GetDialogItem(pMsg->hWin, ID_BUTTON_LINE4);
-		//BUTTON_SetText(masterClock.handles->hButtonLine4,"4");
-		//BUTTON_SetSkin(masterClock.handles->hButtonLine4, _DrawSkin_BUTTON);
-	// USER END
-		if(masterClock.guiVars->menuLocked)
+
+		if (masterClock.guiVars->menuLocked)
 		{
 			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
 			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
@@ -9440,7 +9338,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			if (masterClock.guiVars->prevSecond_H == 5) //прошла минута
 				{
 					sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
-					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                      //обновление строки с часами и минутами
+					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                       //обновление строки с часами и минутами
 
 				}
 		}
@@ -9565,7 +9463,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 			// USER START (Optionally insert additional code for further Ids)
-		case ID_IMAGE_1 :                      // Notifications sent by Lock
+		case ID_IMAGE_1 :                       // Notifications sent by Lock
 			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
@@ -9751,7 +9649,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(backgroundBuffer[backgrline]);                     //°??«  
+				Lcd_Write_Data(backgroundBuffer[backgrline]);                      //°??«  
 
 			}
 			mask >>= 1;
