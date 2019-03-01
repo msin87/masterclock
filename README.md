@@ -1,6 +1,6 @@
 # Первичные часы
-Первичные часы (задающие часы, мастер часы) предназначены для управления электромеханическими часами (вторичными часами). Демонастрация текущего (01.03.19) этапа работы по клику на картинку ниже.
-[![Смотреть видео](https://s133vla.storage.yandex.net/rdisk/e6584dbf3e3b5a97d9b9fd06d00fecb63ac216b602dc7513d50110be0a013b95/5c7986a3/TaqoQ1MIbRgIER90BVROBcjH5a_rfrQXlxMcgNyjnkkVNIhviF382HP-HeNiUWNG0S4-WEtuZM_iVRlPNqJN1w==?uid=310131527&filename=2019-03-01%2018-14-24.JPG&disposition=attachment&hash=&limit=0&content_type=image%2Fjpeg&fsize=1076844&hid=ae868838ed881e2fbd57e7e2f9c0c320&media_type=image&tknv=v2&etag=7bd37f4159af721d95f19dd5e291f660&rtoken=znatBsEVw5xl&force_default=yes&ycrid=na-2d614660c1dcfa139c1595a0f0d4444c-downloader6f&ts=5830d56a4aec0&s=c261775a483a3bc28a1301d73ac0f3dc4b84fe2611ff5b660ba450f74919ab8b&pb=U2FsdGVkX1-sh6qjdL55lij-O5IhsomxVo9paJemvA1HcbjvoVwwziauUfUBoN4sO471Q3CrmPiJo5HLTaTMK2xR0RzLtJonfzTVaO50Pmw)](https://youtu.be/_Fk1Ex_TRxg)
+Первичные часы (задающие часы, мастер часы) предназначены для управления электромеханическими часами (вторичными часами). Демонастрация текущего (02.03.19) этапа работы по клику на картинку ниже.
+[![Смотреть видео](https://s133vla.storage.yandex.net/rdisk/e6584dbf3e3b5a97d9b9fd06d00fecb63ac216b602dc7513d50110be0a013b95/5c7986a3/TaqoQ1MIbRgIER90BVROBcjH5a_rfrQXlxMcgNyjnkkVNIhviF382HP-HeNiUWNG0S4-WEtuZM_iVRlPNqJN1w==?uid=310131527&filename=2019-03-01%2018-14-24.JPG&disposition=attachment&hash=&limit=0&content_type=image%2Fjpeg&fsize=1076844&hid=ae868838ed881e2fbd57e7e2f9c0c320&media_type=image&tknv=v2&etag=7bd37f4159af721d95f19dd5e291f660&rtoken=znatBsEVw5xl&force_default=yes&ycrid=na-2d614660c1dcfa139c1595a0f0d4444c-downloader6f&ts=5830d56a4aec0&s=c261775a483a3bc28a1301d73ac0f3dc4b84fe2611ff5b660ba450f74919ab8b&pb=U2FsdGVkX1-sh6qjdL55lij-O5IhsomxVo9paJemvA1HcbjvoVwwziauUfUBoN4sO471Q3CrmPiJo5HLTaTMK2xR0RzLtJonfzTVaO50Pmw)](https://youtu.be/78TaWfKCd9A)
 ## Характеристики
 - [x] Интерфейс на базе STemWin
 - [x] Тачскрин
@@ -18,8 +18,8 @@
 - [x] Независимые часовые пояса для линий
 - [x] Встроенный календарь, не позволяющий установить неправильную дату
 - [x] Индикация потребляемого линиями тока
-- [ ] Автоматическая блокировка интерфейса 
-- [ ] Экран разблокировки интерфейса при помощи предустановленного пароля
+- [x] Автоматическая блокировка интерфейса 
+- [x] Экран разблокировки интерфейса при помощи предустановленного пароля
 - [ ] Контроль питания 
 - [ ] Дистанционное управление через UART
 - [ ] Расписание событий
