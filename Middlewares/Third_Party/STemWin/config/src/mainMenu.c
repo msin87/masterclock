@@ -9030,7 +9030,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE3, 			175, 209, 50, 20, 0, 0x0, 0 },
 	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE4, 			255, 209, 50, 20, 0, 0x0, 0 },
 	
-	{ PROGBAR_CreateIndirect, "Нагрузка", ID_MAINMENU_PROGBAR, 245, 150, 70, 10, 0x0, 0 },
+	{ PROGBAR_CreateIndirect, "Нагрузка", ID_MAINMENU_PROGBAR, 245, 150, 70, 7, 0x0, 0 },
 	{ TEXT_CreateIndirect, "Нагрузка", ID_MAINMENU_TEXT_LOAD, 245, 130, 70, 20, 0, 0x0, 0 }
 	
 	// USER START (Optionally insert additional widgets)
@@ -9404,7 +9404,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			if (masterClock.guiVars->prevSecond_H == 5) //прошла минута
 				{
 					sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
-					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                    //обновление строки с часами и минутами
+					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                      //обновление строки с часами и минутами
 
 				}
 		}
@@ -9492,7 +9492,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 			// USER START (Optionally insert additional code for further Ids)
-		case ID_IMAGE_1 :                    // Notifications sent by Lock
+		case ID_IMAGE_1 :                      // Notifications sent by Lock
 			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
@@ -9668,7 +9668,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(backgroundBuffer[backgrline]);                   //°??«  
+				Lcd_Write_Data(backgroundBuffer[backgrline]);                     //°??«  
 
 			}
 			mask >>= 1;
@@ -9739,7 +9739,7 @@ WM_HWIN CreateMainMenu(void) {
 	masterClock.handles->hMainMenu = hWin;
 	PROGBAR_SetMinMax(WM_GetDialogItem(hWin, ID_MAINMENU_PROGBAR), 0, 0xFFF);
 	PROGBAR_SetSkin(WM_GetDialogItem(hWin, ID_MAINMENU_PROGBAR), _ProgbarSkin);
-
+	PROGBAR_SetText(WM_GetDialogItem(hWin, ID_MAINMENU_PROGBAR), "");
 
 
 	return hWin;

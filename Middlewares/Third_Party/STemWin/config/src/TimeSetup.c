@@ -109,7 +109,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	// USER START (Optionally insert additional variables)
 	// USER END
 
-	switch (pMsg->MsgId) {
+	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 		hItem = pMsg->hWin;
 		WINDOW_SetBkColor(hItem, 0x191615);
@@ -153,13 +153,13 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			sprintf(time, "%02d", sTime.Seconds);
 			HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 2, time);
 			if (masterClock.guiVars->prevSecond_H == 5 && masterClock.guiVars->prevSecond_L == 9) //прошла минута
-			{
-				sprintf(time, "%02d", sTime.Hours);
-				HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 0, time);
-				sprintf(time, "%02d", sTime.Minutes);
-				HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 1, time);
+				{
+					sprintf(time, "%02d", sTime.Hours);
+					HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 0, time);
+					sprintf(time, "%02d", sTime.Minutes);
+					HEADER_SetItemText(masterClock.handles->hHeaderTimeSetupVals, 1, time);
 
-			}
+				}
 			HEADER_SetTextColor(masterClock.handles->hHeaderTimeSetupVals, GUI_WHITE);
 			pMsg->MsgId = 0;
 			masterClock.guiVars->prevSecond_L = sTime.Seconds % 10;
@@ -172,7 +172,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		NCode = pMsg->Data.v;
 		switch (Id) {
 		case ID_BUTTON_HOURplus: // Notifications sent by 'h+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -204,7 +204,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 
 		case ID_BUTTON_MINplus: // Notifications sent by 'm+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -232,7 +232,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_SECplus: // Notifications sent by 's+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -261,7 +261,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_ENTER: // Notifications sent by 'Enter'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -278,7 +278,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 						masterClock.guiVars->timeFrozen = 0;
 					}
 				}
-				pollLinesOutput(10);
+				//pollLinesOutput(10);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -286,7 +286,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_CALIBRATE: // Notifications sent by 'Calibrate'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -305,7 +305,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_DATE: // Notifications sent by 'Date'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -324,7 +324,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_HOURminus: // Notifications sent by 'h-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -348,7 +348,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_MINminus: // Notifications sent by 'm-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -373,7 +373,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_SECminus: // Notifications sent by 's-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -397,7 +397,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_BACK: // Notifications sent by 'Back'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -418,7 +418,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_HEADER_WINDOW_TIMESETUP: // Notifications sent by 'Header'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -441,7 +441,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 		// USER START (Optionally insert additional message handling)
 		// USER END
-	default:
+	default :
 		WM_DefaultProc(pMsg);
 		break;
 	}

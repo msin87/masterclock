@@ -55,19 +55,19 @@ int _ProgbarSkin(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		loadLevel = PROGBAR_GetValue(pDrawItemInfo->hWin);
 		if (loadLevel < (4096 * 0.65))
 		{
-			GUI_SetColor(GUI_GREEN);
+			GUI_SetColor(GUI_DARKGREEN);
 			GUI_FillRect(Rect.x0, Rect.y0, Rect.x1, Rect.y1);
 		}
 		else if (loadLevel < (4096 * 0.8))
 		{
 			
-			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1 * 0.65, Rect.y1, GUI_GREEN, GUI_ORANGE);
+			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1 * 0.65, Rect.y1, GUI_DARKGREEN, GUI_ORANGE);
 			GUI_SetColor(GUI_ORANGE);
 			GUI_FillRect(Rect.x1 * 0.65, Rect.y0, Rect.x1, Rect.y1);
 		}
 		else
 		{
-			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1 * 0.65, Rect.y1, GUI_GREEN, GUI_ORANGE);
+			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1 * 0.65, Rect.y1, GUI_DARKGREEN, GUI_ORANGE);
 			GUI_DrawGradientH(Rect.x1 * 0.65, Rect.y0, Rect.x1 * 0.85, Rect.y1, GUI_ORANGE, GUI_RED);
 			GUI_SetColor(GUI_RED);
 			GUI_FillRect(Rect.x1 * 0.85, Rect.y0, Rect.x1, Rect.y1);
@@ -89,7 +89,7 @@ int _ProgbarSkin(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		// the area of the cliprect. The size of the cliprect will decrease over time and the white rect
 		// will get smaller.
 		//
-		GUI_SetColor(GUI_WHITE);
+		GUI_SetColor(0X493C3A);
 		GUI_FillRect(Rect.x0, Rect.y0, Rect.x1, Rect.y1);
 		//
 		// Very important, restore the the clipping area
@@ -370,7 +370,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7);                            //°??«  
+				Lcd_Write_Data(0x49E7);                                //°??«  
 
 			}
 			mask >>= 1;

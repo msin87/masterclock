@@ -22,7 +22,7 @@
 #define MENU_STATE_TIME_SUMWIN 12
 
 #define LINES_AMOUNT 4
-#define LINES_DEAD_TIME 50
+#define LINES_DEAD_TIME 10
 #define LINE_WIDTH_MULT 375
 #define LINE_STATUS_OFF  0
 #define LINE_STATUS_RUN  1
@@ -56,6 +56,7 @@
 typedef struct
 {
 	uint8_t menuLocked;
+	uint8_t delayedLineSetupMenu;
 	uint8_t menuState;
 	uint8_t prevSecond_L;
 	uint8_t prevSecond_H;

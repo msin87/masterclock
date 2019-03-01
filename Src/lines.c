@@ -8,7 +8,15 @@ extern RTC_TimeTypeDef sTime;
 extern RTC_DateTypeDef sDate;
 void lineSetupMenuUpdateVals(void)
 {
-	char str[3];
+	//два условия,защищающие от HardFault при попытки обновить неотрендеренное до конца меню.
+	if(!WM_IsVisible(masterClock.handles->hLineSetupVals)) return;
+	if (masterClock.guiVars->delayedLineSetupMenu != 2)  
+	{
+		
+		masterClock.guiVars->delayedLineSetupMenu++;
+		return;
+	}
+	char str[5];
 	sprintf(str, "%02d", masterClock.line[masterClock.guiVars->menuState - 4].Hours);
 	HEADER_SetItemText(masterClock.handles->hLineSetupVals, 0, str);
 	sprintf(str, "%02d", masterClock.line[masterClock.guiVars->menuState - 4].Minutes);
@@ -38,9 +46,9 @@ void pollGPIO(uint8_t lineNumber, uint8_t polarity)
 	if (polarity == POLARITY_POSITIVE)
 	{
 		masterClock.currentSense->startCurrentSense();
-		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos;            		//set
+		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos;                            		//set
 		osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
-		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos << 16;           //reset
+		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos << 16;                           //reset
 		masterClock.currentSense->stopCurrentSense();
 		osDelay(LINES_DEAD_TIME);
 		return;
@@ -48,9 +56,9 @@ void pollGPIO(uint8_t lineNumber, uint8_t polarity)
 	if (polarity == POLARITY_NEGATIVE)
 	{
 		masterClock.currentSense->startCurrentSense();
-		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg;         		//set
+		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg;                         		//set
 		osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
-		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg << 16;           //reset
+		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg << 16;                           //reset
 		masterClock.currentSense->stopCurrentSense();
 		osDelay(LINES_DEAD_TIME);
 	}
@@ -76,7 +84,8 @@ void lineSendSignal(uint8_t lineNumber)
 		}
 		if (masterClock.guiVars->menuState == lineNumber + 4)
 			lineSetupMenuUpdateVals();
-		WM_Invalidate(masterClock.handles->hButtonLine[lineNumber]);
+		if (masterClock.guiVars->menuState == MENU_STATE_MAIN)
+			WM_Invalidate(masterClock.handles->hButtonLine[lineNumber]);
 		if (masterClock.guiVars->linesPolarity & outputMask)
 		{
 			pollGPIO(lineNumber, POLARITY_POSITIVE);
@@ -105,7 +114,7 @@ uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
 		lHour12 = 12;
 	}
 	diff_Min12 = sHour12 * 60 + sTime.Minutes - (lHour12 * 60 + lineToCheck->Minutes);
-
+	
 	if (diff_Min12 < -waitMinutes)
 	{
 
@@ -120,7 +129,7 @@ uint16_t get_sTimeLinesDiff(Lines* lineToCheck, uint8_t waitMinutes)
 	else
 		if ((sMinutes - lMinutes) >= -720 && (sMinutes - lMinutes) < -waitMinutes)
 	{
-		lineToCheck->Hours -= 12;
+		lineToCheck->Hours += 12;
 		if (lineToCheck->Hours < 0) lineToCheck->Hours = -lineToCheck->Hours;
 	}
 	lineToCheck->Hours %= 24;
@@ -231,7 +240,7 @@ void LinesInit(void)
 
 	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
-		doTimeCorrection = true;               //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
+		doTimeCorrection = true;                               //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
 	}
 	else
 	{
