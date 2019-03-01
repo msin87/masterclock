@@ -44,7 +44,7 @@
       <AdditionalIncludeDirectories>Drivers/CMSIS/Include;Middlewares/Third_Party/STemWin/config/inc;Middlewares/Third_Party/STemWin/lib/inc;=;Inc;Drivers\CMSIS\Device\ST\STM32F1xx\Include;Drivers\STM32F1xx_HAL_Driver\Inc;Drivers\STM32F1xx_HAL_Driver\Src;Middlewares\Third_Party\FreeRTOS\Source\include;Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3;Drivers\STM32F1xx_HAL_Driver\Inc\Legacy;%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG=1;flash_layout;STM32F103xE;USE_FREERTOS;%(ClCompile.PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions />
-      <CLanguageStandard />
+      <CLanguageStandard>GNU11</CLanguageStandard>
       <CPPLanguageStandard />
     </ClCompile>
     <Link>
@@ -142,6 +142,7 @@
     <ClCompile Include="Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_hal_dma.c" />
     <ClCompile Include="Src\timedate.c" />
     <ClCompile Include="Src\touch.c" />
+    <ClInclude Include="Inc\language.h" />
     <ClInclude Include="Inc\lines.h" />
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\BUTTON.h" />
     <ClInclude Include="Middlewares\Third_Party\STemWin\lib\inc\BUTTON_Private.h" />

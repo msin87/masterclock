@@ -391,7 +391,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 					masterClock.line[masterClock.guiVars->menuState - 4].Pulses = 0;
 					xQueueReset(masterClock.line[masterClock.guiVars->menuState - 4].xSemaphore);
 					while (diff > 0)
-					{
+					{ 
 						for (i = 0; i < LINES_AMOUNT; ++i)
 						{
 							if ((masterClock.guiVars->menuState - 4) == i && (masterClock.line[i].Status == LINE_STATUS_RUN))

@@ -20,7 +20,7 @@
 #define MENU_STATE_LINE3SETUP_PULSE 10
 #define MENU_STATE_LINE4SETUP_PULSE 11
 #define MENU_STATE_TIME_SUMWIN 12
-
+#define MENU_STATE_PASSWORD 13
 #define LINES_AMOUNT 4
 #define LINES_DEAD_TIME 10
 #define LINE_WIDTH_MULT 375
@@ -55,6 +55,8 @@
 
 #define CURRENT_GREEN_LEVEL 75
 #define CURRENT_ORANGE_LEVEL 85
+
+#define UNLOCK_PASSWORD_ARRAY {4,0,2,5,1}
 typedef struct
 {
 	uint8_t menuLocked;
@@ -104,6 +106,7 @@ typedef struct
 	WM_HWIN hHourMinString;
 	WM_HWIN hSecondsString_H;
 	WM_HWIN hSecondsString_L;
+	WM_HWIN hPasswordMenu;
 
 	HEADER_Handle hHeaderTimeSetupVals;
 	HEADER_Handle hHeaderTimeDateSetupVals;

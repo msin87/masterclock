@@ -1,0 +1,40 @@
+#pragma once
+#define LANG_RU
+#ifdef LANG_RU
+#define MENU_PASSWORD_ALERT_TOP_TEXT "Экран заблокирован!"
+#define MENU_PASSWORD_ALERT_BOTTOM_TEXT "Введите пароль для разблокировки:"
+#define BUTTON_ENTER_TEXT "Ввод"
+#define BUTTON_CANCEL_TEXT "Отмена"
+#define BUTTON_LINE_TEXT "Линия"
+#define OFF_TEXT "ВЫКЛ"
+#define ON_TEXT "ВКЛ"
+#define STOP_TEXT "СТОП"
+#define MONDAY_TEXT "пн "
+#define TUESDAY_TEXT "вт "
+#define WEDNESDAY_TEXT "ср "
+#define THURSDAY_TEXT "чт "
+#define FRIDAY_TEXT "пт "
+#define SATURDAY_TEXT "сб "
+#define SUNDAY_TEXT "вс "
+#define CURRENT_SENSE_TEXT "Нагрузка"
+#define BUTTON_BACKSPACE_TEXT "Стереть"
+#endif // LANG_RU
+
+#ifdef LANG_EN
+#define MENU_PASSWORD_ALERT_TOP_TEXT "Screen is locked!"
+#define MENU_PASSWORD_ALERT_BOTTOM_TEXT "Enter password to unlock screen:"
+#define BUTTON_ENTER_TEXT "Enter"
+#define BUTTON_CANCEL_TEXT "Cancel"
+#define BUTTON_LINE_TEXT "Line"
+#define OFF_TEXT "OFF"
+#define ON_TEXT "ON"
+#define STOP_TEXT "STOP"
+#define MONDAY_TEXT "mon "
+#define TUESDAY_TEXT "tue "
+#define WEDNESDAY_TEXT "wed "
+#define THURSDAY_TEXT "thu "
+#define FRIDAY_TEXT "fri "
+#define SATURDAY_TEXT "sat "
+#define SUNDAY_TEXT "sun "
+#define CURRENT_SENSE_TEXT "Load"
+#endif // LANG_EN

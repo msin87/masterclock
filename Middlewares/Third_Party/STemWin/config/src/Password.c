@@ -22,7 +22,9 @@
 // USER END
 
 #include "Password.h"
-
+#include "language.h"
+#include "guivars.h"
+#include <string.h>
 /*********************************************************************
 *
 *       Defines
@@ -40,14 +42,21 @@
 #define ID_BUTTON_7   (GUI_ID_USER + 0x0B)
 #define ID_BUTTON_8   (GUI_ID_USER + 0x0C)
 #define ID_BUTTON_9   (GUI_ID_USER + 0x0D)
-#define ID_TEXT_0   (GUI_ID_USER + 0x0E)
-#define ID_BUTTON_10   (GUI_ID_USER + 0x0F)
+#define ID_TEXT_ALERT_TOP  (GUI_ID_USER + 0x0E)
+#define ID_TEXT_ALERT_BOTTOM  (GUI_ID_USER + 0x13)
+
+#define ID_BUTTON_BACKSPACE   (GUI_ID_USER + 0x0F)
 #define ID_BUTTON_11   (GUI_ID_USER + 0x10)
-#define ID_HEADER_0   (GUI_ID_USER + 0x11)
-#define ID_TEXT_1   (GUI_ID_USER + 0x12)
+#define ID_HEADER_PASSWORD   (GUI_ID_USER + 0x11)
+#define ID_TEXT_COUNTER   (GUI_ID_USER + 0x12)
+#define LAST_SYMBOL_ENTERED 2
+#define WRONG_NUMBER 0
+#define NOT_LAST_SYMBOL_ENETERD 1
+#define LAST_SYMBOL_DELETED 2
 
 
 // USER START (Optionally insert additional defines)
+
 // USER END
 
 /*********************************************************************
@@ -58,6 +67,13 @@
 */
 
 // USER START (Optionally insert additional static data)
+extern GUI_CONST_STORAGE GUI_FONT GUI_FontArial18;
+uint8_t countDown;
+uint8_t readBuff[5];
+uint8_t readPos = 0;
+uint8_t storedPassw[5] = UNLOCK_PASSWORD_ARRAY;
+
+WM_MESSAGE message;
 // USER END
 
 /*********************************************************************
@@ -65,24 +81,25 @@
 *       _aDialogCreate
 */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
-  { WINDOW_CreateIndirect, "Window", ID_WINDOW_0, -1, -3, 320, 240, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "0", ID_BUTTON_0, 0, 140, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "1", ID_BUTTON_1, 50, 140, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "2", ID_BUTTON_2, 100, 140, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "3", ID_BUTTON_3, 150, 140, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "8", ID_BUTTON_4, 150, 190, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "5", ID_BUTTON_5, 0, 190, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "6", ID_BUTTON_6, 50, 190, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "7", ID_BUTTON_7, 100, 190, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "4", ID_BUTTON_8, 200, 140, 50, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "9", ID_BUTTON_9, 200, 190, 50, 50, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Display is blocked. Enter password to unblock.", ID_TEXT_0, 45, 49, 231, 27, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Enter", ID_BUTTON_10, 250, 140, 70, 50, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Cancel", ID_BUTTON_11, 250, 190, 70, 50, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Header", ID_HEADER_0, 40, 80, 240, 30, 0, 0x0, 0 },
-  { TEXT_CreateIndirect, "Countdown", ID_TEXT_1, 248, 11, 59, 20, 0, 0x0, 0 },
-  // USER START (Optionally insert additional widgets)
-  // USER END
+	{ WINDOW_CreateIndirect, "Window", ID_WINDOW_0, -1, -3, 320, 240, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "0", ID_BUTTON_0, 0, 140, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "1", ID_BUTTON_1, 50, 140, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "2", ID_BUTTON_2, 100, 140, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "3", ID_BUTTON_3, 150, 140, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "8", ID_BUTTON_8, 150, 190, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "5", ID_BUTTON_5, 0, 190, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "6", ID_BUTTON_6, 50, 190, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "7", ID_BUTTON_7, 100, 190, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "4", ID_BUTTON_4, 200, 140, 46, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "9", ID_BUTTON_9, 200, 190, 46, 46, 0, 0x0, 0 },
+	{ TEXT_CreateIndirect, MENU_PASSWORD_ALERT_TOP_TEXT, ID_TEXT_ALERT_TOP, 0, 35, 320, 20, 0, 0x0, 0 },
+	{ TEXT_CreateIndirect, MENU_PASSWORD_ALERT_BOTTOM_TEXT, ID_TEXT_ALERT_BOTTOM, 0, 55, 320, 20, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, BUTTON_BACKSPACE_TEXT, ID_BUTTON_BACKSPACE, 250, 140, 70, 46, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, BUTTON_CANCEL_TEXT, ID_BUTTON_11, 250, 190, 70, 46, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Header", ID_HEADER_PASSWORD, 40, 80, 240, 30, 0, 0x0, 0 },
+	{ TEXT_CreateIndirect, "30", ID_TEXT_COUNTER, 248, 11, 59, 20, 0, 0x0, 0 },
+	// USER START (Optionally insert additional widgets)
+	// USER END
 };
 
 /*********************************************************************
@@ -93,6 +110,69 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 */
 
 // USER START (Optionally insert additional static code)
+static void returnToMainMenu(void)
+{
+	masterClock.guiVars->menuState = MENU_STATE_MAIN;
+	message.MsgId = WM_BACKTOMAINMENU;
+	message.Data.v = 0xFF;
+	WM_SendMessage(masterClock.handles->hMainMenu, &message);
+	WM_DeleteWindow(masterClock.handles->hPasswordMenu);
+}
+static void checkPassword(void)
+{
+	uint8_t i;
+	uint8_t isValid = 1;
+	for (i = 0; i < sizeof(readBuff); i++)
+	{
+		isValid &= (readBuff[i] == storedPassw[i]);
+	}
+	if (isValid)
+	{
+		masterClock.guiVars->menuLocked = 0;
+		returnToMainMenu();
+	}
+	else
+	{
+		HEADER_SetItemText(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), 0, "__");
+		HEADER_SetItemText(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), 1, "__");
+		HEADER_SetItemText(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), 2, "__");
+		HEADER_SetItemText(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), 3, "__");
+		HEADER_SetItemText(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), 4, "__");
+		readPos = 0;
+		HEADER_SetTextColor(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), GUI_WHITE);
+	}
+	
+}
+static uint8_t addNumToBuff(uint8_t num)
+{
+	if (num > 9) return WRONG_NUMBER;
+	if (readPos > 4) 
+	{
+		checkPassword();
+		return LAST_SYMBOL_ENTERED;
+	}
+	char symbol[2];
+	sprintf(symbol, "%d", num);
+	HEADER_SetItemText(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), readPos, symbol);
+	HEADER_SetTextColor(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), GUI_WHITE);
+	readBuff[readPos] = num;
+	readPos++;
+	if (readPos > 4) 
+	{
+		checkPassword();
+	}
+	return NOT_LAST_SYMBOL_ENETERD;
+}
+static uint8_t deleteLastFromBuff(void)
+{
+	if (readPos > 9) return WRONG_NUMBER;
+	if (readPos == 0) return LAST_SYMBOL_DELETED;
+	readPos--;
+	HEADER_SetItemText(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), readPos, "__");
+	HEADER_SetTextColor(WM_GetDialogItem(masterClock.handles->hPasswordMenu, ID_HEADER_PASSWORD), GUI_WHITE);
+	readBuff[readPos] = 0;
+	return NOT_LAST_SYMBOL_ENETERD;
+}
 // USER END
 
 /*********************************************************************
@@ -100,226 +180,270 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 *       _cbDialog
 */
 static void _cbDialog(WM_MESSAGE * pMsg) {
-  WM_HWIN hItem;
-  int     NCode;
-  int     Id;
-  // USER START (Optionally insert additional variables)
-  // USER END
+	WM_HWIN hItem;
+	int     NCode;
+	int     Id;
+	char secondsString[3] = { 0, 0, 0 };
+	
+	// USER START (Optionally insert additional variables)
+	// USER END
 
-  switch (pMsg->MsgId) {
-  case WM_INIT_DIALOG:
-    //
-    // Initialization of 'Header'
-    //
-    hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_0);
-    HEADER_AddItem(hItem, 48, "Num0", 14);
-    HEADER_AddItem(hItem, 48, "Num1", 14);
-    HEADER_AddItem(hItem, 48, "Num2", 14);
-    HEADER_AddItem(hItem, 48, "Num3", 14);
-    HEADER_AddItem(hItem, 48, "Num4", 14);
-    // USER START (Optionally insert additional code for further widget initialization)
-    // USER END
-    break;
-  case WM_NOTIFY_PARENT:
-    Id    = WM_GetId(pMsg->hWinSrc);
-    NCode = pMsg->Data.v;
-    switch(Id) {
-    case ID_BUTTON_0: // Notifications sent by '0'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_1: // Notifications sent by '1'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_2: // Notifications sent by '2'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_3: // Notifications sent by '3'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_4: // Notifications sent by '8'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_5: // Notifications sent by '5'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_6: // Notifications sent by '6'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_7: // Notifications sent by '7'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_8: // Notifications sent by '4'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_9: // Notifications sent by '9'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_10: // Notifications sent by 'Enter'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_BUTTON_11: // Notifications sent by 'Cancel'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    case ID_HEADER_0: // Notifications sent by 'Header'
-      switch(NCode) {
-      case WM_NOTIFICATION_CLICKED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_RELEASED:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      case WM_NOTIFICATION_MOVED_OUT:
-        // USER START (Optionally insert code for reacting on notification message)
-        // USER END
-        break;
-      // USER START (Optionally insert additional code for further notification handling)
-      // USER END
-      }
-      break;
-    // USER START (Optionally insert additional code for further Ids)
-    // USER END
-    }
-    break;
-  // USER START (Optionally insert additional message handling)
-  // USER END
-  default:
-    WM_DefaultProc(pMsg);
-    break;
-  }
+	switch(pMsg->MsgId) {
+	case WM_INIT_DIALOG:
+		//
+		// Initialization of 'Header'
+		//
+		countDown = 30;
+		hItem = pMsg->hWin;
+		WINDOW_SetBkColor(hItem, 0x191615);
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_PASSWORD);
+		readPos = 0;
+		
+		HEADER_AddItem(hItem, 48, "__", 14);           //10000
+		HEADER_AddItem(hItem, 48, "__", 14);           //1000
+		HEADER_AddItem(hItem, 48, "__", 14);           //100
+		HEADER_AddItem(hItem, 48, "__", 14);           //10
+		HEADER_AddItem(hItem, 48, "__", 14);           //1
+		HEADER_SetTextColor(hItem, GUI_WHITE);
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_ALERT_TOP);
+		TEXT_SetFont(hItem, &GUI_FontArial18);
+		TEXT_SetTextColor(hItem, GUI_WHITE);
+		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_ALERT_BOTTOM);
+		TEXT_SetFont(hItem, &GUI_FontArial18);
+		TEXT_SetTextColor(hItem, GUI_WHITE);
+		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_COUNTER);
+		TEXT_SetFont(hItem, &GUI_FontArial18);
+		TEXT_SetTextColor(hItem, GUI_WHITE);
+		TEXT_SetTextAlign(hItem, GUI_TA_HCENTER | GUI_TA_VCENTER);
+		// USER START (Optionally insert additional code for further widget initialization)
+		// USER END
+		break;
+	case WM_SEC_UPDATE:
+		countDown--;
+		sprintf(secondsString, "%d", countDown);
+		TEXT_SetText(WM_GetDialogItem(pMsg->hWin, ID_TEXT_COUNTER), secondsString);
+		if (countDown == 0)
+		{
+			returnToMainMenu();
+		}
+		break;
+	case WM_NOTIFY_PARENT:
+		Id    = WM_GetId(pMsg->hWinSrc);
+		NCode = pMsg->Data.v;
+		countDown = 30;
+		switch (Id) {
+
+		case ID_BUTTON_0: // Notifications sent by '0'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(0);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_1: // Notifications sent by '1'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(1);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_2: // Notifications sent by '2'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(2);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_3: // Notifications sent by '3'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(3);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_4: // Notifications sent by '8'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(4);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_5: // Notifications sent by '5'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(5);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_6: // Notifications sent by '6'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(6);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_7: // Notifications sent by '7'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(7);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_8: // Notifications sent by '4'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(8);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_9: // Notifications sent by '9'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+			  addNumToBuff(9);
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_BACKSPACE: // Notifications sent by 'Enter'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+				  deleteLastFromBuff();
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_BUTTON_11: // Notifications sent by 'Cancel'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+				returnToMainMenu();
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_HEADER_PASSWORD: // Notifications sent by 'Header'
+		  switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_MOVED_OUT:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+			// USER START (Optionally insert additional code for further Ids)
+			// USER END
+		}
+		break;
+		// USER START (Optionally insert additional message handling)
+		// USER END
+		default :
+		  WM_DefaultProc(pMsg);
+		break;
+	}
 }
 
 /*********************************************************************
@@ -333,10 +457,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 *       CreateWindow
 */
 WM_HWIN CreatePasswordWindow(void) {
-  WM_HWIN hWin;
+	WM_HWIN hWin;
 
-  hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
-  return hWin;
+	hWin = GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate), _cbDialog, WM_HBKWIN, 0, 0);
+	masterClock.handles->hPasswordMenu = hWin;
+	return hWin;
 }
 
 // USER START (Optionally insert additional public code)

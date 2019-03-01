@@ -839,6 +839,9 @@
     <ClInclude Include="Inc\lines.h">
       <Filter>Header files</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\language.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Middlewares\Third_Party\STemWin\lib\STemWin532_CM3_OS_GCC.a">

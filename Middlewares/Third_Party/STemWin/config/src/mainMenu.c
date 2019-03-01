@@ -22,7 +22,8 @@
 // USER END
 
 #include "mainMenu.h"
-
+#include "language.h"
+#include "Password.h"
 /*********************************************************************
 *
 *       Defines
@@ -9017,21 +9018,12 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 	{ IMAGE_CreateIndirect, "Image", ID_IMAGE_0, 277, 6, 35, 35, 0, 0, 0 },
 	{ IMAGE_CreateIndirect, "Image", ID_IMAGE_1, 6, 4, 35, 35, 0, 0, 0 },
 	{ IMAGE_CreateIndirect, "Image", ID_IMAGE_2, 6, 4, 35, 35, 0, 0, 0 },
-	//{ TEXT_CreateIndirect, "Ëèíèÿ 1", ID_TEXT_0, 	  10, 170, 60, 20, 0, 0x0, 0 },
-   // { TEXT_CreateIndirect, "Ëèíèÿ 2", ID_TEXT_1, 			90, 170, 60, 20, 0, 0x0, 0 },
-   // { TEXT_CreateIndirect, "Ëèíèÿ 3", ID_TEXT_2, 			170, 170, 60, 20, 0, 0x0, 0 },
-   // { TEXT_CreateIndirect, "Ëèíèÿ 4", ID_TEXT_3, 			250, 170, 60, 20, 0, 0x0, 0 },
 	{ TEXT_CreateIndirect, "--:--", ID_TEXT_HOUR_MIN, 30, 60, 160, 53, 0, 0x0, 0 },
 	{ TEXT_CreateIndirect, ":-", ID_TEXT_SECONDS_H, 193, 60, 60, 53, 0, 0x0, 0 },
 	{ TEXT_CreateIndirect, "-", ID_TEXT_SECONDS_L, 256, 60, 30, 53, 0, 0x0, 0 },
-	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE1, 			15, 209, 50, 20, 0, 0x0, 0 },
-	{ TEXT_CreateIndirect, "17.12.2018 mon", ID_TEXT_DATE, 110, 116, 100, 20, 0, 0x0, 0 },
-	//{TEXT_CreateIndirect, "", ID_TEXT_LINE2, 			95, 209, 50, 20, 0, 0x0, 0 },
-	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE3, 			175, 209, 50, 20, 0, 0x0, 0 },
-	//{ TEXT_CreateIndirect, "", ID_TEXT_LINE4, 			255, 209, 50, 20, 0, 0x0, 0 },
-	
-	{ PROGBAR_CreateIndirect, "Íàãðóçêà", ID_MAINMENU_PROGBAR, 245, 150, 70, 7, 0x0, 0 },
-	{ TEXT_CreateIndirect, "Íàãðóçêà", ID_MAINMENU_TEXT_LOAD, 245, 130, 70, 20, 0, 0x0, 0 }
+	{ TEXT_CreateIndirect, "17.12.2018 mon", ID_TEXT_DATE, 110, 116, 100, 20, 0, 0x0, 0 },	
+	{ PROGBAR_CreateIndirect, CURRENT_SENSE_TEXT, ID_MAINMENU_PROGBAR, 245, 150, 70, 7, 0x0, 0 },
+	{ TEXT_CreateIndirect, CURRENT_SENSE_TEXT, ID_MAINMENU_TEXT_LOAD, 245, 130, 70, 20, 0, 0x0, 0 }
 	
 	// USER START (Optionally insert additional widgets)
 	// USER END
@@ -9067,6 +9059,8 @@ static const void * _GetImageById(U32 Id, U32 * pSize) {
 static void _cbButton(WM_MESSAGE * pMsg)
 {
 	GUI_RECT Rect;
+	char lineText[sizeof("BUTTON_LINE_TEXT") + 2] = BUTTON_LINE_TEXT;
+	
 	//	static BUTTON_SKINFLEX_PROPS PropsUnpressed;
 		//char str[5];
 	unsigned char lineNum = 0xFF;
@@ -9090,20 +9084,22 @@ static void _cbButton(WM_MESSAGE * pMsg)
 		switch (id)
 		{
 		case ID_BUTTON_LINE1:
-			GUI_DispStringInRect("Ëèíèÿ 1", &Rect, TextAlign);
+			
+			strcat(lineText, " 1");
+			GUI_DispStringInRect(lineText, &Rect, TextAlign);
 			Rect.y0 = 50;
 			Rect.y1 = 60;
 			switch (masterClock.line[0].Status) {
 			case LINE_STATUS_OFF:
 				GUI_SetColor(GUI_GRAY);
-				strcpy(timeString, "ÂÛÊË");
+				strcpy(timeString, OFF_TEXT);
 				break;
 			case LINE_STATUS_RUN:
 				sprintf(timeString, "%02d:%02d", masterClock.line[0].Hours, masterClock.line[0].Minutes);
 				GUI_SetColor(GUI_WHITE);
 				break;
 			case LINE_STATUS_STOP:
-				strcpy(timeString, "ÑÒÎÏ");
+				strcpy(timeString, STOP_TEXT);
 				GUI_SetColor(GUI_RED);
 				break;
 			}
@@ -9112,20 +9108,21 @@ static void _cbButton(WM_MESSAGE * pMsg)
 
 			break;
 		case ID_BUTTON_LINE2:
-			GUI_DispStringInRect("Ëèíèÿ 2", &Rect, TextAlign);
+			strcat(lineText, " 2");
+			GUI_DispStringInRect(lineText, &Rect, TextAlign);
 			Rect.y0 = 50;
 			Rect.y1 = 60;
 			switch (masterClock.line[1].Status) {
 			case LINE_STATUS_OFF:
 				GUI_SetColor(GUI_GRAY);
-				strcpy(timeString, "ÂÛÊË");
+				strcpy(timeString, OFF_TEXT);
 				break;
 			case LINE_STATUS_RUN:
 				sprintf(timeString, "%02d:%02d", masterClock.line[1].Hours, masterClock.line[1].Minutes);
 				GUI_SetColor(GUI_WHITE);
 				break;
 			case LINE_STATUS_STOP:
-				strcpy(timeString, "ÑÒÎÏ");
+				strcpy(timeString, STOP_TEXT);
 				GUI_SetColor(GUI_RED);
 				break;
 			}
@@ -9133,40 +9130,42 @@ static void _cbButton(WM_MESSAGE * pMsg)
 
 			break;
 		case ID_BUTTON_LINE3:
-			GUI_DispStringInRect("Ëèíèÿ 3", &Rect, TextAlign);
+			strcat(lineText, " 3");
+			GUI_DispStringInRect(lineText, &Rect, TextAlign);
 			Rect.y0 = 50;
 			Rect.y1 = 60;
 			switch (masterClock.line[2].Status) {
 			case LINE_STATUS_OFF:
 				GUI_SetColor(GUI_GRAY);
-				strcpy(timeString, "ÂÛÊË");
+				strcpy(timeString, OFF_TEXT);
 				break;
 			case LINE_STATUS_RUN:
 				sprintf(timeString, "%02d:%02d", masterClock.line[2].Hours, masterClock.line[2].Minutes);
 				GUI_SetColor(GUI_WHITE);
 				break;
 			case LINE_STATUS_STOP:
-				strcpy(timeString, "ÑÒÎÏ");
+				strcpy(timeString, STOP_TEXT);
 				GUI_SetColor(GUI_RED);
 				break;
 			}
 			GUI_DispStringInRect(timeString, &Rect, TextAlign);
 			break;
 		case ID_BUTTON_LINE4:
-			GUI_DispStringInRect("Ëèíèÿ 4", &Rect, TextAlign);
+			strcat(lineText, " 4");
+			GUI_DispStringInRect(lineText, &Rect, TextAlign);
 			Rect.y0 = 50;
 			Rect.y1 = 60;
 			switch (masterClock.line[3].Status) {
 			case LINE_STATUS_OFF:
 				GUI_SetColor(GUI_GRAY);
-				strcpy(timeString, "ÂÛÊË");
+				strcpy(timeString, OFF_TEXT);
 				break;
 			case LINE_STATUS_RUN:
 				sprintf(timeString, "%02d:%02d", masterClock.line[3].Hours, masterClock.line[3].Minutes);
 				GUI_SetColor(GUI_WHITE);
 				break;
 			case LINE_STATUS_STOP:
-				strcpy(timeString, "ÑÒÎÏ");
+				strcpy(timeString, STOP_TEXT);
 				GUI_SetColor(GUI_RED);
 				break;
 			}
@@ -9191,6 +9190,7 @@ void sendMsgToMainLineButtons(uint16_t message)
 	WM_MESSAGE msgButton;
 	if (masterClock.handles->hMainMenu != 0)
 	{
+		
 		msgButton.MsgId = message;
 		WM_SendMessage(masterClock.handles->hButtonLine[0], &msgButton);
 		WM_SendMessage(masterClock.handles->hButtonLine[1], &msgButton);
@@ -9402,7 +9402,17 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		//BUTTON_SetText(masterClock.handles->hButtonLine4,"4");
 		//BUTTON_SetSkin(masterClock.handles->hButtonLine4, _DrawSkin_BUTTON);
 	// USER END
-
+		if(masterClock.guiVars->menuLocked)
+		{
+			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
+		}
+		else
+		{
+			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
+			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+		}
+		
 		break;
 	case WM_BACKTOMAINMENU:
 		masterClock.guiVars->menuState = MENU_STATE_MAIN;
@@ -9455,9 +9465,19 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				masterClock.guiVars->menuState = MENU_STATE_LINE1SETUP;
-				WM_HideWindow(masterClock.handles->hMainMenu);
-				CreateLineSetupWindow();
+				if(masterClock.guiVars->menuLocked)
+				{
+					masterClock.guiVars->menuState = MENU_STATE_PASSWORD;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreatePasswordWindow();
+				}
+				else
+				{
+					masterClock.guiVars->menuState = MENU_STATE_LINE1SETUP;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreateLineSetupWindow();
+				}
+				
 
 				// USER END
 				break;
@@ -9474,9 +9494,18 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				masterClock.guiVars->menuState = MENU_STATE_LINE2SETUP;
-				WM_HideWindow(masterClock.handles->hMainMenu);
-				CreateLineSetupWindow();
+				if(masterClock.guiVars->menuLocked)
+				{
+					masterClock.guiVars->menuState = MENU_STATE_PASSWORD;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreatePasswordWindow();
+				}
+				else
+				{
+					masterClock.guiVars->menuState = MENU_STATE_LINE2SETUP;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreateLineSetupWindow();
+				}
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9491,9 +9520,18 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				masterClock.guiVars->menuState = MENU_STATE_LINE3SETUP;
-				WM_HideWindow(masterClock.handles->hMainMenu);
-				CreateLineSetupWindow();
+				if(masterClock.guiVars->menuLocked)
+				{
+					masterClock.guiVars->menuState = MENU_STATE_PASSWORD;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreatePasswordWindow();
+				}
+				else
+				{
+					masterClock.guiVars->menuState = MENU_STATE_LINE3SETUP;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreateLineSetupWindow();
+				}
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9508,9 +9546,18 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				masterClock.guiVars->menuState = MENU_STATE_LINE4SETUP;
-				WM_HideWindow(masterClock.handles->hMainMenu);
-				CreateLineSetupWindow();
+				if(masterClock.guiVars->menuLocked)
+				{
+					masterClock.guiVars->menuState = MENU_STATE_PASSWORD;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreatePasswordWindow();
+				}
+				else
+				{
+					masterClock.guiVars->menuState = MENU_STATE_LINE4SETUP;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreateLineSetupWindow();
+				}
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9564,9 +9611,19 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				masterClock.guiVars->menuState = MENU_STATE_TIMESETUP;
-				WM_HideWindow(masterClock.handles->hMainMenu);
-				CreateTimeSetupWindow();
+				if(masterClock.guiVars->menuLocked)
+				{
+					masterClock.guiVars->menuState = MENU_STATE_PASSWORD;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreatePasswordWindow();
+				}
+				else
+				{
+					masterClock.guiVars->menuState = MENU_STATE_TIMESETUP;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreateTimeSetupWindow();
+				}
+				
 
 
 
@@ -9766,7 +9823,7 @@ WM_HWIN CreateMainMenu(void) {
 	PROGBAR_SetMinMax(WM_GetDialogItem(hWin, ID_MAINMENU_PROGBAR), 0, 0xFFF);
 	PROGBAR_SetSkin(WM_GetDialogItem(hWin, ID_MAINMENU_PROGBAR), _ProgbarSkin);
 	PROGBAR_SetText(WM_GetDialogItem(hWin, ID_MAINMENU_PROGBAR), "");
-
+	
 
 	return hWin;
 }
@@ -9841,25 +9898,25 @@ void TFT_MainMenu_ShowDate(void)
 	switch (sDate.WeekDay)
 	{
 	case RTC_WEEKDAY_MONDAY:
-		strcat(str, "ïí ");
+		strcat(str, MONDAY_TEXT);
 		break;
 	case RTC_WEEKDAY_TUESDAY:
-		strcat(str, "âò ");
+		strcat(str, TUESDAY_TEXT);
 		break;
 	case RTC_WEEKDAY_WEDNESDAY:
-		strcat(str, "ñð ");
+		strcat(str, WEDNESDAY_TEXT);
 		break;
 	case RTC_WEEKDAY_THURSDAY:
-		strcat(str, "÷ò ");
+		strcat(str, THURSDAY_TEXT);
 		break;
 	case RTC_WEEKDAY_FRIDAY:
-		strcat(str, "ïò ");
+		strcat(str, FRIDAY_TEXT);
 		break;
 	case RTC_WEEKDAY_SATURDAY:
-		strcat(str, "ñá ");
+		strcat(str, SATURDAY_TEXT);
 		break;
 	case RTC_WEEKDAY_SUNDAY:
-		strcat(str, "âñ ");
+		strcat(str, SUNDAY_TEXT);
 		break;
 	}
 	TEXT_SetText(WM_GetDialogItem(masterClock.handles->hMainMenu, ID_TEXT_DATE), str);
