@@ -53,6 +53,8 @@
 #define FLASH_CALIF_OFFSET 0x0807F800 + 20
 #define FLASH_CRC_OFFSET 0x0807F800 + 24
 
+#define CURRENT_GREEN_LEVEL 75
+#define CURRENT_ORANGE_LEVEL 85
 typedef struct
 {
 	uint8_t menuLocked;

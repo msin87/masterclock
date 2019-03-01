@@ -51,6 +51,11 @@ int _ProgbarSkin(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		//
 		// Receive the area of the PROGBAR widget
 		//
+//		UserRect.x0 = pDrawItemInfo->x0;
+//		UserRect.y0 = pDrawItemInfo->y0;
+//		UserRect.x1 = pDrawItemInfo->x1;
+//		UserRect.y1 = pDrawItemInfo->y1;
+		//WM_SetUserClipRect(&UserRect);
 		WM_GetClientRectEx(pDrawItemInfo->hWin, &Rect);
 		loadLevel = PROGBAR_GetValue(pDrawItemInfo->hWin);
 		if (loadLevel < (4096 * 0.65))
@@ -60,17 +65,14 @@ int _ProgbarSkin(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		}
 		else if (loadLevel < (4096 * 0.8))
 		{
+			//GUI_SetColor(0x191615);
+			//GUI_FillRect(Rect.x0, Rect.y0, Rect.x1, Rect.y1);
+			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1, Rect.y1, GUI_DARKGREEN, GUI_ORANGE);
 			
-			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1 * 0.65, Rect.y1, GUI_DARKGREEN, GUI_ORANGE);
-			GUI_SetColor(GUI_ORANGE);
-			GUI_FillRect(Rect.x1 * 0.65, Rect.y0, Rect.x1, Rect.y1);
 		}
 		else
 		{
-			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1 * 0.65, Rect.y1, GUI_DARKGREEN, GUI_ORANGE);
-			GUI_DrawGradientH(Rect.x1 * 0.65, Rect.y0, Rect.x1 * 0.85, Rect.y1, GUI_ORANGE, GUI_RED);
-			GUI_SetColor(GUI_RED);
-			GUI_FillRect(Rect.x1 * 0.85, Rect.y0, Rect.x1, Rect.y1);
+			GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1, Rect.y1, GUI_DARKGREEN, GUI_RED);
 		}
 		//
 		// Draw a green rounded rect over the complete area, this gets (partially) overwritten by a white one
@@ -370,7 +372,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7);                                //°??«  
+				Lcd_Write_Data(0x49E7);                                      //°??«  
 
 			}
 			mask >>= 1;

@@ -9210,6 +9210,31 @@ void forceUpdateStrings(void)
 	HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 	TFT_MainMenu_ShowDate();
 }
+//void drawCurrentMeter(CurrentSense *currentSense)
+//{
+//	GUI_RECT Rect;
+//	uint32_t level = (currentSense->currentLevel / 4095.0);
+//	uint16_t greenLevel, orangeLevel;
+//	
+//	Rect.x0 = 245;
+//	Rect.x1 = Rect.x0 + 70;
+//	Rect.y0 = 150;
+//	Rect.y1 = Rect.y0 + 7;
+//	
+//	level = Rect.x1*level;
+//	greenLevel = Rect.x1*(CURRENT_GREEN_LEVEL / 100);
+//	orangeLevel = Rect.x1*(CURRENT_ORANGE_LEVEL / 100);
+//	if (level <= greenLevel)
+//	{
+//		GUI_SetColor(GUI_DARKGREEN);
+//		GUI_FillRect(Rect.x0, Rect.y0, Rect.x1, Rect.y1);
+//	}
+//	else if (level <= orangeLevel)
+//	{
+//		
+//		GUI_DrawGradientH(Rect.x0, Rect.y0, Rect.x1, Rect.y1, GUI_DARKGREEN, GUI_ORANGE);
+//	}
+//}
 /*static void _cbLocalTimeSetupWindows(WM_MESSAGE * pMsg)
 {
 	FRAMEWIN_Handle hItem;
@@ -9390,8 +9415,9 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 	case WM_CURRENTMETER_UPDATE:
 		
-		//WM_Invalidate(WM_GetDialogItem(masterClock.handles->hMainMenu, ID_MAINMENU_PROGBAR)); 
+		WM_Invalidate(WM_GetDialogItem(masterClock.handles->hMainMenu, ID_MAINMENU_PROGBAR)); 
 		PROGBAR_SetValue(WM_GetDialogItem(masterClock.handles->hMainMenu, ID_MAINMENU_PROGBAR), masterClock.currentSense->currentLevel);
+		//drawCurrentMeter(masterClock.currentSense);
 		break;
 	case WM_SEC_UPDATE:
 		sprintf(timeString, "%d", sTime.Seconds % 10);
