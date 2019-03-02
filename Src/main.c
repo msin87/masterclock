@@ -148,7 +148,10 @@ void delay(uint32_t delayTime);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+	masterClock.currentSense->DMAtransferComplete = 1;
+}
 void delay(uint32_t delayTime)
 {
 	uint32_t i;
@@ -273,7 +276,8 @@ int main(void)
 	MX_ADC1_Init();
 	/* USER CODE BEGIN 2 */
 	//GUI_Init();
-  HAL_RTCEx_SetSecond_IT(&hrtc);
+	__TURN_BACKLIGHT_ON;
+	HAL_RTCEx_SetSecond_IT(&hrtc);
 	//Init_SSD1289();
 
 	variables.calibrated = 1;
@@ -284,15 +288,15 @@ int main(void)
 	/* USER CODE END 2 */
 
 	/* USER CODE BEGIN RTOS_MUTEX */
-						/* add mutexes, ... */
+						  /* add mutexes, ... */
 	/* USER CODE END RTOS_MUTEX */
 
 	/* USER CODE BEGIN RTOS_SEMAPHORES */
-						/* add semaphores, ... */
+						  /* add semaphores, ... */
 	/* USER CODE END RTOS_SEMAPHORES */
 
 	/* USER CODE BEGIN RTOS_TIMERS */
-						/* start timers, add new ones, ... */
+						  /* start timers, add new ones, ... */
 	/* USER CODE END RTOS_TIMERS */
 
 	/* Create the thread(s) */
@@ -321,11 +325,11 @@ int main(void)
 	TaskLine3Handle = osThreadCreate(osThread(TaskLine3), NULL);
 
 	/* USER CODE BEGIN RTOS_THREADS */
-						/* add threads, ... */
+						  /* add threads, ... */
 	/* USER CODE END RTOS_THREADS */
 
 	/* USER CODE BEGIN RTOS_QUEUES */
-						/* add queues, ... */
+						  /* add queues, ... */
 	/* USER CODE END RTOS_QUEUES */
  
 
@@ -564,6 +568,7 @@ static void MX_RTC_Init(void)
 
 	/**Initialize RTC and set the Time and Date 
 	*/
+
 	/* USER CODE BEGIN RTC_Init 2 */
 	HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
 	/* USER CODE END RTC_Init 2 */
@@ -716,7 +721,7 @@ static void MX_GPIO_Init(void)
 	/*Configure GPIO pin Output Level */
 	HAL_GPIO_WritePin(GPIOE,
 		LINE0_NEG_OUTPUT_Pin|LINE1_NEG_OUTPUT_Pin|LINE2_NEG_OUTPUT_Pin|LINE3_NEG_OUTPUT_Pin 
-	                        |LCD_RESET_Pin,
+	                        |BACKLIGHT_CONTROL_Pin|LCD_RESET_Pin,
 		GPIO_PIN_RESET);
 
 	/*Configure GPIO pin Output Level */
@@ -774,6 +779,13 @@ static void MX_GPIO_Init(void)
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 	HAL_GPIO_Init(TOUCH_CS_GPIO_Port, &GPIO_InitStruct);
 
+	/*Configure GPIO pin : BACKLIGHT_CONTROL_Pin */
+	GPIO_InitStruct.Pin = BACKLIGHT_CONTROL_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(BACKLIGHT_CONTROL_GPIO_Port, &GPIO_InitStruct);
+
 }
 
 /* FSMC initialization function */
@@ -818,8 +830,7 @@ static void MX_FSMC_Init(void)
 
 	__HAL_AFIO_FSMCNADV_DISCONNECTED();
 
-}
-
+} 
 /* USER CODE BEGIN 4 */
 
 
@@ -958,7 +969,7 @@ void vTaskGUI(void const * argument)
 								{
 									if (masterClock.timeCalibration->seconds > 0) //если добавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                             //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                                //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
@@ -966,13 +977,13 @@ void vTaskGUI(void const * argument)
 										}
 									if (masterClock.timeCalibration->seconds < 0) //если убавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                              //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                                 //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
 											}
 										}
-									masterClock.timeCalibration->daysPassed = 0;                             // 1 => 0
+									masterClock.timeCalibration->daysPassed = 0;                                // 1 => 0
 									timeCalibr.isCalibrated = true;
 								}
 						}
@@ -1018,33 +1029,43 @@ void vTaskGUI(void const * argument)
 				switch (masterClock.guiVars->menuState) {
 				case MENU_STATE_MAIN:
 					sendMsg(masterClock.handles->hMainMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hMainMenu);
 					break;
 				case MENU_STATE_TIMESETUP:
 					sendMsg(masterClock.handles->hTimeSetupMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hTimeSetupMenu);
 					break;
 				case MENU_STATE_LINE1SETUP:
 					sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hLineSetupMenu);
 					break;
 				case MENU_STATE_LINE2SETUP:
 					sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hLineSetupMenu);
 					break;
 				case MENU_STATE_LINE3SETUP:
 					sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hLineSetupMenu);
 					break;
 				case MENU_STATE_LINE4SETUP:
 					sendMsg(masterClock.handles->hLineSetupMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hLineSetupMenu);
 					break;
 				case MENU_STATE_LINE1SETUP_PULSE:
 					sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hLineSetupPulseMenu);
 					break;
 				case MENU_STATE_LINE2SETUP_PULSE:
 					sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hLineSetupPulseMenu);
 					break;
 				case MENU_STATE_LINE3SETUP_PULSE:
 					sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hLineSetupPulseMenu);
 					break;
 				case MENU_STATE_LINE4SETUP_PULSE:
 					sendMsg(masterClock.handles->hLineSetupPulseMenu, WM_SEC_UPDATE);
+					menuLocker(&masterClock.handles->hLineSetupPulseMenu);
 					break;
 				case MENU_STATE_PASSWORD:
 					sendMsg(masterClock.handles->hPasswordMenu, WM_SEC_UPDATE);
@@ -1069,7 +1090,7 @@ void vTaskGUI(void const * argument)
 void vTaskLine0(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine0 */
-				/* Infinite loop */
+				  /* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(masterClock.line[0].xSemaphore, portMAX_DELAY);
@@ -1089,7 +1110,7 @@ void vTaskLine0(void const * argument)
 void vTaskLine1(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine1 */
-				/* Infinite loop */
+				  /* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(masterClock.line[1].xSemaphore, portMAX_DELAY);
@@ -1109,7 +1130,7 @@ void vTaskLine1(void const * argument)
 void vTaskLine2(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine2 */
-				/* Infinite loop */
+				  /* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(masterClock.line[2].xSemaphore, portMAX_DELAY);
@@ -1129,7 +1150,7 @@ void vTaskLine2(void const * argument)
 void vTaskLine3(void const * argument)
 {
 	/* USER CODE BEGIN vTaskLine3 */
-				/* Infinite loop */
+				  /* Infinite loop */
 	for (;;)
 	{
 		xSemaphoreTake(masterClock.line[3].xSemaphore, portMAX_DELAY);
@@ -1137,11 +1158,6 @@ void vTaskLine3(void const * argument)
 		saveLineToBKP(3);
 	}
 	/* USER CODE END vTaskLine3 */
-}
-
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-{
-	masterClock.currentSense->DMAtransferComplete = 1;
 }
 
 /**
@@ -1172,7 +1188,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
 	/* USER CODE BEGIN Error_Handler_Debug */
-						/* User can add his own implementation to report the HAL error return state */
+						  /* User can add his own implementation to report the HAL error return state */
 
 	/* USER CODE END Error_Handler_Debug */
 }
@@ -1188,9 +1204,9 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 { 
 	/* USER CODE BEGIN 6 */
-						/* User can add his own implementation to report the file name and line number,
-						   tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-	/* USER CODE END 6 */
+						  /* User can add his own implementation to report the file name and line number,
+						     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+    /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
 

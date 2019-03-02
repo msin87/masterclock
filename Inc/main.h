@@ -116,6 +116,8 @@ void Error_Handler(void);
 #define NOT_PEN_GPIO_Port GPIOB
 #define TOUCH_CS_Pin GPIO_PIN_7
 #define TOUCH_CS_GPIO_Port GPIOB
+#define BACKLIGHT_CONTROL_Pin GPIO_PIN_0
+#define BACKLIGHT_CONTROL_GPIO_Port GPIOE
 #define LCD_RESET_Pin GPIO_PIN_1
 #define LCD_RESET_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */

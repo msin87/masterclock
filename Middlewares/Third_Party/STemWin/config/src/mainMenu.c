@@ -9225,7 +9225,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 
-
+		masterClock.guiVars->lockCountDown = TIME_TO_LOCK_MENU;
 		hItem = pMsg->hWin;
 		WINDOW_SetBkColor(hItem, 0x191615);
 	
@@ -9302,17 +9302,28 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 
 		if (masterClock.guiVars->menuLocked)
 		{
-			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
-			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
+			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
+			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
 		}
 		else
 		{
-			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
-			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
 		}
 		
 		break;
 	case WM_BACKTOMAINMENU:
+		masterClock.guiVars->lockCountDown = TIME_TO_LOCK_MENU;
+		if (masterClock.guiVars->menuLocked)
+		{
+			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
+			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+		}
+		else
+		{
+			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
+		}
 		masterClock.guiVars->menuState = MENU_STATE_MAIN;
 		forceUpdateStrings();
 		break;
@@ -9338,20 +9349,33 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			if (masterClock.guiVars->prevSecond_H == 5) //прошла минута
 				{
 					sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
-					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                       //обновление строки с часами и минутами
+					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                            //обновление строки с часами и минутами
 
 				}
 		}
 		pMsg->MsgId = 0;
 		masterClock.guiVars->prevSecond_L = sTime.Seconds % 10;
 		masterClock.guiVars->prevSecond_H = sTime.Seconds / 10;
-		break;
+		//		if (masterClock.guiVars->lockCountDown != 0)
+		//		{
+		//			masterClock.guiVars->lockCountDown--;
+		//		}
+		//		else
+		//		{
+		//			__TURN_BACKLIGHT_OFF;
+		//			masterClock.guiVars->menuLocked = 1;
+		//			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
+		//			WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+		//		}
+				break;
 
 
 
 	case WM_NOTIFY_PARENT:
 		Id = WM_GetId(pMsg->hWinSrc);
 		NCode = pMsg->Data.v;
+		masterClock.guiVars->lockCountDown = TIME_TO_LOCK_MENU;
+		
 		switch (Id) {
 		case ID_BUTTON_LINE1: // Notifications sent by ''
 			switch(NCode) {
@@ -9463,7 +9487,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 			// USER START (Optionally insert additional code for further Ids)
-		case ID_IMAGE_1 :                       // Notifications sent by Lock
+		case ID_IMAGE_1 :                            // Notifications sent by Lock
 			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
@@ -9649,7 +9673,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(backgroundBuffer[backgrline]);                      //°??«  
+				Lcd_Write_Data(backgroundBuffer[backgrline]);                           //°??«  
 
 			}
 			mask >>= 1;

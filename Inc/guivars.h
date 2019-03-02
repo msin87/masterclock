@@ -57,6 +57,10 @@
 #define CURRENT_ORANGE_LEVEL 85
 
 #define UNLOCK_PASSWORD_ARRAY {4,0,2,5,1}
+#define TIME_TO_LOCK_MENU 30
+
+#define __TURN_BACKLIGHT_ON BACKLIGHT_CONTROL_GPIO_Port->BSRR |= BACKLIGHT_CONTROL_Pin
+#define __TURN_BACKLIGHT_OFF BACKLIGHT_CONTROL_GPIO_Port->BSRR |= (BACKLIGHT_CONTROL_Pin<<16)
 typedef struct
 {
 	uint8_t menuLocked;
@@ -69,7 +73,9 @@ typedef struct
 	uint8_t valsChanged;
 	uint8_t linesPolarity;
 	uint8_t linesTimeChanged;
+	uint8_t lockCountDown;
 	int16_t	diffSystemLine;
+	
 
 } GUI_Vars;
 typedef struct

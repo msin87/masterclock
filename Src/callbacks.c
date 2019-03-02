@@ -11,7 +11,7 @@
 #include "LineSetupPulse.h"
 #include "LineSetup.h"
 #include "timedate.h"
-
+#include "main.h"
 #define HEADER_ITEM0 0
 #define HEADER_ITEM1 1
 #define HEADER_ITEM2 2
@@ -372,7 +372,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7);                                      //°??«  
+				Lcd_Write_Data(0x49E7);                                       //°??«  
 
 			}
 			mask >>= 1;
@@ -557,4 +557,30 @@ void pollButton(uint16_t id, uint8_t action, int8_t* val)
 
 	}
 
+}
+void menuLocker(WM_HWIN *CurrentMenuHandle)
+{
+	
+	
+	if (masterClock.guiVars->lockCountDown != 0)
+	{
+		masterClock.guiVars->lockCountDown--;
+	}
+	else
+	{
+		if (*CurrentMenuHandle == masterClock.handles->hMainMenu && masterClock.guiVars->menuLocked) 
+		{
+			__TURN_BACKLIGHT_OFF;
+			return;
+		}
+		WM_MESSAGE msg;
+		msg.MsgId = WM_BACKTOMAINMENU;
+		msg.Data.v = 0xFF;
+		masterClock.guiVars->lockCountDown = 30;
+		masterClock.guiVars->menuLocked = 1;
+		masterClock.guiVars->menuState = MENU_STATE_MAIN;
+		WM_SendMessage(masterClock.handles->hMainMenu, &msg);
+		WM_DeleteWindow(*CurrentMenuHandle);
+		
+	}
 }

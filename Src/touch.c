@@ -2,6 +2,8 @@
 #include "flash.h"
 #include "crc.h"
 #include "backup.h"
+#include "cmsis_os.h"
+#include "main.h"
 #define TOLERANCE 20
 
 //unsigned int Xs_1=0,Xs_2=0,Xs_3=0,Xs_4=0,Ys_1=0,Ys_2=0,Ys_3=0,Ys_4=0; //јЗВјґҐЧш±кЦµ
@@ -131,7 +133,7 @@ uint8_t ReadTouchXY(Variables *var)
 
 	//var->a=touch;
 
-	while (var->touch_it&&count < 10)
+	while(var->touch_it&&count < 10)
 	{
 		if (read_once(var))
 		{
@@ -177,7 +179,7 @@ uint8_t ReadTouchXY(Variables *var)
 
 		x1 = buffer_x[3]; x2 = buffer_x[4];
 		y1 = buffer_y[3]; y2 = buffer_y[4];
-		if (((x1 > x2) && (x1 > x2 + TOLERANCE)) || ((x2 > x1) && (x2 > x1 + TOLERANCE)) || ((y1 > y2) && (y1 > y2 + TOLERANCE)) || ((y2 > y1) && (y2 > y1 + TOLERANCE)));
+		if (((x1 > x2) && (x1 > x2 + TOLERANCE)) || ((x2 > x1) && (x2 > x1 + TOLERANCE)) || ((y1 > y2) && (y1 > y2 + TOLERANCE)) || ((y2 > y1) && (y2 > y1 + TOLERANCE))) ;
 		else
 		{
 			X1 = (buffer_x[3] + buffer_x[4]) / 2;
@@ -413,13 +415,10 @@ void touch_control(Variables *var)
 	var->touch_it = !HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6);
 	if (var->calibrated)
 	{
-
-
 		if (var->touch_it == 1)
 		{
-
-
-
+			__TURN_BACKLIGHT_ON;
+			masterClock.guiVars->lockCountDown = TIME_TO_LOCK_MENU;
 			if (ReadTouchXY(var))
 			{
 				touch_correct(var);
