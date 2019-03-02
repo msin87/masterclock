@@ -372,7 +372,7 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(0x49E7);                                       //°??«  
+				Lcd_Write_Data(0x49E7);                                         //°??«  
 
 			}
 			mask >>= 1;
@@ -574,13 +574,12 @@ void menuLocker(WM_HWIN *CurrentMenuHandle)
 			return;
 		}
 		WM_MESSAGE msg;
+		if (!masterClock.guiVars->menuLocked && *CurrentMenuHandle != masterClock.handles->hMainMenu) WM_DeleteWindow(*CurrentMenuHandle);
 		msg.MsgId = WM_BACKTOMAINMENU;
 		msg.Data.v = 0xFF;
 		masterClock.guiVars->lockCountDown = 30;
-		masterClock.guiVars->menuLocked = 1;
 		masterClock.guiVars->menuState = MENU_STATE_MAIN;
+		masterClock.guiVars->menuLocked = 1;
 		WM_SendMessage(masterClock.handles->hMainMenu, &msg);
-		WM_DeleteWindow(*CurrentMenuHandle);
-		
 	}
 }
