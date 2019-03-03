@@ -44,7 +44,7 @@
     <AllDependencies>
       <ProjectDependency>
         <RelativePath>freertos_cubemx.gpdsc</RelativePath>
-        <Timestamp>131958548701105827</Timestamp>
+        <Timestamp>131959951073262631</Timestamp>
       </ProjectDependency>
     </AllDependencies>
     <RootDirectory>
@@ -233,6 +233,28 @@
               </Files>
             </VirtualDirectorySnapshot>
             <VirtualDirectorySnapshot>
+              <Name>PCCARD</Name>
+              <Files>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h</RelativePath>
+                </VirtualFileSnapshot>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
+                </VirtualFileSnapshot>
+              </Files>
+            </VirtualDirectorySnapshot>
+            <VirtualDirectorySnapshot>
+              <Name>NOR</Name>
+              <Files>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h</RelativePath>
+                </VirtualFileSnapshot>
+                <VirtualFileSnapshot>
+                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
+                </VirtualFileSnapshot>
+              </Files>
+            </VirtualDirectorySnapshot>
+            <VirtualDirectorySnapshot>
               <Name>FREERTOS</Name>
               <Files>
                 <VirtualFileSnapshot>
@@ -309,28 +331,6 @@
                 </VirtualFileSnapshot>
                 <VirtualFileSnapshot>
                   <RelativePath>Middlewares\Third_Party\FreeRTOS\Source\portable\GCC\ARM_CM3\portmacro.h</RelativePath>
-                </VirtualFileSnapshot>
-              </Files>
-            </VirtualDirectorySnapshot>
-            <VirtualDirectorySnapshot>
-              <Name>NOR</Name>
-              <Files>
-                <VirtualFileSnapshot>
-                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h</RelativePath>
-                </VirtualFileSnapshot>
-                <VirtualFileSnapshot>
-                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
-                </VirtualFileSnapshot>
-              </Files>
-            </VirtualDirectorySnapshot>
-            <VirtualDirectorySnapshot>
-              <Name>PCCARD</Name>
-              <Files>
-                <VirtualFileSnapshot>
-                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Inc\stm32f1xx_ll_fsmc.h</RelativePath>
-                </VirtualFileSnapshot>
-                <VirtualFileSnapshot>
-                  <RelativePath>Drivers\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_fsmc.c</RelativePath>
                 </VirtualFileSnapshot>
               </Files>
             </VirtualDirectorySnapshot>

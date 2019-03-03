@@ -571,6 +571,7 @@ static void MX_RTC_Init(void)
 
 	/* USER CODE BEGIN RTC_Init 2 */
 	HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+	saveDateToBKP();
 	/* USER CODE END RTC_Init 2 */
 
 }
@@ -969,7 +970,7 @@ void vTaskGUI(void const * argument)
 								{
 									if (masterClock.timeCalibration->seconds > 0) //если добавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                                //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                                 //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
@@ -977,13 +978,13 @@ void vTaskGUI(void const * argument)
 										}
 									if (masterClock.timeCalibration->seconds < 0) //если убавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                                 //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                                  //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
 											}
 										}
-									masterClock.timeCalibration->daysPassed = 0;                                // 1 => 0
+									masterClock.timeCalibration->daysPassed = 0;                                 // 1 => 0
 									timeCalibr.isCalibrated = true;
 								}
 						}

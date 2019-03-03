@@ -72,6 +72,7 @@ typedef struct
 	uint8_t timeFrozen;
 	uint8_t valsChanged;
 	uint8_t linesPolarity;
+	uint8_t powerLossDetected;
 	uint8_t linesTimeChanged;
 	uint8_t lockCountDown;
 	int16_t	diffSystemLine;

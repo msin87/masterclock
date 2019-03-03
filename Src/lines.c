@@ -46,9 +46,9 @@ void pollGPIO(uint8_t lineNumber, uint8_t polarity)
 	if (polarity == POLARITY_POSITIVE)
 	{
 		masterClock.currentSense->startCurrentSense();
-		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos;                            		//set
+		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos;                             		//set
 		osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
-		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos << 16;                           //reset
+		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos << 16;                            //reset
 		masterClock.currentSense->stopCurrentSense();
 		osDelay(LINES_DEAD_TIME);
 		return;
@@ -56,9 +56,9 @@ void pollGPIO(uint8_t lineNumber, uint8_t polarity)
 	if (polarity == POLARITY_NEGATIVE)
 	{
 		masterClock.currentSense->startCurrentSense();
-		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg;                         		//set
+		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg;                          		//set
 		osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
-		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg << 16;                           //reset
+		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg << 16;                            //reset
 		masterClock.currentSense->stopCurrentSense();
 		osDelay(LINES_DEAD_TIME);
 	}
@@ -66,7 +66,7 @@ void pollGPIO(uint8_t lineNumber, uint8_t polarity)
 }
 void lineSendSignal(uint8_t lineNumber)
 {
-
+	if (masterClock.guiVars->powerLossDetected) return;
 	uint8_t outputMask = 1 << lineNumber;
 	Lines *lTemp;
 	uint16_t count = uxSemaphoreGetCount(masterClock.line[lineNumber].xSemaphore);
@@ -240,7 +240,7 @@ void LinesInit(void)
 
 	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
-		doTimeCorrection = true;                               //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
+		doTimeCorrection = true;                                //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
 	}
 	else
 	{
