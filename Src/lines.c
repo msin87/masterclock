@@ -24,11 +24,31 @@ void lineSetupMenuUpdateVals(void)
 	HEADER_SetTextColor(masterClock.handles->hLineSetupVals, GUI_WHITE);
 
 }
+
 void pollLinesOutput(uint8_t waitMinutes)
 {
 	uint16_t i = 0;
 	uint8_t lineNum = 0;
+	uint8_t line0_oldHours = 0;
+	line0_oldHours = masterClock.line[0].Hours;
 	masterClock.guiVars->diffSystemLine = get_sTimeLinesDiff(&masterClock.line[0], waitMinutes);
+	if (masterClock.line[0].Hours - line0_oldHours == 12)
+	{
+		for (i = 1; i < LINES_AMOUNT; i++)
+		{
+			masterClock.line[i].Hours = correctHours(masterClock.line[i].Hours + 12);
+		}
+	}
+	else if (masterClock.line[0].Hours - line0_oldHours == -12)
+	{
+		for (i = 1; i < LINES_AMOUNT; i++)
+		{
+			masterClock.line[i].Hours = correctHours(masterClock.line[i].Hours - 12);
+		}
+	}
+			
+	
+
 	if (masterClock.guiVars->diffSystemLine > 0)
 	{
 		for (i = 0; i < masterClock.guiVars->diffSystemLine; i++)
@@ -46,9 +66,9 @@ void pollGPIO(uint8_t lineNumber, uint8_t polarity)
 	if (polarity == POLARITY_POSITIVE)
 	{
 		masterClock.currentSense->startCurrentSense();
-		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos;                             		//set
+		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos;                              		//set
 		osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
-		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos << 16;                            //reset
+		masterClock.line[lineNumber].LineGPIOpos->BSRR = masterClock.line[lineNumber].LinePinPos << 16;                             //reset
 		masterClock.currentSense->stopCurrentSense();
 		osDelay(LINES_DEAD_TIME);
 		return;
@@ -56,9 +76,9 @@ void pollGPIO(uint8_t lineNumber, uint8_t polarity)
 	if (polarity == POLARITY_NEGATIVE)
 	{
 		masterClock.currentSense->startCurrentSense();
-		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg;                          		//set
+		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg;                           		//set
 		osDelay(masterClock.line[lineNumber].Width * LINE_WIDTH_MULT);
-		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg << 16;                            //reset
+		masterClock.line[lineNumber].LineGPIOneg->BSRR = masterClock.line[lineNumber].LinePinNeg << 16;                             //reset
 		masterClock.currentSense->stopCurrentSense();
 		osDelay(LINES_DEAD_TIME);
 	}
@@ -240,7 +260,7 @@ void LinesInit(void)
 
 	if (sTime.Hours == 1 && sTime.Minutes == 2 && sTime.Seconds == 30 && isDaylightSavingTimeEU(sDate.Date, sDate.Month, sDate.WeekDay))
 	{
-		doTimeCorrection = true;                                //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
+		doTimeCorrection = true;                                 //если время 01:02:00 и текущая дата - дата перехода на зимнее/летнее время
 	}
 	else
 	{

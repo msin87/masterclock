@@ -24,6 +24,7 @@
 #include "mainMenu.h"
 #include "language.h"
 #include "Password.h"
+#include  "settingsMenu.h"
 /*********************************************************************
 *
 *       Defines
@@ -9225,7 +9226,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 
-		masterClock.guiVars->lockCountDown = TIME_TO_LOCK_MENU;
+		masterClock.guiVars->lockCountDown = masterClock.guiVars->lockCountDownInitial;
 		hItem = pMsg->hWin;
 		WINDOW_SetBkColor(hItem, 0x191615);
 	
@@ -9313,7 +9314,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		
 		break;
 	case WM_BACKTOMAINMENU:
-		masterClock.guiVars->lockCountDown = TIME_TO_LOCK_MENU;
+		masterClock.guiVars->lockCountDown = masterClock.guiVars->lockCountDownInitial;
 		if (masterClock.guiVars->menuLocked)
 		{
 			WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
@@ -9349,7 +9350,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			if (masterClock.guiVars->prevSecond_H == 5) //прошла минута
 				{
 					sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
-					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                            //обновление строки с часами и минутами
+					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                               //обновление строки с часами и минутами
 
 				}
 		}
@@ -9374,7 +9375,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	case WM_NOTIFY_PARENT:
 		Id = WM_GetId(pMsg->hWinSrc);
 		NCode = pMsg->Data.v;
-		masterClock.guiVars->lockCountDown = TIME_TO_LOCK_MENU;
+		masterClock.guiVars->lockCountDown = masterClock.guiVars->lockCountDownInitial;
 		
 		switch (Id) {
 		case ID_BUTTON_LINE1: // Notifications sent by ''
@@ -9487,7 +9488,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 			// USER START (Optionally insert additional code for further Ids)
-		case ID_IMAGE_1 :                            // Notifications sent by Lock
+		case ID_IMAGE_1 :                               // Notifications sent by Lock
 			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
@@ -9519,6 +9520,32 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				masterClock.guiVars->menuLocked = 1;
 				WM_HideWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_2));
 				WM_ShowWindow(WM_GetDialogItem(pMsg->hWin, ID_IMAGE_1));
+				// USER END
+				break;
+				// USER START (Optionally insert additional code for further notification handling)
+				// USER END
+			}
+			break;
+		case ID_IMAGE_0: // Notifications sent by Unlock
+		switch(NCode) {
+			case WM_NOTIFICATION_CLICKED:
+				// USER START (Optionally insert code for reacting on notification message)
+				// USER END
+				break;
+			case WM_NOTIFICATION_RELEASED:
+				// USER START (Optionally insert code for reacting on notification message)
+				if(masterClock.guiVars->menuLocked)
+				{
+					masterClock.guiVars->menuState = MENU_STATE_PASSWORD;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreatePasswordWindow();
+				}
+				else
+				{
+					masterClock.guiVars->menuState = MENU_STATE_SETTINGS;
+					WM_HideWindow(masterClock.handles->hMainMenu);
+					CreateSettingsWindow();
+				}
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)
@@ -9673,7 +9700,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(backgroundBuffer[backgrline]);                           //°??«  
+				Lcd_Write_Data(backgroundBuffer[backgrline]);                              //°??«  
 
 			}
 			mask >>= 1;
@@ -9693,7 +9720,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 }
 WM_HWIN CreateMainMenu(void) {
 	WM_HWIN hWin;
-	masterClock.guiVars->menuLocked = 1;
+	masterClock.guiVars->menuLocked = 0;
 	BUTTON_SKINFLEX_PROPS Props;
 	HEADER_SKINFLEX_PROPS Header_Props;
 	Props.aColorFrame[0] = GUI_ORANGE;

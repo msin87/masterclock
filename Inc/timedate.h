@@ -10,5 +10,6 @@ void correctDate(RTC_DateTypeDef* Date);
 uint8_t increaseDay(RTC_DateTypeDef* Date);
 uint8_t getLastDayOfMonth(RTC_DateTypeDef* Date);
 uint8_t hoursToUTC(int8_t hours, int8_t timeZone);
+uint8_t correctHours(int8_t hours);
 
 #endif

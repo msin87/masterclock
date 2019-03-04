@@ -22,4 +22,5 @@ void TFT_LineSetupShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color);
 
 void pollButton(uint16_t id, uint8_t action, int8_t* val);
 void menuLocker(WM_HWIN *CurrentMenuHandle);
+void returnToMainMenu(WM_HWIN* hCurrentWindow);
 #endif

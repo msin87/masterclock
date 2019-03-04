@@ -254,7 +254,7 @@ void Calibrate(Variables *var)
 					osDelay(1);
 					xt1 = var->X;
 					yt1 = var->Y;
-					sprintf(s, "%4d %4d", xt1, yt1);
+					//sprintf(s, "%4d %4d", xt1, yt1);
 					//TFT_ShowString(32,90,(u8*)s, RED,LIGHTGRAY1);
 					var->a = PEN;
 					var->touch_it = 0;
@@ -282,7 +282,7 @@ void Calibrate(Variables *var)
 					osDelay(1);
 					xt2 = var->X;
 					yt2 = var->Y;
-					sprintf(s, "%4d %4d", xt2, yt2);
+					//sprintf(s, "%4d %4d", xt2, yt2);
 					//TFT_ShowString(180,200,(u8*)s, GREEN,LIGHTGRAY1);
 					var->a = PEN;
 					var->touch_it = 0;
@@ -310,7 +310,7 @@ void Calibrate(Variables *var)
 					osDelay(1);
 					xt3 = var->X;
 					yt3 = var->Y;
-					sprintf(s, "%4d %4d", xt3, yt3);
+					//sprintf(s, "%4d %4d", xt3, yt3);
 					//TFT_ShowString(240,40,(u8*)s, BLUE,LIGHTGRAY1);
 					var->a = PEN;
 					var->touch_it = 0;
@@ -329,38 +329,38 @@ void Calibrate(Variables *var)
 		temp2 = ((double)xt1 * ((double)yt2 - (double)yt3)) + ((double)xt2 * ((double)yt3 - (double)yt1)) + ((double)xt3 * ((double)yt1 - (double)yt2));
 		cal_A = temp1 / temp2;
 		cali_A = (int32_t)((double)cal_A * RESCALE_FACTOR);
-		sprintf(s, "A=%4d", cali_A);
+		//sprintf(s, "A=%4d", cali_A);
 		//TFT_ShowString(140,120,(u8*)s, GRED,LIGHTGRAY1);
 		//B
 		temp1 = (cal_A * ((double)xt3 - (double)xt2)) + (double)cpoint2.X - (double)cpoint3.X;
 		temp2 = (double)yt2 - (double)yt3;
 		cal_B = temp1 / temp2;
 		cali_B = (int32_t)((double)cal_B * RESCALE_FACTOR);
-		sprintf(s, "B=%4d", cali_B);
+		//sprintf(s, "B=%4d", cali_B);
 		//TFT_ShowString(140,130,(u8*)s, GRED,LIGHTGRAY1);
 		//C
 		cal_C = (double)cpoint3.X - (cal_A * (double)xt3) - (cal_B * (double)yt3);
 		cali_C = (int32_t)(cal_C * RESCALE_FACTOR);
-		sprintf(s, "C=%4d", cali_C);
+		//sprintf(s, "C=%4d", cali_C);
 		//TFT_ShowString(140,140,(u8*)s, GRED,LIGHTGRAY1);
 		//D
 		temp1 = ((double)cpoint1.Y * ((double)yt2 - (double)yt3)) + ((double)cpoint2.Y * ((double)yt3 - (double)yt1)) + ((double)cpoint3.Y * ((double)yt1 - (double)yt2));
 		temp2 = ((double)xt1 * ((double)yt2 - (double)yt3)) + ((double)xt2 * ((double)yt3 - (double)yt1)) + ((double)xt3 * ((double)yt1 - (double)yt2));
 		cal_D = (double)temp1 / (double)temp2;
 		cali_D = (int32_t)(cal_D * RESCALE_FACTOR);
-		sprintf(s, "D=%4d", cali_D);
+		//sprintf(s, "D=%4d", cali_D);
 		//TFT_ShowString(140,150,(u8*)s, GRED,LIGHTGRAY1);
 		//E
 		temp1 = (cal_D * ((double)xt3 - (double)xt2)) + (double)cpoint2.Y - (double)cpoint3.Y;
 		temp2 = (double)yt2 - (double)yt3;
 		cal_E = (double)temp1 / (double)temp2;
 		cali_E = (int32_t)(cal_E * RESCALE_FACTOR);
-		sprintf(s, "E=%4d", cali_E);
+		//sprintf(s, "E=%4d", cali_E);
 		//TFT_ShowString(140,160,(u8*)s, GRED,LIGHTGRAY1);
 		//F
 		cal_F = (double)cpoint3.Y - cal_D * (double)xt3 - cal_E * (double)yt3;
 		cali_F = (int32_t)(cal_F * RESCALE_FACTOR);
-		sprintf(s, "F=%4d", cali_F);
+		//sprintf(s, "F=%4d", cali_F);
 		//TFT_ShowString(140,170,(u8*)s, GRED,LIGHTGRAY1);
 
 		/*FlashSectorEarse(0);
@@ -418,7 +418,7 @@ void touch_control(Variables *var)
 		if (var->touch_it == 1)
 		{
 			__TURN_BACKLIGHT_ON;
-			masterClock.guiVars->lockCountDown = TIME_TO_LOCK_MENU;
+			masterClock.guiVars->lockCountDown = masterClock.guiVars->lockCountDownInitial;
 			if (ReadTouchXY(var))
 			{
 				touch_correct(var);

@@ -284,7 +284,7 @@ int main(void)
 	initStructures();
 	LinesInit();
 	readLinesPolarityFromBKP();
-
+	readSettingsFromBKP();
 	/* USER CODE END 2 */
 
 	/* USER CODE BEGIN RTOS_MUTEX */
@@ -970,7 +970,7 @@ void vTaskGUI(void const * argument)
 								{
 									if (masterClock.timeCalibration->seconds > 0) //если добавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                                 //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                                   //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
@@ -978,13 +978,13 @@ void vTaskGUI(void const * argument)
 										}
 									if (masterClock.timeCalibration->seconds < 0) //если убавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                                  //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                                    //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
 											}
 										}
-									masterClock.timeCalibration->daysPassed = 0;                                 // 1 => 0
+									masterClock.timeCalibration->daysPassed = 0;                                   // 1 => 0
 									timeCalibr.isCalibrated = true;
 								}
 						}
@@ -1070,6 +1070,9 @@ void vTaskGUI(void const * argument)
 					break;
 				case MENU_STATE_PASSWORD:
 					sendMsg(masterClock.handles->hPasswordMenu, WM_SEC_UPDATE);
+					break;
+				case MENU_STATE_SETTINGS:
+					menuLocker(&masterClock.handles->hLineSetupPulseMenu);
 					break;
 
 				}

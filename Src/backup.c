@@ -13,9 +13,9 @@ void rtc_write_backup_reg(uint16_t BackupRegister, uint16_t data)
 	HAL_PWR_EnableBkUpAccess();
 	HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
 	
-	bkpCRC = calcCRCofBKP();                  //рассчет новой CRC для регистров BKP
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);                  //запись старших 16 бит CRC (Маска 0xFFFF0000)
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);                  //запись младших 16 бит CRC
+	bkpCRC = calcCRCofBKP();                    //рассчет новой CRC для регистров BKP
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);                    //запись старших 16 бит CRC (Маска 0xFFFF0000)
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);                    //запись младших 16 бит CRC
 }
 uint16_t rtc_read_backup_reg(uint16_t BackupRegister)
 {
@@ -56,13 +56,15 @@ void saveLineToBKP(uint8_t lineNumber)
 		}
 		else
 		{
-			dataToBKP = (~(masterClock.line[i].TimeZone)) & 0xFF;                  //если отрицательное, то инверсия и флаг отрицательного.
+			dataToBKP = (~(masterClock.line[i].TimeZone)) & 0xFF;                    //если отрицательное, то инверсия и флаг отрицательного.
 			dataToBKP |= 0b10000;
 		}
 		buff |= (dataToBKP << ((i - 1) * 5));
 	}
 
 	rtc_write_backup_reg(BKP_LINES_TIMEZONE_OFFSET, buff);
+	
+	
 
 }
 void saveDaylightSavingToBKP(void)
@@ -87,12 +89,12 @@ void saveDaylightSavingToBKP(void)
 	}
 	else
 	{
-		dataToBKP = (~(masterClock.daylightSaving->timeZone)) & 0xFF;                  //если отрицательное, то инверсия и флаг отрицательного.
+		dataToBKP = (~(masterClock.daylightSaving->timeZone)) & 0xFF;                    //если отрицательное, то инверсия и флаг отрицательного.
 		dataToBKP |= 0b10000;
 	}
 	if (masterClock.daylightSaving->timeShift < 0)
 	{
-		dataToBKP |= (0b10 << 5);                  //отрицательный флаг для timeShift
+		dataToBKP |= (0b10 << 5);                    //отрицательный флаг для timeShift
 	}
 	else
 	{
@@ -156,4 +158,62 @@ void readLinesPolarityFromBKP(void)
 	uint16_t readBuff = 0;
 	readBuff = rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);
 	masterClock.guiVars->linesPolarity = readBuff >> 8;
+}
+void saveSettingsToBKP(void)
+{
+	// 7 6 5 4 3 2 1 0
+	//     Ini \DTMFon/
+	uint16_t writeBuff = 0;
+	uint8_t i = 0;
+	uint16_t state = 0;
+	switch (masterClock.guiVars->lockCountDownInitial)
+	{
+	case 0:
+		state = 0;
+		break;
+	case 60:
+		state = 1;
+		break;
+	case 300:
+		state = 2;
+		break;
+	case 600:
+		state = 3;
+		break;	  
+	}
+	for (i = 0; i < LINES_AMOUNT; i++)
+	{
+		writeBuff |= (masterClock.line[i].DTMFon << i);
+	}
+	writeBuff |= state << 4;
+	rtc_write_backup_reg(BKP_SETTINGS_OFFSET, writeBuff);
+}
+void readSettingsFromBKP(void)
+{
+	
+	uint16_t readBuff = 0;
+	uint8_t i = 0;
+	uint16_t state = 0;
+	
+	readBuff = rtc_read_backup_reg(BKP_SETTINGS_OFFSET);
+	for (i = 0; i < LINES_AMOUNT; i++)
+	{
+		masterClock.line[i].DTMFon = (readBuff >> i) & 1;
+	}
+	state = (readBuff >> 4) & 0b11;
+	switch (state)
+	{
+	case 0:
+		masterClock.guiVars->lockCountDownInitial = 0;
+		break;
+	case 1:
+		masterClock.guiVars->lockCountDownInitial = 60;
+		break;
+	case 2:
+		masterClock.guiVars->lockCountDownInitial = 60 * 5;
+		break;
+	case 3:
+		masterClock.guiVars->lockCountDownInitial = 60 * 10;
+		break;	  
+	}
 }

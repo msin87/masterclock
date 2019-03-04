@@ -12,4 +12,6 @@ void readTimeCalibrFromBKP(void);
 void saveLinesPolarityToBKP(void);
 void readLinesPolarityFromBKP(void);
 uint16_t rtc_read_backup_reg(uint16_t BackupRegister);
+void readSettingsFromBKP(void);
+void saveSettingsToBKP(void);
 #endif

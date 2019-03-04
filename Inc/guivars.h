@@ -21,6 +21,7 @@
 #define MENU_STATE_LINE4SETUP_PULSE 11
 #define MENU_STATE_TIME_SUMWIN 12
 #define MENU_STATE_PASSWORD 13
+#define MENU_STATE_SETTINGS 14
 #define LINES_AMOUNT 4
 #define LINES_DEAD_TIME 10
 #define LINE_WIDTH_MULT 375
@@ -39,9 +40,10 @@
 #define BKP_LINESPOLARITY_OFFSET BKP_DAYLIGHTSAVING_OFFSET
 
 #define BKP_LINES_TIMEZONE_OFFSET BKP_TIMECALIBR_OFFSET+1
+#define BKP_SETTINGS_OFFSET BKP_LINES_TIMEZONE_OFFSET+1
 
 
-#define BKP_CRC_OFFSET_HIGH BKP_LINES_TIMEZONE_OFFSET+1
+#define BKP_CRC_OFFSET_HIGH BKP_SETTINGS_OFFSET+1
 #define BKP_CRC_OFFSET_LOW BKP_CRC_OFFSET_HIGH+1
 
 
@@ -57,7 +59,7 @@
 #define CURRENT_ORANGE_LEVEL 85
 
 #define UNLOCK_PASSWORD_ARRAY {4,0,2,5,1}
-#define TIME_TO_LOCK_MENU 30
+
 
 #define __TURN_BACKLIGHT_ON BACKLIGHT_CONTROL_GPIO_Port->BSRR |= BACKLIGHT_CONTROL_Pin
 #define __TURN_BACKLIGHT_OFF BACKLIGHT_CONTROL_GPIO_Port->BSRR |= (BACKLIGHT_CONTROL_Pin<<16)
@@ -74,7 +76,8 @@ typedef struct
 	uint8_t linesPolarity;
 	uint8_t powerLossDetected;
 	uint8_t linesTimeChanged;
-	uint8_t lockCountDown;
+	uint16_t lockCountDown;
+	uint16_t lockCountDownInitial;
 	int16_t	diffSystemLine;
 	
 
@@ -114,7 +117,7 @@ typedef struct
 	WM_HWIN hSecondsString_H;
 	WM_HWIN hSecondsString_L;
 	WM_HWIN hPasswordMenu;
-
+	WM_HWIN hSettingsMenu;
 	HEADER_Handle hHeaderTimeSetupVals;
 	HEADER_Handle hHeaderTimeDateSetupVals;
 	HEADER_Handle hHeaderTimeCalibrVals;
@@ -142,6 +145,7 @@ typedef struct
 	uint8_t Status;
 	uint8_t Width;
 	uint8_t Polarity;
+	uint8_t DTMFon;
 	int16_t	Pulses;
 	int8_t TimeZone;
 	GPIO_TypeDef* LineGPIOpos;

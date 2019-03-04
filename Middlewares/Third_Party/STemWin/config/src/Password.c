@@ -25,6 +25,7 @@
 #include "language.h"
 #include "guivars.h"
 #include <string.h>
+#include "callbacks.h"
 /*********************************************************************
 *
 *       Defines
@@ -110,14 +111,7 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 */
 
 // USER START (Optionally insert additional static code)
-static void returnToMainMenu(void)
-{
-	masterClock.guiVars->menuState = MENU_STATE_MAIN;
-	message.MsgId = WM_BACKTOMAINMENU;
-	message.Data.v = 0xFF;
-	WM_SendMessage(masterClock.handles->hMainMenu, &message);
-	WM_DeleteWindow(masterClock.handles->hPasswordMenu);
-}
+
 static void checkPassword(void)
 {
 	uint8_t i;
@@ -129,7 +123,7 @@ static void checkPassword(void)
 	if (isValid)
 	{
 		masterClock.guiVars->menuLocked = 0;
-		returnToMainMenu();
+		returnToMainMenu(&masterClock.handles->hPasswordMenu);
 	}
 	else
 	{
@@ -199,11 +193,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_HEADER_PASSWORD);
 		readPos = 0;
 		
-		HEADER_AddItem(hItem, 48, "__", 14);           //10000
-		HEADER_AddItem(hItem, 48, "__", 14);           //1000
-		HEADER_AddItem(hItem, 48, "__", 14);           //100
-		HEADER_AddItem(hItem, 48, "__", 14);           //10
-		HEADER_AddItem(hItem, 48, "__", 14);           //1
+		HEADER_AddItem(hItem, 48, "__", 14);            //10000
+		HEADER_AddItem(hItem, 48, "__", 14);            //1000
+		HEADER_AddItem(hItem, 48, "__", 14);            //100
+		HEADER_AddItem(hItem, 48, "__", 14);            //10
+		HEADER_AddItem(hItem, 48, "__", 14);            //1
 		HEADER_SetTextColor(hItem, GUI_WHITE);
 		hItem = WM_GetDialogItem(pMsg->hWin, ID_TEXT_ALERT_TOP);
 		TEXT_SetFont(hItem, &GUI_FontArial18);
@@ -226,7 +220,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		TEXT_SetText(WM_GetDialogItem(pMsg->hWin, ID_TEXT_COUNTER), secondsString);
 		if (countDown == 0)
 		{
-			returnToMainMenu();
+			returnToMainMenu(&masterClock.handles->hPasswordMenu);
 		}
 		break;
 	case WM_NOTIFY_PARENT:
@@ -409,7 +403,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				returnToMainMenu();
+				returnToMainMenu(&masterClock.handles->hPasswordMenu);
 				// USER END
 				break;
 				// USER START (Optionally insert additional code for further notification handling)

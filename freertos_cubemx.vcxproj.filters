@@ -510,6 +510,9 @@
     <ClCompile Include="Src\adc.c">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="Src\settingsMenu.c">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\arial18.h">
