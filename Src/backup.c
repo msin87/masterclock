@@ -13,9 +13,9 @@ void rtc_write_backup_reg(uint16_t BackupRegister, uint16_t data)
 	HAL_PWR_EnableBkUpAccess();
 	HAL_RTCEx_BKUPWrite(&RtcHandle, BackupRegister, data);
 	
-	bkpCRC = calcCRCofBKP();                    //рассчет новой CRC для регистров BKP
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);                    //запись старших 16 бит CRC (Маска 0xFFFF0000)
-	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);                    //запись младших 16 бит CRC
+	bkpCRC = calcCRCofBKP();                     //рассчет новой CRC для регистров BKP
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_HIGH, bkpCRC >> 16);                     //запись старших 16 бит CRC (Маска 0xFFFF0000)
+	HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_CRC_OFFSET_LOW, bkpCRC & 0xFFFF);                     //запись младших 16 бит CRC
 }
 uint16_t rtc_read_backup_reg(uint16_t BackupRegister)
 {
@@ -56,7 +56,7 @@ void saveLineToBKP(uint8_t lineNumber)
 		}
 		else
 		{
-			dataToBKP = (~(masterClock.line[i].TimeZone)) & 0xFF;                    //если отрицательное, то инверсия и флаг отрицательного.
+			dataToBKP = (~(masterClock.line[i].TimeZone)) & 0xFF;                     //если отрицательное, то инверсия и флаг отрицательного.
 			dataToBKP |= 0b10000;
 		}
 		buff |= (dataToBKP << ((i - 1) * 5));
@@ -89,12 +89,12 @@ void saveDaylightSavingToBKP(void)
 	}
 	else
 	{
-		dataToBKP = (~(masterClock.daylightSaving->timeZone)) & 0xFF;                    //если отрицательное, то инверсия и флаг отрицательного.
+		dataToBKP = (~(masterClock.daylightSaving->timeZone)) & 0xFF;                     //если отрицательное, то инверсия и флаг отрицательного.
 		dataToBKP |= 0b10000;
 	}
 	if (masterClock.daylightSaving->timeShift < 0)
 	{
-		dataToBKP |= (0b10 << 5);                    //отрицательный флаг для timeShift
+		dataToBKP |= (0b10 << 5);                     //отрицательный флаг для timeShift
 	}
 	else
 	{

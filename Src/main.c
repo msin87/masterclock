@@ -518,10 +518,7 @@ static void MX_RTC_Init(void)
 
 	/* USER CODE BEGIN Check_RTC_BKUP */
 	read = rtc_read_backup_reg(BKP_DATE_OFFSET);
-	if (!isCRC_OK_BKP())
-	{
-		DateToUpdate.Date = 12;
-	}
+	
 	if (((read & 0b1111111000000000) >> 9) < 100 && ((read & 0b111100000) >> 5) < 13 && (read & 0b11111) < 32)
 	{
 		DateToUpdate.Date = read & 0b11111;
@@ -560,6 +557,12 @@ static void MX_RTC_Init(void)
 		DateToUpdate.Month = 1;
 		DateToUpdate.Year = 19;
 		DateToUpdate.WeekDay = RTC_WEEKDAY_MONDAY;
+	}
+	if (!isCRC_OK_BKP())
+	{
+		DateToUpdate.Date = 12;
+		DateToUpdate.Month = 12;
+		DateToUpdate.Year = 18;
 	}
 	hrtc.DateToUpdate = DateToUpdate;
 
@@ -970,7 +973,7 @@ void vTaskGUI(void const * argument)
 								{
 									if (masterClock.timeCalibration->seconds > 0) //если добавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                                   //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                                    //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
@@ -978,13 +981,13 @@ void vTaskGUI(void const * argument)
 										}
 									if (masterClock.timeCalibration->seconds < 0) //если убавить секунды
 										{
-											sTime.Seconds += masterClock.timeCalibration->seconds;                                    //прибавили секунды
+											sTime.Seconds += masterClock.timeCalibration->seconds;                                     //прибавили секунды
 											if(HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN) != HAL_OK)
 											{
 												Error_Handler();
 											}
 										}
-									masterClock.timeCalibration->daysPassed = 0;                                   // 1 => 0
+									masterClock.timeCalibration->daysPassed = 0;                                    // 1 => 0
 									timeCalibr.isCalibrated = true;
 								}
 						}

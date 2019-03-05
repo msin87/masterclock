@@ -4,20 +4,22 @@
 #include "flash.h"
 uint32_t calcCRCofBKP(void)
 {
-	uint32_t dataInBKP[4] = { 0, 0, 0, 0 };
-	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);                  //date
-	dataInBKP[0] |= rtc_read_backup_reg(BKP_LINE1_OFFSET);                 //line 1
-	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);                  //line 2 
-	dataInBKP[1] |= rtc_read_backup_reg(BKP_LINE3_OFFSET);                 //line 3
-	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);                  //line 4
-	dataInBKP[2] |= rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET);        //daylightsaving 8 бит из 16.
-	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);                 //
-	dataInBKP[3] |= rtc_read_backup_reg(BKP_LINES_TIMEZONE_OFFSET);
+	uint32_t dataInBKP[5] = { 0, 0, 0, 0, 0 };
+	dataInBKP[0] = rtc_read_backup_reg(BKP_DATE_OFFSET);  						 //date
+	dataInBKP[0] |= (rtc_read_backup_reg(BKP_LINE1_OFFSET) << 16);                   //line 1
+	dataInBKP[1] = rtc_read_backup_reg(BKP_LINE2_OFFSET);  						 //line 2 
+	dataInBKP[1] |= (rtc_read_backup_reg(BKP_LINE3_OFFSET) << 16);                   //line 3
+	dataInBKP[2] = rtc_read_backup_reg(BKP_LINE4_OFFSET);  						 //line 4
+	dataInBKP[2] |= (rtc_read_backup_reg(BKP_DAYLIGHTSAVING_OFFSET) << 16);          //daylightsaving 8 бит из 16.
+	dataInBKP[3] = rtc_read_backup_reg(BKP_TIMECALIBR_OFFSET);  				     //
+	dataInBKP[3] |= (rtc_read_backup_reg(BKP_LINES_TIMEZONE_OFFSET) << 16);
+	dataInBKP[4] = rtc_read_backup_reg(BKP_SETTINGS_OFFSET);
 	CRC->CR |= CRC_CR_RESET;
 	CRC->DR = dataInBKP[0];
 	CRC->DR = dataInBKP[1];
 	CRC->DR = dataInBKP[2];
 	CRC->DR = dataInBKP[3];
+	CRC->DR = dataInBKP[4];
 	return CRC->DR;
 }
 uint32_t calkCRCofFlash(void)
@@ -56,10 +58,11 @@ uint8_t isCRC_OK_Flash(void)
 }
 uint8_t isCRC_OK_BKP(void)
 {
+	uint32_t calculatedCRC = calcCRCofBKP();
 	uint32_t CRCinBKP = 0;
 	CRCinBKP = rtc_read_backup_reg(BKP_CRC_OFFSET_LOW);
 	CRCinBKP |= (rtc_read_backup_reg(BKP_CRC_OFFSET_HIGH) << 16);
-	if (CRCinBKP == calcCRCofBKP())
+	if (CRCinBKP == calculatedCRC)
 	{
 		return 1;
 	}

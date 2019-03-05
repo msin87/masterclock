@@ -109,7 +109,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	// USER START (Optionally insert additional variables)
 	// USER END
 
-	switch (pMsg->MsgId) {
+	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 
 		daylightSavingTemp = *masterClock.daylightSaving;
@@ -166,11 +166,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		NCode = pMsg->Data.v;
 		switch (Id) {
 		case ID_BUTTON_SUMWINSETUP_Zplus: // Notifications sent by 'Time Zone +'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 
-				if (daylightSavingTemp.timeZone != 12)
+				if(daylightSavingTemp.timeZone != 12)
 				{
 					pollButton(ID_BUTTON_SUMWINSETUP_Zplus, WM_NOTIFICATION_CLICKED, (int8_t*)&daylightSavingTemp.timeZone);
 
@@ -197,7 +197,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_SUMWINSETUP_SUMWIN_ON: // Notifications sent by "Enable Daylight Saving"
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 
@@ -206,7 +206,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if (daylightSavingTemp.enableDLS == false)
+				if(daylightSavingTemp.enableDLS == false)
 				{
 					daylightSavingTemp.enableDLS = true;
 
@@ -225,7 +225,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_SUMWINSETUP_ENTER: // Notifications sent by 'Enter'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 
@@ -235,6 +235,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.daylightSaving = &daylightSavingTemp;
 				masterClock.guiVars->valsChanged = false;
+				masterClock.line[0].TimeZone = masterClock.daylightSaving->timeZone;
 				saveDaylightSavingToBKP();
 				// USER END
 				break;
@@ -244,11 +245,11 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_SUMWINSETUP_Zminus: // Notifications sent by 'h-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 
-				if (daylightSavingTemp.timeZone != -12)
+				if(daylightSavingTemp.timeZone != -12)
 				{
 					pollButton(ID_BUTTON_SUMWINSETUP_Zminus, WM_NOTIFICATION_CLICKED, (int8_t*)&daylightSavingTemp.timeZone);
 				}
@@ -279,7 +280,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				break;
 			case WM_NOTIFICATION_RELEASED:
 				// USER START (Optionally insert code for reacting on notification message)
-				if (daylightSavingTemp.enableDLS == true)
+				if(daylightSavingTemp.enableDLS == true)
 				{
 					daylightSavingTemp.enableDLS = false;
 					masterClock.guiVars->valsChanged = true;
@@ -299,7 +300,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_SUMWINSETUP_BACK: // Notifications sent by 'Back'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -321,7 +322,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 		// USER START (Optionally insert additional message handling)
 		// USER END
-	default:
+	default :
 		WM_DefaultProc(pMsg);
 		break;
 	}

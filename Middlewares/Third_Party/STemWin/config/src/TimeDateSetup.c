@@ -64,20 +64,20 @@ RTC_DateTypeDef sDateTemp;
 *       _aDialogCreate
 */
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
-  { WINDOW_CreateIndirect, "Window", ID_WINDOW_DATETIMESETUP, 1, -3, 320, 240, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Dplus, 5, 85, 70, 70, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Header", ID_HEADER_DTS_DMY, 0, 20, 240, 30, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Header", ID_HEADER_DTS_VALS, 0, 50, 240, 30, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Mplus, 85, 85, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Yplus, 165, 85, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Ввод", ID_BUTTON_DTS_ENTER, 245, 85, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Dminus, 5, 165, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Mminus, 85, 165, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Yminus, 165, 165, 70, 70, 0, 0x0, 0 },
-  { BUTTON_CreateIndirect, "Назад", ID_BUTTON_DTS_BACK, 245, 165, 70, 70, 0, 0x0, 0 },
-  { HEADER_CreateIndirect, "Header", ID_HEADER_DTS, 0, 0, 240, 20, 0, 0x0, 0 },
-  // USER START (Optionally insert additional widgets)
-  // USER END
+	{ WINDOW_CreateIndirect, "Window", ID_WINDOW_DATETIMESETUP, 1, -3, 320, 240, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Dplus, 5, 85, 70, 70, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Header", ID_HEADER_DTS_DMY, 0, 20, 240, 30, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Header", ID_HEADER_DTS_VALS, 0, 50, 240, 30, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Mplus, 85, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Yplus, 165, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Ввод", ID_BUTTON_DTS_ENTER, 245, 85, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Dminus, 5, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Mminus, 85, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "", ID_BUTTON_DTS_Yminus, 165, 165, 70, 70, 0, 0x0, 0 },
+	{ BUTTON_CreateIndirect, "Назад", ID_BUTTON_DTS_BACK, 245, 165, 70, 70, 0, 0x0, 0 },
+	{ HEADER_CreateIndirect, "Header", ID_HEADER_DTS, 0, 0, 240, 20, 0, 0x0, 0 },
+	// USER START (Optionally insert additional widgets)
+	// USER END
 };
 
 /*********************************************************************
@@ -89,51 +89,6 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 
 // USER START (Optionally insert additional static code)
 
-//void correctDate(char* outString)
-//{
-//
-//	if (sDateTemp.Month == 1 || sDateTemp.Month == 3 || sDateTemp.Month == 5 || sDateTemp.Month == 7 || sDateTemp.Month == 8 || sDateTemp.Month == 10 || sDateTemp.Month == 12)
-//	{
-//		if (sDateTemp.Date > 31)
-//		{
-//			sDateTemp.Date = 31;
-//			sprintf(outString, "%02d", sDateTemp.Date);
-//			HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, outString);
-//		}
-//	}
-//	else if (sDateTemp.Month == 4 || sDateTemp.Month == 6 || sDateTemp.Month == 9 || sDateTemp.Month == 11)
-//	{
-//		if (sDateTemp.Date > 30)
-//		{
-//			sDateTemp.Date = 30;
-//			sprintf(outString, "%02d", sDateTemp.Date);
-//			HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, outString);
-//		}
-//	}
-//	else if (sDateTemp.Month == 2) //Если февраль
-//	{
-//		if ((sDateTemp.Year % 400 == 0 || (sDateTemp.Year % 4 == 0 && sDateTemp.Year % 100 != 0))) //Если високосный год
-//		{
-//			if (sDateTemp.Date > 29)
-//			{
-//				sDateTemp.Date = 29;
-//				sprintf(outString, "%02d", sDateTemp.Date);
-//				HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, outString);
-//			}
-//		}
-//		else
-//
-//		{
-//			if (sDateTemp.Date > 28)
-//			{
-//				sDateTemp.Date = 28;
-//				sprintf(outString, "%02d", sDateTemp.Date);
-//				HEADER_SetItemText(masterClock.handles->hHeaderTimeDateSetupVals, 0, outString);
-//			}
-//		}
-//	}
-//}
-// USER END
 
 /*********************************************************************
 *
@@ -149,11 +104,12 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 	// USER START (Optionally insert additional variables)
 	// USER END
 
-	switch (pMsg->MsgId) {
+	switch(pMsg->MsgId) {
 	case WM_INIT_DIALOG:
 		//
 		// Initialization of 'Main Window'
 		//
+		
 		sDateTemp = sDate;
 		hItem = pMsg->hWin;
 		WINDOW_SetBkColor(hItem, 0x191615);
@@ -201,7 +157,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		NCode = pMsg->Data.v;
 		switch (Id) {
 		case ID_BUTTON_DTS_Dplus: // Notifications sent by 'd+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -230,7 +186,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			break;
 
 		case ID_BUTTON_DTS_Mplus: // Notifications sent by 'm+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -262,7 +218,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_DTS_Yplus: // Notifications sent by 'y+'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -294,7 +250,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_DTS_ENTER: // Notifications sent by 'Enter'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -306,7 +262,8 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 				sDateTemp.WeekDay = (sDateTemp.Date += sDateTemp.Month < 3 ? sDateTemp.Year-- : sDateTemp.Year - 2, 23 * sDateTemp.Month / 9 + sDateTemp.Date + 4 + sDateTemp.Year / 4 - sDateTemp.Year / 100 + sDateTemp.Year / 400) % 7;
 				if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN) != HAL_OK)
 				{
-					while (1) {};
+					while (1) {}
+					;
 				}
 				sendMsg(masterClock.handles->hTimeDateSetupMenu, WM_DATE_UPDATE);
 				masterClock.guiVars->valsChanged = false;
@@ -320,7 +277,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_DTS_Dminus: // Notifications sent by 'd-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -345,7 +302,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_DTS_Mminus: // Notifications sent by 'm-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -373,7 +330,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_DTS_Yminus: // Notifications sent by 'y-'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				masterClock.guiVars->timeFrozen = 1;
@@ -401,7 +358,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 		case ID_BUTTON_DTS_BACK: // Notifications sent by 'Back'
-			switch (NCode) {
+			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
 				// USER END
@@ -426,7 +383,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 		break;
 		// USER START (Optionally insert additional message handling)
 		// USER END
-	default:
+	default :
 		WM_DefaultProc(pMsg);
 		break;
 	}

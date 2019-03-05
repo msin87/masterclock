@@ -43,8 +43,8 @@
 #define BKP_SETTINGS_OFFSET BKP_LINES_TIMEZONE_OFFSET+1
 
 
-#define BKP_CRC_OFFSET_HIGH BKP_SETTINGS_OFFSET+1
-#define BKP_CRC_OFFSET_LOW BKP_CRC_OFFSET_HIGH+1
+#define BKP_CRC_OFFSET_HIGH RTC_BKP_DR10
+#define BKP_CRC_OFFSET_LOW RTC_BKP_DR11
 
 
 #define FLASH_CALIA_OFFSET 0x0807F800 + 0
@@ -166,10 +166,10 @@ typedef struct
 
 typedef struct
 {
-	char timeZone;
-	char timeShift;
-	char enableDLS;
-	char needToShift;
+	int8_t timeZone;
+	int8_t timeShift;
+	int8_t enableDLS;
+	int8_t needToShift;
 
 } DaylightSaving;
 typedef struct

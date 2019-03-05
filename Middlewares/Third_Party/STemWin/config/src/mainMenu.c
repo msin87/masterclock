@@ -9174,10 +9174,6 @@ static void _cbButton(WM_MESSAGE * pMsg)
 		break;
 	default:
 		BUTTON_Callback(pMsg);
-		if (lineNum != 0xFF && masterClock.guiVars->menuState == MENU_STATE_MAIN)
-		{
-			TFT_MainMenu_ShowLineTime_ex(lineNum);
-		}
 		break;
 	}
 
@@ -9350,7 +9346,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			if (masterClock.guiVars->prevSecond_H == 5) //прошла минута
 				{
 					sprintf(timeString, "%02d:%02d", sTime.Hours, sTime.Minutes);
-					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                               //обновление строки с часами и минутами
+					TEXT_SetText(masterClock.handles->hHourMinString, timeString);                                //обновление строки с часами и минутами
 
 				}
 		}
@@ -9488,7 +9484,7 @@ static void _cbDialog(WM_MESSAGE * pMsg) {
 			}
 			break;
 			// USER START (Optionally insert additional code for further Ids)
-		case ID_IMAGE_1 :                               // Notifications sent by Lock
+		case ID_IMAGE_1 :                                // Notifications sent by Lock
 			switch(NCode) {
 			case WM_NOTIFICATION_CLICKED:
 				// USER START (Optionally insert code for reacting on notification message)
@@ -9700,7 +9696,7 @@ void TFT_ShowChar(u16 x, u16 y, u8 num, uint8_t fontsize, u16 color)
 			else
 			{
 
-				Lcd_Write_Data(backgroundBuffer[backgrline]);                              //°??«  
+				Lcd_Write_Data(backgroundBuffer[backgrline]);                               //°??«  
 
 			}
 			mask >>= 1;
@@ -9776,68 +9772,8 @@ WM_HWIN CreateMainMenu(void) {
 
 	return hWin;
 }
-void TFT_MainMenu_ShowLineTime()
-{
 
-	//uint8_t i = 0;
 
-	//for (i = 0; i < 4; i++)
-	//{
-	//	TFT_ReadBackground(TEXT_TIME_LINE_X - 8 + 80 * i, 209, 18, backgroundBuffer);      //80-ширина кнопок, 2-отступ, чтобы попасть точно на фон
-	//	switch (line[i].Status) {
-	//	case LINE_STATUS_OFF:
-	//		TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "ВЫКЛ ", 18, 0x8410);     //цвет 0x8410 BGR
-	//		break;
-	//	case LINE_STATUS_RUN:
-	//		sprintf(timeString, "%02d:%02d", line[i].Hours, line[i].Minutes);
-	//		strcat(timeString, " ");
-	//		TFT_ShowString(TEXT_TIME_LINE_X + 80 * i, 209, timeString, 18, 0xFFFF);     //0x00
-	//		break;
-	//	case LINE_STATUS_STOP:
-	//		TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "СТОП ", 18, 0x1F);     //0xF800
-	//		break;
-	//	}
-	//}
-
-}
-void TFT_MainMenu_ShowLineTime_ex(uint8_t i)
-{
-
-	//TFT_ReadBackground(TEXT_TIME_LINE_X - 8 + 80 * i, 209, 18, backgroundBuffer);
-	//switch (line[i].Status) {
-	//case LINE_STATUS_OFF:
-	//	TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "ВЫКЛ ", 18, 0x8410);
-	//	break;
-	//case LINE_STATUS_RUN:
-	//	sprintf(timeString, "%02d:%02d", line[i].Hours, line[i].Minutes);
-	//	strcat(timeString, " ");
-	//	TFT_ShowString(TEXT_TIME_LINE_X + 80 * i, 209, timeString, 18, 0xFFFF);
-	//	break;
-	//case LINE_STATUS_STOP:
-	//	//																											R			R			R			R			R			G			G			G		G			G		G			B		B			B		B		B
-	//	TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "СТОП ", 18, 0x1F);
-	//	break;
-	//}
-
-}
-void TFT_MainMenu_ShowLineTime_ex2(uint8_t i, uint8_t Hours, uint8_t Minutes)
-{
-	//TFT_ReadBackground(TEXT_TIME_LINE_X - 8 + 80 * i, 209, 18, backgroundBuffer);
-	//switch (line[i].Status) {
-	//case LINE_STATUS_OFF:
-	//	TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "ВЫКЛ ", 18, 0x8410);
-	//	break;
-	//case LINE_STATUS_RUN:
-	//	sprintf(timeString, "%02d:%02d", Hours, Minutes);
-	//	strcat(timeString, " ");
-	//	TFT_ShowString(TEXT_TIME_LINE_X + 80 * i, 209, timeString, 18, 0xFFFF);
-	//	break;
-	//case LINE_STATUS_STOP:
-	//	//																											R			R			R			R			R			G			G			G		G			G		G			B		B			B		B		B
-	//	TFT_ShowString(TEXT_TIME_LINE_X - 5 + 80 * i, 209, "СТОП ", 18, 0x1F);
-	//	break;
-	//}
-}
 void TFT_MainMenu_ShowDate(void)
 {
 
